@@ -1,0 +1,105 @@
+[build-system]
+requires = ["setuptools>=61.2.0", "wheel==0.41.3", "pip-tools==7.3.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "telicent-lib"
+version = "2.0.0"
+authors = [{name = "Telicent Ltd", email = "admin@telicent.io"}]
+description = "A helper package for building Adapters, Mappers and Projectors for Telicent Core"
+requires-python = ">=3.8"
+license = {file = "LICENSE.md"}
+dependencies = [
+    "colored==1.4.4",
+    "rdflib==6.3.2",
+    "Werkzeug==3.0.1",
+    "PyJWT==2.8.0",
+    "requests==2.31.0",
+    "pytz==2022.6",
+    "confluent-kafka==2.3.0",
+    "opentelemetry-api==1.20.0",
+    "opentelemetry-sdk==1.20.0",
+    "pydantic==2.5.2"
+]
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development",
+    "Typing :: Typed",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Operating System :: Unix",
+    "Operating System :: MacOS",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit==3.5.0",
+    "ruff==0.1.5",
+    "types-pytz==2023.3.1.1",
+    "types-requests==2.31.0.10",
+    "mypy==1.7.0",
+    "mkdocs==1.5.3",
+]
+
+[tool.setuptools.dynamic]
+readme = {file = ["README.md"]}
+
+[tool.ruff]
+target-version = "py38"
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+    "UP", # pyupgrade
+]
+ignore = [
+    "C901", # too complex
+]
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+line-length = 120
+
+[project.urls]
+Repository = "https://github.com/Telicent-io/map-lib"
+
+[tool.distutils.bdist_wheel]
+universal = true
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["telicent_lib*"]
+namespaces = true
+
+[tool.mypy]
+no_implicit_optional = false
+ignore_missing_imports = true
+modules = ["telicent_lib", "tests", "debug"]

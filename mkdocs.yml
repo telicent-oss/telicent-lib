@@ -1,0 +1,26 @@
+site_name: telicent_lib
+nav:
+    - Home: index.md
+    - Getting Started:
+      - Dependencies: dependencies.md
+      - Installation: installation.md
+      - Development, Build, and Release: development-build.md
+    - Actions:
+      - Actions: actions.md
+      - Adapters: adapters.md
+      - Mappers: mappers.md
+      - Projectors: projectors.md
+    - Record Handling:
+        - Records: records.md
+        - DataSource: data-sources.md
+        - DataSink: data-sinks.md
+        - RecordUtils: record-utils.md
+    - Utilities and Helpers:
+        - Configuration: configuration.md
+        - Logging: logging.md
+        - Error Handling: error-handling.md
+        - Provenance and Audit: provenance.md
+        - Telemetry: telemetry.md
+theme:
+    name: readthedocs
+    locale: en
