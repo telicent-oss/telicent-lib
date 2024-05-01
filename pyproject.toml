@@ -4,11 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "telicent-lib"
-version = "0.1.0"
+version = "2.0.0"
 authors = [{name = "Telicent Ltd", email = "admin@telicent.io"}]
 description = "A helper package for building Adapters, Mappers and Projectors for Telicent Core"
-requires-python = ">=3.8"
-license = {file = "LICENSE.md"}
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+readme = "README.md"
 dependencies = [
     "colored==1.4.4",
     "rdflib==6.3.2",
