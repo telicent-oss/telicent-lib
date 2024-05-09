@@ -50,7 +50,6 @@ class AccessMiddleware:
             conf = Configurator()
             self.logger = CoreLoggerFactory.get_logger(
                 'Authenticator',
-                conf.get("BOOTSTRAP_SERVERS", required=True, on_error=OnError.RAISE_EXCEPTION)
             )
         else:
             self.logger = logger
