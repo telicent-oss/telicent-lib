@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import json
 import logging
-import sys
-import traceback
 from typing import Any, MutableMapping
 
 from confluent_kafka import KafkaException
@@ -31,7 +29,6 @@ limitations under the License.
 class CoreLogFormats:
     BASIC = ['name', 'levelname', 'msg', 'created']
     CORE = ['name', 'log_type', 'levelname', 'msg', 'created']
-    UNHANDLED_EXCEPTION = ['name', 'log_type', 'levelname', 'msg', 'created', 'unhandled_info']
 
 
 MERGE = 0
@@ -142,30 +139,5 @@ class CoreLoggerFactory:
 
         logger.addHandler(handler)
         core_logger = CoreLoggerAdapter(logger, headers=headers, log_type=log_type, header_method=header_method)
-
-        def handle_unhandled_exception(exc_type, exc_value, exc_traceback):
-            if issubclass(exc_type, KeyboardInterrupt):
-                sys.__excepthook__(exc_type, exc_value, exc_traceback)
-                return
-            traceback_info = traceback.extract_tb(exc_traceback)
-            if traceback_info:
-                filename, lineno, funcname, _ = traceback_info[-1]
-            else:
-                filename, lineno, funcname = "", "", ""
-
-            extra_info = {
-                'exception_type': str(exc_type),
-                'exception_value': str(exc_value),
-                'filename': filename,
-                'lineno': lineno,
-                'func': funcname
-            }
-            for _handler in filter(lambda h: isinstance(h, KafkaHandler), core_logger.logger.handlers):
-                _handler.setFormatter(JSONFormatter(CoreLogFormats.UNHANDLED_EXCEPTION))
-            core_logger.critical(
-                "Unhandled exception", extra={'unhandled_info': extra_info}, log_type='CRITICAL'
-            )
-
-        sys.excepthook = handle_unhandled_exception
 
         return core_logger
