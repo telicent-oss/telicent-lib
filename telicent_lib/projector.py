@@ -96,7 +96,7 @@ class Projector(InputAction):
                             " - will write out to " + self.target_store)
         if self.reporter is not None:
             self.reporter.run()
-            self.print_coloured(f"Telicent Live Reporter registered to send heartbeats to {self.reporter.target}")
+            self.print_coloured(f"Telicent Live Reporter registered to send heartbeats to {self.reporter.sink}")
         with self.source:
             try:
                 self.started()
