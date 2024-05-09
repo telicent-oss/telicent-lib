@@ -4,7 +4,6 @@ import jwt
 import requests
 from werkzeug.wrappers import Request, Response
 
-from telicent_lib.config import Configurator
 from telicent_lib.exceptions import ConfigurationException
 from telicent_lib.logging import CoreLoggerFactory
 
