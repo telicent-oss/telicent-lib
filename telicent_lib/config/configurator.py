@@ -1,5 +1,5 @@
-import sys
 import logging
+import sys
 from enum import Enum
 from typing import Any, Callable
 
@@ -149,4 +149,4 @@ class Configurator:
             sys.exit(self.exit_code)
         else:
             raise ValueError(message)
-        
+
