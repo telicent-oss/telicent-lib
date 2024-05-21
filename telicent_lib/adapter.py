@@ -91,7 +91,7 @@ class Adapter(OutputAction):
 
         if self.reporter is not None:
             self.reporter.run()
-            self.print_coloured(f"Telicent Live Reporter registered to send heartbeats to {self.reporter.target}")
+            self.print_coloured(f"Telicent Live Reporter registered to send heartbeats to {self.reporter.sink}")
 
         self.started()
 

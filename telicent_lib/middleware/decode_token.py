@@ -4,7 +4,6 @@ import jwt
 import requests
 from werkzeug.wrappers import Request, Response
 
-from telicent_lib.config import Configurator, OnError
 from telicent_lib.exceptions import ConfigurationException
 from telicent_lib.logging import CoreLoggerFactory
 
@@ -47,10 +46,8 @@ class AccessMiddleware:
             self.public_key_url = self.public_key_url.strip("/")
         self.jwt_header = jwt_header
         if logger is None:
-            conf = Configurator()
             self.logger = CoreLoggerFactory.get_logger(
                 'Authenticator',
-                conf.get("BOOTSTRAP_SERVERS", required=True, on_error=OnError.RAISE_EXCEPTION)
             )
         else:
             self.logger = logger
