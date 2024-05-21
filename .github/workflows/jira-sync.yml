@@ -11,7 +11,7 @@ on:
 
 jobs:
   sync-to-jira:
-    uses: telicent-oss/shared-workflows/.github/workflows/jira-sync.yml@jira-sync
+    uses: telicent-oss/shared-workflows/.github/workflows/jira-sync.yml@main
     with:
       jira-url: https://telicent.atlassian.net
       jira-project: TPT
