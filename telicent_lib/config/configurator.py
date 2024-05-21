@@ -145,7 +145,7 @@ class Configurator:
         :param on_error: On Error behaviour
         """
         if on_error is OnError.EXIT:
-            logger.error(message)
+            logger.critical(message)
             sys.exit(self.exit_code)
         else:
             raise ValueError(message)
