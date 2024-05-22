@@ -1,0 +1,45 @@
+name: Build Python Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Release Distribution
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.x"
+
+    - name: Install pypa/build
+      run: >-
+        python3 -m
+        pip install
+        build
+        --user
+
+    - name: Cyclone DX Vulnerability Scan
+      uses: python-cyclone-dx.yml
+
+    - name: Download SBOM
+      uses: actions/download-artifact@v3
+      with:
+        name: cyclone-dx-sbom
+
+    - name: Place SBOM in pkg
+      run: |
+        mv ${{ github.run_number }}-cyclone-dx.json telicent_lib/sbom.json
+
+    - name: Build a binary wheel and a source tarball
+      run: python3 -m build
+
+    - name: Store the distribution packages
+      uses: actions/upload-artifact@v3
+      with:
+        name: python-package-distributions
+        path: dist/
