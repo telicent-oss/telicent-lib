@@ -38,8 +38,37 @@ jobs:
 
     - name: Generate SBOM
       run: |
-        python -m cyclonedx_py environment > cyclonedx.json
+        mkdir sbom/
+        python -m cyclonedx_py environment > sbom/cyclonedx.json
 
+    - name: Store the SBOM
+      uses: actions/upload-artifact@v3
+      with:
+        name: cyclone-dx-sbom
+        path: sbom/
+
+  scan_sbom:
+    name: Scan SBOM
+    needs:
+    - generate_sbom
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download SBOM
+        uses: actions/download-artifact@v3
+        with:
+          name: cyclone-dx-sbom
+          path: sbom/
+      - name: Scan SBOM
+        uses: aquasecurity/trivy-action@master
+        with:
+          exit-code: '1'
+          format: 'table'
+          severity: 'HIGH,CRITICAL'
+          ignore-unfixed: true
+          scan-ref: sbom/cyclonedx.json
+          scan-type: 'sbom'
+          scanners: 'vuln'
+          output: scan-results
 #    scan:
 #    runs-on: ubuntu-latest
 #    permissions:
