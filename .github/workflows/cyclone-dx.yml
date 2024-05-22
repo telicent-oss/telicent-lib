@@ -67,7 +67,7 @@ jobs:
           ignore-unfixed: true
           scan-ref: sbom/cyclonedx.json
           scan-type: 'sbom'
-          scanners: 'vuln,library'
+          scanners: 'vuln'
 
 #    scan:
 #    runs-on: ubuntu-latest
