@@ -24,7 +24,7 @@ jobs:
         --user
 
     - name: Cyclone DX Vulnerability Scan
-      uses: ./python-cyclone-dx.yml
+      uses: ./.github/workflows/python-cyclone-dx.yml
 
     - name: Download SBOM
       uses: actions/download-artifact@v3

@@ -17,7 +17,7 @@ on:
 jobs:
   prepare-release:
     name: Build Release
-    uses: ./python-build-release.yml
+    uses: ./.github/workflows/python-build-release.yml
 
   publish-to-pypi:
     name: Publish Python distribution to PyPI
