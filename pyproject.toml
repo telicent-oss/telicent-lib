@@ -99,6 +99,9 @@ include-package-data = true
 include = ["telicent_lib*"]
 namespaces = true
 
+[tool.setuptools.package-data]
+"telicent_lib" = ["cyclonedx.json"]
+
 [tool.mypy]
 no_implicit_optional = false
 ignore_missing_imports = true
