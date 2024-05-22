@@ -47,7 +47,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: cyclone-dx-sbom
-          path: sbom/
       - name: Scan SBOM
         uses: aquasecurity/trivy-action@master
         with:
