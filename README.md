@@ -7,7 +7,7 @@ telicent-lib provides useful helper libraries for building Adaptors, Mappers and
 - Python \>=3.10
 - Kafka*
 
-maplib uses `confluent-kafka` to manage connections to Kafka. 
+telicent-lib uses `confluent-kafka` to manage connections to Kafka. 
 Please see [confluent-kafka's compatability documentation](https://docs.confluent.io/platform/current/installation/versions-interoperability.html) to ensure you have a compatible Kafka instance.
 
 
