@@ -43,6 +43,7 @@ dev = [
     "types-requests==2.31.0.10",
     "mypy==1.7.0",
     "mkdocs==1.5.3",
+    "cyclonedx-bom==4.4.3"
 ]
 
 [tool.setuptools.dynamic]
