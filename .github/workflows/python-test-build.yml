@@ -10,7 +10,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  test_and_build:
+  test-and-build:
+    name: Python Test and Build
     strategy:
       fail-fast: true
       matrix:
