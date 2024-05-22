@@ -61,14 +61,14 @@ jobs:
       - name: Scan SBOM
         uses: aquasecurity/trivy-action@master
         with:
-          exit-code: 0
+          exit-code: '0'
           format: 'table'
           severity: 'HIGH,CRITICAL'
           ignore-unfixed: true
           scan-ref: sbom/cyclonedx.json
           scan-type: 'sbom'
-          scanners: 'vuln'
-          output: scan-results
+          scanners: 'vuln,library'
+
 #    scan:
 #    runs-on: ubuntu-latest
 #    permissions:
