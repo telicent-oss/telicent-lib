@@ -15,14 +15,25 @@ on:
   workflow_dispatch:
 
 jobs:
-  prepare-release:
-    name: Build Release
-    uses: ./.github/workflows/python-build-release.yml
+  test-and-build:
+    name: Python Tests
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    uses: telicent-oss/shared-workflows/.github/workflows/python-test-library.yml@TPT-90-Test-scanning-of-a-Python-SBOM
+    with:
+      PYTHON_VERSION: ${{ matrix.python-version }}
+      BUILD: false
+
+  prepare-build-release:
+    name: Prepare and Build Release
+    uses: telicent-oss/shared-workflows/.github/workflows/python-build-release.yml@TPT-90-Test-scanning-of-a-Python-SBOM
 
   publish-to-pypi:
     name: Publish Python distribution to PyPI
     needs:
-    - prepare-release
+    - prepare-build-release
     runs-on: ubuntu-latest
 
     environment:
