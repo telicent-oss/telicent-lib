@@ -35,7 +35,6 @@ jobs:
     - name: Generate requirements
       run: |
         python -m piptools compile -o requirements.txt pyproject.toml
-        pip install -r requirements.txt
         pip install cyclonedx-bom==4.4.3
 
     - name: Generate SBOM

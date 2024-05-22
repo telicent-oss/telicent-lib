@@ -17,7 +17,8 @@ dependencies = [
     "confluent-kafka==2.3.0",
     "opentelemetry-api==1.20.0",
     "opentelemetry-sdk==1.20.0",
-    "pydantic==2.5.2"
+    "pydantic==2.5.2",
+    "Werkzeug==3.0.1",
 ]
 classifiers = [
     "Programming Language :: Python :: 3.10",
