@@ -8,6 +8,7 @@ on:
 
 jobs:
   generate_sbom:
+    name: Generate SBOM
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -33,13 +34,13 @@ jobs:
 
     - name: Generate requirements
       run: |
-        python -m piptools compile --extra dev -o requirements.txt pyproject.toml
+        python -m piptools compile -o requirements.txt pyproject.toml
         pip install -r requirements.txt
 
     - name: Generate SBOM
       run: |
         mkdir sbom/
-        python -m cyclonedx_py environment > sbom/cyclonedx.json
+        python -m cyclonedx_py requirements > sbom/cyclonedx.json
 
     - name: Store the SBOM
       uses: actions/upload-artifact@v3
@@ -47,8 +48,8 @@ jobs:
         name: cyclone-dx-sbom
         path: sbom/
 
-  scan_sbom:
-    name: Scan SBOM
+  scan_sbom_for_high_crit:
+    name: Scan SBOM for HIGH and CRITICAL
     needs:
     - generate_sbom
     runs-on: ubuntu-latest
@@ -69,35 +70,23 @@ jobs:
           scan-type: 'sbom'
           scanners: 'vuln'
 
-#    scan:
-#    runs-on: ubuntu-latest
-#    permissions:
-#      id-token: write
-#      contents: read
-#    steps:
-#      - name: Trivy Vulnerability Scan
-#        uses: aquasecurity/trivy-action@master
-#        with:
-#          scan-type: "sbom"
-#          image-ref: ${{ inputs.IMAGE_REF }}
-#          output: trivy-docker-report.json
-#          format: json
-#          exit-code: 0
-#  run_high_risk_vulnerability_scanner:
-#    needs:
-#      - generate_bom
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Download artifact
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: ${{ github.run_number }}-sbom.json
-#      - name: Run Scan
-#        uses: aquasecurity/trivy-action@master
-#        with:
-#          exit-code: '1'
-#          format: 'table'
-#          severity: 'HIGH,CRITICAL'
-#          ignore-unfixed: true
-#          input: ${{ github.run_number }}-sbom.json
-#          scan-type: 'sbom'
+  scan_sbom_for_low_med:
+    name: Scan SBOM for LOW and MEDIUM
+    needs:
+    - generate_sbom
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download SBOM
+        uses: actions/download-artifact@v3
+        with:
+          name: cyclone-dx-sbom
+          path: sbom/
+      - name: Scan SBOM
+        uses: aquasecurity/trivy-action@master
+        with:
+          exit-code: '0'
+          severity: 'UNKNOWN,LOW,MEDIUM'
+          ignore-unfixed: true
+          scan-ref: sbom/cyclonedx.json
+          scan-type: 'sbom'
+          scanners: 'vuln'
