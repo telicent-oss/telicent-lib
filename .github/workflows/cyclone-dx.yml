@@ -34,7 +34,7 @@ jobs:
     - name: Generate requirements
       run: |
         python -m piptools compile --extra dev -o requirements.txt pyproject.toml
-        pip install -r requirements.txt#  
+        pip install -r requirements.txt
 
     - name: Generate SBOM
       run: |
