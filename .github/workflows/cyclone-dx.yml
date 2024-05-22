@@ -65,7 +65,6 @@ jobs:
           exit-code: '1'
           format: 'table'
           severity: 'HIGH,CRITICAL'
-          ignore-unfixed: true
           scan-ref: sbom/cyclonedx.json
           scan-type: 'sbom'
           scanners: 'vuln'
@@ -87,7 +86,6 @@ jobs:
           exit-code: '0'
           format: 'table'
           severity: 'UNKNOWN,LOW,MEDIUM'
-          ignore-unfixed: true
           scan-ref: sbom/cyclonedx.json
           scan-type: 'sbom'
           scanners: 'vuln'
