@@ -24,7 +24,7 @@ jobs:
     uses: telicent-oss/shared-workflows/.github/workflows/python-test-library.yml@TPT-90-Test-scanning-of-a-Python-SBOM
     with:
       PYTHON_VERSION: ${{ matrix.python-version }}
-      BUILD: false
+      SKIP_BUILD: true
 
   prepare-build-release:
     name: Prepare and Build Release
