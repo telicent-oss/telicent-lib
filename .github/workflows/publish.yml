@@ -1,17 +1,11 @@
 name: Release to PyPI
 
-#on:
-#  push:
-#    branches:
-#      - "main"
-#    paths:
-#      - "CHANGELOG.md"
-#  workflow_dispatch:
-
 on:
   push:
-    branches-ignore:
+    branches:
       - "main"
+    paths:
+      - "CHANGELOG.md"
   workflow_dispatch:
 
 jobs:
@@ -21,14 +15,14 @@ jobs:
       fail-fast: true
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
-    uses: telicent-oss/shared-workflows/.github/workflows/python-test-library.yml@TPT-90-Test-scanning-of-a-Python-SBOM
+    uses: telicent-oss/shared-workflows/.github/workflows/python-test-library.yml@main
     with:
       PYTHON_VERSION: ${{ matrix.python-version }}
       SKIP_BUILD: true
 
   prepare-build-release:
     name: Prepare and Build Release
-    uses: telicent-oss/shared-workflows/.github/workflows/python-build-release.yml@TPT-90-Test-scanning-of-a-Python-SBOM
+    uses: telicent-oss/shared-workflows/.github/workflows/python-build-release.yml@main
 
   publish-to-pypi:
     name: Publish Python distribution to PyPI
@@ -51,9 +45,5 @@ jobs:
         name: python-package-distributions
         path: dist/
 
-    - name: Confirm All's OK
-      run: |
-        ls ./*
-
-#    - name: Publish distribution to PyPI
-#      uses: pypa/gh-action-pypi-publish@release/v1
+    - name: Publish distribution to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1

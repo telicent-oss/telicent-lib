@@ -1,12 +1,12 @@
 name: Python Test Build
 
 on:
-#  pull_request:
-#    branches:
-#      - "release-please*"
-#  push:
-#    branches-ignore:
-#      - "main"
+  pull_request:
+    branches:
+      - "release-please*"
+  push:
+    branches-ignore:
+      - "main"
   workflow_dispatch:
 
 jobs:
