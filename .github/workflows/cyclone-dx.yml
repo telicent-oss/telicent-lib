@@ -36,6 +36,7 @@ jobs:
       run: |
         python -m piptools compile -o requirements.txt pyproject.toml
         pip install -r requirements.txt
+        pip install cyclonedx-bom==4.4.3
 
     - name: Generate SBOM
       run: |
@@ -85,6 +86,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           exit-code: '0'
+          format: 'table'
           severity: 'UNKNOWN,LOW,MEDIUM'
           ignore-unfixed: true
           scan-ref: sbom/cyclonedx.json
