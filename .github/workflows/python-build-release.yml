@@ -1,7 +1,7 @@
 name: Build Python Release
 
 on:
-  workflow_dispatch:
+  workflow_call:
 
 jobs:
   build:
