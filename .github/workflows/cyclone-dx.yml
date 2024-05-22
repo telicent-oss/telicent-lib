@@ -61,7 +61,7 @@ jobs:
       - name: Scan SBOM
         uses: aquasecurity/trivy-action@master
         with:
-          exit-code: '0'
+          exit-code: '1'
           format: 'table'
           severity: 'HIGH,CRITICAL'
           ignore-unfixed: true
