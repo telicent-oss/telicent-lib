@@ -1,3 +1,4 @@
+import logging
 import sys
 from enum import Enum
 from typing import Any, Callable
@@ -20,6 +21,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+logger = logging.getLogger(__name__)
 
 class OnError(Enum):
     """
@@ -56,7 +58,7 @@ class Configurator:
         self.debug = debug
         self.source = config_source
         if self.debug:
-            print(f"Configuration Source is {str(self.source)}")
+            logger.debug(f"Configuration Source is {str(self.source)}")
 
     @staticmethod
     def string_to_bool(value):
@@ -105,12 +107,12 @@ class Configurator:
         value: Any = None
         raw_value = self.source.get(config_key)
         if self.debug:
-            print(f"Raw Value for Configuration Key {config_key} is {raw_value}")
+            logger.debug(f"Raw Value for Configuration Key {config_key} is {raw_value}")
 
         if raw_value is None:
             raw_value = default
             if self.debug and default is not None:
-                print(f"Using default value {default}")
+                logger.debug(f"Using default value {default}")
             if raw_value is None and required:
                 self.__handle_errors__(f"Required Configuration Key {config_key} is not set.  {description}", on_error)
 
@@ -118,7 +120,7 @@ class Configurator:
             try:
                 value = converter(raw_value)
                 if self.debug:
-                    print(f"Converted raw value {raw_value} into typed value {value} with type {type(value)}")
+                    logger.debug(f"Converted raw value {raw_value} into typed value {value} with type {type(value)}")
             except Exception as e:
                 self.__handle_errors__(
                     f"Configuration Key {config_key} has raw value {raw_value} that failed value conversion: {e}",
@@ -143,7 +145,8 @@ class Configurator:
         :param on_error: On Error behaviour
         """
         if on_error is OnError.EXIT:
-            print(message)
+            logger.critical(message)
             sys.exit(self.exit_code)
         else:
             raise ValueError(message)
+
