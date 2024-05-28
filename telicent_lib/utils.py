@@ -1,7 +1,7 @@
 import inspect
 from inspect import Parameter
 from itertools import islice
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from confluent_kafka.admin import AdminClient
 
@@ -22,7 +22,7 @@ limitations under the License.
 """
 
 
-def __get_signature__(function: Any) -> Optional[inspect.Signature]:
+def __get_signature__(function: Any) -> inspect.Signature | None:
     """
     Gets the signature for a function (if any)
     :param function: A function or class

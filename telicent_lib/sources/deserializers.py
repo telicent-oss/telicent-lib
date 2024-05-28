@@ -1,6 +1,6 @@
 import json
 import zlib
-from typing import Any, Optional, Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 # noinspection PyProtectedMember
 from confluent_kafka.serialization import Deserializer
@@ -15,7 +15,7 @@ class DeserializerFunction(Protocol):
     into some more useful Python object
     """
 
-    def __call__(self, data: Optional[bytes]) -> Any:
+    def __call__(self, data: bytes | None) -> Any:
         """
         Decodes bytes into any Python object
 
@@ -32,7 +32,7 @@ class Deserializers:
     """
 
     @staticmethod
-    def unzip_to_string(data: Optional[bytes]) -> Optional[str]:
+    def unzip_to_string(data: bytes | None) -> str | None:
         """
         A deserializer which decompresses the data with zlib and decodes into a string assuming UTF-8 encoding
 
@@ -45,7 +45,7 @@ class Deserializers:
         return zlib.decompress(data).decode('utf-8')
 
     @staticmethod
-    def binary_to_string(data: Optional[bytes]) -> Optional[str]:
+    def binary_to_string(data: bytes | None) -> str | None:
         """
         A deserializer which decodes the data into a string assuming UTF-8 encoding
 
@@ -58,7 +58,7 @@ class Deserializers:
         return data.decode('utf-8')
 
     @staticmethod
-    def from_json(data: Optional[bytes]) -> Optional[Any]:
+    def from_json(data: bytes | None) -> Any | None:
         """
         A deserializer which decodes the data into an object by deserializing it as JSON
 

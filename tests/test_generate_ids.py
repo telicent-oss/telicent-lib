@@ -1,4 +1,4 @@
-from typing import Iterable, List, Union
+from typing import Iterable, List
 from unittest import TestCase
 
 from telicent_lib import Adapter, AutomaticAdapter, Mapper, Projector, Record
@@ -74,7 +74,7 @@ class InputOutputActionTestCase(TestCase):
         self.assertEqual('None-from-In-Memory List(0 records)-to-In-Memory List', action.generate_id())
 
     def test_id_is_name_adapter(self):
-        def my_func(record: Record) -> Union[Record, List[Record], None]:
+        def my_func(record: Record) -> Record | List[Record] | None:
             pass
         action = Mapper(
             source=ListSource(), target=ListSink(), has_error_handler=False, has_reporter=False,
@@ -83,7 +83,7 @@ class InputOutputActionTestCase(TestCase):
         self.assertEqual('Mapper-from-In-Memory List(0 records)-to-In-Memory List', action.generate_id())
 
     def test_named_action(self):
-        def my_func(record: Record) -> Union[Record, List[Record], None]:
+        def my_func(record: Record) -> Record | List[Record] | None:
             pass
         action = Mapper(
             source=ListSource(), target=ListSink(), has_error_handler=False, has_reporter=False, map_function=my_func,

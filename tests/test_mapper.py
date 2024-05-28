@@ -1,6 +1,6 @@
 
 import unittest
-from typing import List, Union
+from typing import List
 from unittest.mock import patch
 
 from telicent_lib import Mapper, Record, RecordMapper
@@ -10,7 +10,7 @@ from tests.delaySink import DelaySink
 from tests.test_records import RecordVerifier
 
 
-def __cube_keys__(record: Record) -> Union[Record, List[Record], None]:
+def __cube_keys__(record: Record) -> Record | List[Record] | None:
     if record is None:
         return None
     if isinstance(record.key, str):
@@ -18,13 +18,13 @@ def __cube_keys__(record: Record) -> Union[Record, List[Record], None]:
     return Record(record.headers, record.key * record.key * record.key, record.value, record.raw)
 
 
-def __power_keys__(record: Record, **map_args) -> Union[Record, List[Record], None]:
+def __power_keys__(record: Record, **map_args) -> Record | List[Record] | None:
     if record is None:
         return None
     return Record(record.headers, record.key ** map_args["power"], record.value, record.raw)
 
 
-def __fail_mapping__(record: Record) -> Union[Record, List[Record], None]:
+def __fail_mapping__(record: Record) -> Record | List[Record] | None:
     raise ValueError("Can't map this record")
 
 
@@ -32,7 +32,7 @@ class SideChannelMapper(RecordMapper):
     def __init__(self):
         self.data: List[Record] = []
 
-    def __call__(self, record: Record) -> Union[Record, List[Record], None]:
+    def __call__(self, record: Record) -> Record | List[Record] | None:
         self.data.append(record)
         return __cube_keys__(record)
 

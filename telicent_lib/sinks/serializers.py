@@ -1,6 +1,6 @@
 import json
 import zlib
-from typing import Any, Optional, Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 # noinspection PyProtectedMember
 from confluent_kafka.serialization import Serializer
@@ -29,7 +29,7 @@ class SerializerFunction(Protocol):
     A protocol for serializer functions that can encode Python objects into bytes
     """
 
-    def __call__(self, data: Any) -> Optional[bytes]:
+    def __call__(self, data: Any) -> bytes | None:
         """
         Encodes a Python object into bytes
         :param data: Python Object
@@ -44,7 +44,7 @@ class Serializers:
     """
 
     @staticmethod
-    def to_zipped_binary(data: Any) -> Optional[bytes]:
+    def to_zipped_binary(data: Any) -> bytes | None:
         """
         Serializes data by first converting it into bytes and then compressing those bytes with zlib
 
@@ -54,7 +54,7 @@ class Serializers:
         """
         if data is None:
             return None
-        binary_data: Optional[bytes]
+        binary_data: bytes | None
         if isinstance(data, bytes):
             binary_data = data
         else:
@@ -65,7 +65,7 @@ class Serializers:
         return zlib.compress(binary_data)
 
     @staticmethod
-    def to_binary(data: Any) -> Optional[bytes]:
+    def to_binary(data: Any) -> bytes | None:
         """
         Serializes data into bytes
 
@@ -89,7 +89,7 @@ class Serializers:
         return bytes(data)
 
     @staticmethod
-    def as_is(data: Any) -> Optional[bytes]:
+    def as_is(data: Any) -> bytes | None:
         """
         A serializer that assumes the data is already bytes i.e. assumes the records will already have the relevant
         fields represented as bytes.
@@ -108,7 +108,7 @@ class Serializers:
         return data
 
     @staticmethod
-    def to_json(data: Any) -> Optional[bytes]:
+    def to_json(data: Any) -> bytes | None:
         """
         A serializer that converts the data into a JSON string and then encodes that into UTF-8 bytes
 

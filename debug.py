@@ -1,7 +1,7 @@
 
 import random
 import time
-from typing import Any, List, Optional, Union
+from typing import Any, List
 
 # noinspection PyProtectedMember
 from telicent_lib import Mapper, Record
@@ -14,7 +14,7 @@ from telicent_lib.sources.dictSource import DictionarySource
 from telicent_lib.utils import validate_callable_protocol
 
 
-def int_to_bytes(data: Any) -> Optional[bytes]:
+def int_to_bytes(data: Any) -> bytes | None:
     if data is not None:
         return int.to_bytes(data, byteorder="big", length=4, signed=True)
     else:
@@ -84,7 +84,7 @@ def action_test(iterations: int = 1500, with_abort: bool = True):
         action.aborted()
 
 
-def to_upper(record: Record) -> Union[Record, List[Record], None]:
+def to_upper(record: Record) -> Record | List[Record] | None:
     if record.key == 0:
         return None
     if record.key == 1:

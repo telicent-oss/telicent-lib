@@ -1,6 +1,6 @@
 
 import unittest
-from typing import Any, Optional, Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 from telicent_lib.sinks import SerializerFunction
 from telicent_lib.sources import DeserializerFunction
@@ -15,11 +15,11 @@ def nearly_a_deserializer(data: int) -> int:
     return data
 
 
-def a_deserializer(data: Optional[bytes]) -> Any:
+def a_deserializer(data: bytes | None) -> Any:
     return data
 
 
-def kwargs_deserializer(data: Optional[bytes], **kwargs) -> Any:
+def kwargs_deserializer(data: bytes | None, **kwargs) -> Any:
     return data
 
 

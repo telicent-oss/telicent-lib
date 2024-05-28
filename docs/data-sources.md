@@ -88,17 +88,17 @@ bytes representing a `str` value, and we deserialize as such.
 
 You can optionally provide custom deserializer functions for both the keys and values via the `key_deserializer` and
 `value_deserializer` parameters, since the keys and values may be of different types. These parameters both take either
-a `DeserializerFunction` i.e. a Python function that can convert from `Optional[bytes]` to any Python type, or a
+a `DeserializerFunction` i.e. a Python function that can convert from `bytes | None` to any Python type, or a
 `Deserializer` instance. This function **MUST** allow for a `None` value, since a record may contain an empty key/value.
 If the function produces an error it will abort further processing so consider returning `None` or another special value
 in this case and handling those values in your code e.g.
 
 ```python
-from typing import Any, Optional
+from typing import Any
 from telicent_lib.sources import KafkaSource
 
 
-def int_from_bytes(data: Optional[bytes]) -> Any:
+def int_from_bytes(data: bytes | None) -> Any:
     if data is None:
         return "<none>"
     try:

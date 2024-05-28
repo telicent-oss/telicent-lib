@@ -88,9 +88,9 @@ class KafkaSource(DataSource):
         :param kafka_config: Kafka configuration
         :type kafka_config: dict
         :param key_deserializer: The deserializer function/class to use to deserialize record keys
-        :type key_deserializer: Union[DeserializerFunction, Deserializer]
+        :type key_deserializer: DeserializerFunction | Deserializer
         :param value_deserializer: The deserializer function/class to use to deserialize record values
-        :type value_deserializer: Union[DeserializerFunction, Deserializer]
+        :type value_deserializer: DeserializerFunction | Deserializer
         :param commit_interval:
             How often to commit the read position to Kafka.  Defaults to 10,000 i.e. every 10,000 records read the read
             position will be committed.  Note that the read position is also committed whenever the source is closed

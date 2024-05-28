@@ -1,6 +1,6 @@
 import json
 import unittest
-from typing import Any, Callable, Iterable, List, Optional, Tuple, Union
+from typing import Any, Callable, Iterable, List, Tuple
 
 from telicent_lib import Record, RecordUtils
 
@@ -70,7 +70,7 @@ class TestRecords(RecordVerifier):
         with self.assertRaisesRegex(TypeError, expected_regex=".*missing.*required positional arguments.*"):
             Record(raw=[(1, "test")])  # type: ignore
 
-    def __validate_expected_headers__(self, iterable: Iterable[Optional[str]], expected_items: List[Optional[str]]):
+    def __validate_expected_headers__(self, iterable: Iterable[str | None], expected_items: List[str | None]):
         count = 0
         for i, item in enumerate(iterable):
             if i + 1 > len(expected_items):
@@ -225,7 +225,7 @@ class TestRecords(RecordVerifier):
         self.__validate_expected_headers__(RecordUtils.get_headers(record, "Exec-Path"), ["foo"])
 
     def test_header_preparation_02(self) -> None:
-        headers: Optional[List[Tuple[str, Union[str, bytes, None]]]] = [("Test", "12345"),
+        headers: List[Tuple[str, str | bytes | None]] | None = [("Test", "12345"),
                                                                         ("Exec-Path", b"foo")]
         record = Record(RecordUtils.to_headers({"Test": "6789", "Exec-Path": "bar"}, headers), "key", "value")
 
