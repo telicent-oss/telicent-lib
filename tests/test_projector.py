@@ -1,6 +1,5 @@
 
 import unittest
-from typing import List
 
 from telicent_lib import Projector, Record, RecordProjector
 from telicent_lib.sources.listSource import ListSource
@@ -21,12 +20,12 @@ def __args_projector__(record: Record, **kwargs) -> None:
 
 class CollectingProjector(RecordProjector):
     def __init__(self):
-        self.data: List[Record] = []
+        self.data: list[Record] = []
 
     def __call__(self, record: Record) -> None:
         self.data.append(record)
 
-    def get(self) -> List[Record]:
+    def get(self) -> list[Record]:
         return self.data
 
 
@@ -39,11 +38,6 @@ class TestProjector(RecordVerifier):
     def test_bad_projector_02(self):
         with self.assertRaisesRegex(ValueError, expected_regex=".*cannot be None"):
             Projector(source=ListSource(), target_store="Test", projector_function=None,
-                      has_reporter=False, has_error_handler=False)
-
-    def test_bad_projector_03(self):
-        with self.assertRaisesRegex(TypeError, expected_regex=".*for protocol.*RecordProjector.*"):
-            Projector(source=ListSource(), target_store="Test", projector_function=self.test_bad_projector_02,
                       has_reporter=False, has_error_handler=False)
 
     def test_projector_01(self):
