@@ -2,7 +2,6 @@
 import unittest
 from typing import Any, Protocol, runtime_checkable
 
-from telicent_lib.sinks import SerializerFunction
 from telicent_lib.sources import DeserializerFunction
 from telicent_lib.utils import validate_callable_protocol
 
