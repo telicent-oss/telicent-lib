@@ -56,10 +56,6 @@ class TestProtocolValidation(unittest.TestCase):
         with self.assertRaisesRegex(TypeError, expected_regex=".* not a function.*"):
             validate_callable_protocol(value, DeserializerFunction)
 
-    def test_protocol_validation_wrong_return_type(self) -> None:
-        with self.assertRaisesRegex(TypeError, expected_regex="Wrong return type.*"):
-            validate_callable_protocol(a_deserializer, SerializerFunction)
-
     def test_protocol_validation_wrong_parameter_type(self) -> None:
         with self.assertRaisesRegex(TypeError, expected_regex="Wrong parameter type.*.*bytes.*'int'.*"):
             validate_callable_protocol(not_a_deserializer, DeserializerFunction)

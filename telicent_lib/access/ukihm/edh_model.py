@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from typing import List
 
 from pydantic import AwareDatetime, BaseModel, PlainSerializer
 from typing_extensions import Annotated
@@ -47,20 +46,20 @@ class EDHModel(EDHMixin):
     specification: str | None = "UKIC v3.0"
     identifier: str
     classification: str
-    permittedOrgs: List[str]
-    permittedNats: List[str]
-    orGroups: List[str]
-    andGroups: List[str]
+    permittedOrgs: list[str]
+    permittedNats: list[str]
+    orGroups: list[str]
+    andGroups: list[str]
 
     createdDateTime: SerialisableDt | None = DEFAULT_OPTIONAL_DT
     originator: str | None = None
     custodian: str | None = None
     policyRef: str | None = None
-    dataSet: str | None
-    authRef: str | None
+    dataSet: list[str]
+    authRef: list[str]
     dispositionDate: SerialisableDt | None = DEFAULT_OPTIONAL_DT
     dispositionProcess: str | None = None
-    dissemination: str | None
+    dissemination: list[str]
 
     def build_security_labels(self):
         return super().build_security_labels()
