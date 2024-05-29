@@ -89,13 +89,6 @@ def validate_callable_protocol(function: Any, protocol: Any) -> None:
     if required_signature is None:
         raise TypeError(f"{protocol} is not a protocol whose validity can be checked")
 
-    # Validate return type
-    if signature.return_annotation != required_signature.return_annotation:
-        if signature.return_annotation == inspect.Signature.empty or required_signature.return_annotation != Any:
-            raise TypeError(f"Wrong return type {signature.return_annotation} for protocol {str(protocol)}, "
-                            f"expected {required_signature.return_annotation} but function {function} returns "
-                            f"{signature.return_annotation}")
-
     has_self = False
     adj = 0
     for i, parameter_tuple in enumerate(required_signature.parameters.items()):
