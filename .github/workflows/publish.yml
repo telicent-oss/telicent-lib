@@ -23,6 +23,8 @@ jobs:
   prepare-build-release:
     name: Prepare and Build Release
     uses: telicent-oss/shared-workflows/.github/workflows/python-build-release.yml@main
+    with:
+      PACKAGE: telicent_lib
 
   publish-to-pypi:
     name: Publish Python distribution to PyPI
