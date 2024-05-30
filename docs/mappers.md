@@ -11,10 +11,9 @@ A mapping function conforms to the [`RecordMapper`](records.md#working-with-reco
 the following signature:
 
 ```python
-from typing import List
 from telicent_lib import Record
 
-def example_mapping_function(record: Record) -> Record | List[Record] | None:
+def example_mapping_function(record: Record) -> Record | list[Record] | None:
     return record
 ```
 
@@ -32,7 +31,6 @@ subclass this class to create advanced mapping functions e.g. those that store s
 etc., by extending this class.  For example consider the following example:
 
 ```python
-from typing import List
 from telicent_lib import Record, RecordMapper
 
 class MyCustomMapper(RecordMapper):
@@ -40,7 +38,7 @@ class MyCustomMapper(RecordMapper):
     # Create some reference to some external service your Mapper needs
     self.external_service = connect_to_service()
 
-  def __call__(self, record: Record) -> Record | List[Record] | None:
+  def __call__(self, record: Record) -> Record | list[Record] | None:
     if self.external_service.should_transform(record):
         return self.external_service.transform_record(record)
     else:
@@ -57,19 +55,18 @@ In this example we use the a [`DictionarySource`](data-sources.md#dictionary-sou
 [`DictionarySink`](data-sinks.md#dictionary-sink) to provide dummy data for the mapper.
 
 ```python
-from typing import List
 from telicent_lib import Record, Mapper
 from telicent_lib.sinks.dictSink import DictionarySink
 from telicent_lib.sources.dictSource import DictionarySource
 
 # Define a mapping function
-def to_upper(record: Record) -> Record | List[Record] | None:
+def to_upper(record: Record) -> Record | list[Record] | None:
     if record.key == 0:
         return None
     if record.key == 1:
         return Record(record.headers, record.key, str.upper(record.value), None)
 
-    records: List[Record] = []
+    records: list[Record] = []
     for i in range(0, record.key):
         records.append(Record(record.headers, record.key, str.upper(record.value), None))
     return records

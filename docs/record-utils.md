@@ -8,7 +8,7 @@ a `Record` tuple is a list of tuples that can be inconvenient to work with at ti
 typically stored as `bytes` internally. 
 
 You can access the value of a header via the `RecordUtils.get_first_header(record, header)` method. This provides the
-first value for the header (if any) as an `Optional[str]`. `get_frist_header` either returns `None` if no such header exists, or the
+first value for the header (if any) as an `str | None`. `get_frist_header` either returns `None` if no such header exists, or the
 first value for the header decoded into a `str`. Note that the header key given is matched in a case-insensitive manner,
 so `RecordUtils.get_first_header(record, "test")` will find the first header named `test` regardless of case, i.e.
 `test`, `TEST` and `Test` would all match.  Conversely, if you are interested only in the most recently added header of

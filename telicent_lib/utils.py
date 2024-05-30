@@ -1,7 +1,7 @@
 import inspect
 from inspect import Parameter
 from itertools import islice
-from typing import Any, Dict
+from typing import Any
 
 from confluent_kafka.admin import AdminClient
 
@@ -36,7 +36,7 @@ def __get_signature__(function: Any) -> inspect.Signature | None:
         return None
 
 
-def __get_nth_value__(dictionary: Dict[Any, Any], n: int) -> Any:
+def __get_nth_value__(dictionary: dict[Any, Any], n: int) -> Any:
     """
     Gets the Nth value in a dictionary, only reliable if the dictionary is an ordered dictionary
     :param dictionary: Dictionary
