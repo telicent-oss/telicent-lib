@@ -1,6 +1,6 @@
 import json
 import unittest
-from typing import Any, Callable, Iterable, List, Tuple
+from typing import Any, Callable, Iterable
 
 from telicent_lib import Record, RecordUtils
 
@@ -17,7 +17,7 @@ class RecordVerifier(unittest.TestCase):
         self.assertEqual(record.raw, raw, "Raw Records don't match")
 
     @staticmethod
-    def __generate_records__(total: int, value_function: Callable[[int], Any] = str) -> List[Record]:
+    def __generate_records__(total: int, value_function: Callable[[int], Any] = str) -> list[Record]:
         records = []
         for i in range(1, total + 1):
             records.append(Record(None, i, value_function(i)))
@@ -70,7 +70,7 @@ class TestRecords(RecordVerifier):
         with self.assertRaisesRegex(TypeError, expected_regex=".*missing.*required positional arguments.*"):
             Record(raw=[(1, "test")])  # type: ignore
 
-    def __validate_expected_headers__(self, iterable: Iterable[str | None], expected_items: List[str | None]):
+    def __validate_expected_headers__(self, iterable: Iterable[str | None], expected_items: list[str | None]):
         count = 0
         for i, item in enumerate(iterable):
             if i + 1 > len(expected_items):
@@ -225,7 +225,7 @@ class TestRecords(RecordVerifier):
         self.__validate_expected_headers__(RecordUtils.get_headers(record, "Exec-Path"), ["foo"])
 
     def test_header_preparation_02(self) -> None:
-        headers: List[Tuple[str, str | bytes | None]] | None = [("Test", "12345"),
+        headers: list[tuple[str, str | bytes | None]] | None = [("Test", "12345"),
                                                                         ("Exec-Path", b"foo")]
         record = Record(RecordUtils.to_headers({"Test": "6789", "Exec-Path": "bar"}, headers), "key", "value")
 

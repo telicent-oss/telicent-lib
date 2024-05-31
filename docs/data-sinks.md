@@ -83,7 +83,7 @@ function to serialize those into bytes. In this example no record headers or raw
 
 Using a function should be sufficient for most use cases, a `Serializer` will likely only be needed if serialization
 requires some persistent state or configuration to be maintained. If you are using a function it must conform to the
-`SerializerFunction` protocol, this requires that your function has the signature of `(data: Any) -> Optional[bytes]`.
+`SerializerFunction` protocol, this requires that your function has the signature of `(data: Any) -> bytes | None`.
 Attempting to use a serializer value that is not a `Serializer` instance, and does not conform to the
 `SerializerFunction` protocol will result in a `TypeError`.
 

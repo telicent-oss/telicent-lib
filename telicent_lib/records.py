@@ -1,6 +1,6 @@
 import collections
 import json
-from typing import Any, Dict, Iterable, List, Protocol, Tuple, runtime_checkable
+from typing import Any, Iterable, Protocol, runtime_checkable
 
 __license__ = """
 Copyright (c) Telicent Ltd.
@@ -34,7 +34,7 @@ class RecordMapper(Protocol):
     Represents a callable function that maps an input record into zero or more output records.
     """
 
-    def __call__(self, record: Record) -> Record | List[Record] | None:
+    def __call__(self, record: Record) -> Record | list[Record] | None:
         """
         Maps an input record into zero or more output records.
         :param record: Input record
@@ -191,7 +191,7 @@ class RecordUtils:
         return Record(new_headers, record.key, record.value, record.raw)
 
     @staticmethod
-    def add_headers(record: Record, headers: List[Tuple[str, str | bytes | dict | None]]) -> Record:
+    def add_headers(record: Record, headers: list[tuple[str, str | bytes | dict | None]]) -> Record:
         """
         Adds multiple headers, this produces a new copy of the Record with the new headers added
 
@@ -282,15 +282,15 @@ class RecordUtils:
         return Record(new_headers, record.key, record.value, record.raw)
 
     @staticmethod
-    def to_headers(headers: Dict[str, str | bytes | None],
-                   existing_headers: List[Tuple[str, str | bytes | None]] = None) \
-            -> List[Tuple[str, str | bytes | None]]:
+    def to_headers(headers: dict[str, str | bytes | None],
+                   existing_headers: list[tuple[str, str | bytes | None]] = None) \
+            -> list[tuple[str, str | bytes | None]]:
         """
         Convenience function to convert from a Python dictionary into the header list format that Record's use
 
         :param headers: Dictionary of headers
         :param existing_headers: Existing headers to append the given headers to, a copy of these will be taken
-        :return: List of header tuples
+        :return: list of header tuples
         """
         if headers is None:
             if existing_headers is None:

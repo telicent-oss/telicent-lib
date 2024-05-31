@@ -50,17 +50,16 @@ Typically, you work with records when implementing a function to pass to an acti
 where you define your function in terms of the `Record` type. For example consider the following map function:
 
 ```python
-from typing import List
 from telicent_lib import Record
 
 
-def to_upper(record: Record) -> Record | List[Record] | None:
+def to_upper(record: Record) -> Record | list[Record] | None:
     if record.key == 0:
         return None
     if record.key == 1:
         return Record(record.headers, record.key, str.upper(record.value), None)
 
-    records: List[Record] = []
+    records: list[Record] = []
     for i in range(0, record.key):
         records.append(Record(record.headers, record.key, str.upper(record.value), None))
     return records
@@ -83,17 +82,16 @@ only exception to this is that functions may take keyword arguments as their fin
 rewrite our earlier example like so:
 
 ```python
-from typing import List
 from telicent_lib import Record
 
 
-def to_upper(record: Record, **kwargs) -> Record | List[Record] | None:
+def to_upper(record: Record, **kwargs) -> Record | list[Record] | None:
     if record.key == 0:
         return None
     if record.key == 1:
         return Record(record.headers, record.key, str.upper(record.value), None)
 
-    records: List[Record] = []
+    records: list[Record] = []
     for i in range(0, min(record.key, kwargs["max-records"])):
         records.append(Record(record.headers, record.key, str.upper(record.value), None))
     return records

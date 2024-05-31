@@ -2,7 +2,7 @@
 import inspect
 import unittest
 from json import JSONDecodeError
-from typing import Any, Callable, List, Tuple
+from typing import Any, Callable
 
 from confluent_kafka import KafkaException
 from confluent_kafka.serialization import Deserializer, Serializer
@@ -16,7 +16,7 @@ from telicent_lib.sources import Deserializers, KafkaSource
 from telicent_lib.sources.deserializers import DeserializerFunction, RdfDeserializer
 
 
-def __default_serdes__() -> List[Tuple[Callable[[Any], bytes | None], Callable[[bytes | None], bytes | Any]]]:
+def __default_serdes__() -> list[tuple[Callable[[Any], bytes | None], Callable[[bytes | None], bytes | Any]]]:
     return [
         (Serializers.to_binary, Deserializers.binary_to_string),
         (Serializers.to_zipped_binary, Deserializers.unzip_to_string),

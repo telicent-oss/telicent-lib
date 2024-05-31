@@ -96,7 +96,6 @@ the `ConfigSource` correctly when used with the [`debug`](#debugging-configurati
 In the following example we provide configuration from a dictionary:
 
 ```python
-from typing import Dict
 from telicent_lib.config import Configurator, ConfigSource
 
 
@@ -105,7 +104,7 @@ class DictionaryConfig(ConfigSource):
     A Configuration Source backed by a dictionary
     """
 
-    def __init__(self, dictionary: Dict[str, str]):
+    def __init__(self, dictionary: dict[str, str]):
         self.configuration = dictionary
 
     def get(self, config_key: str):

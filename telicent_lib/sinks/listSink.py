@@ -1,5 +1,4 @@
 
-from typing import List
 
 from telicent_lib.records import Record
 from telicent_lib.sinks import DataSink
@@ -28,14 +27,14 @@ class ListSink(DataSink):
 
     def __init__(self):
         super().__init__("List")
-        self.data: List[Record] = []
+        self.data: list[Record] = []
 
     def send(self, record: Record):
         if record is None:
             return
         self.data.append(record)
 
-    def get(self) -> List[Record]:
+    def get(self) -> list[Record]:
         """Gets the underlying list"""
         return self.data
 

@@ -1,7 +1,7 @@
 
 import random
 import time
-from typing import Any, List
+from typing import Any
 
 # noinspection PyProtectedMember
 from telicent_lib import Mapper, Record
@@ -84,13 +84,13 @@ def action_test(iterations: int = 1500, with_abort: bool = True):
         action.aborted()
 
 
-def to_upper(record: Record) -> Record | List[Record] | None:
+def to_upper(record: Record) -> Record | list[Record] | None:
     if record.key == 0:
         return None
     if record.key == 1:
         return Record(record.headers, record.key, str.upper(record.value), None)
 
-    records: List[Record] = []
+    records: list[Record] = []
     for _ in range(0, record.key):
         records.append(Record(record.headers, record.key, str.upper(record.value), None))
     return records

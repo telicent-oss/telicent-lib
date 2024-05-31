@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from telicent_lib import Record
 from telicent_lib.sinks import DataSink
@@ -27,14 +27,14 @@ class DictionarySink(DataSink):
 
     def __init__(self):
         super().__init__("Dictionary")
-        self.data: Dict[Any, Any] = {}
+        self.data: dict[Any, Any] = {}
 
     def send(self, record: Record):
         if record is None:
             return
         self.data[record.key] = record.value
 
-    def get(self) -> Dict[Any, Any]:
+    def get(self) -> dict[Any, Any]:
         """Gets the underlying dictionary"""
         return self.data
 

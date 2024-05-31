@@ -1,5 +1,4 @@
 import threading
-from typing import List
 
 from telicent_lib import Record
 from telicent_lib.sinks.listSink import ListSink
@@ -27,7 +26,7 @@ class DelaySink(ListSink):
         self.closed = False
         self.delay = threading.Event()
         self.delay_time = delay_time
-        self.delayed: List[Record] = []
+        self.delayed: list[Record] = []
 
         # Start a background thread that sends the records onwards after enforcing a delay on them
         self.thread = threading.Thread(target=self.__send_delayed__, args=())
