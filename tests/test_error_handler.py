@@ -1,5 +1,5 @@
 import json
-from typing import Iterable, List, Union
+from typing import Iterable, List
 from unittest import TestCase, mock
 
 from telicent_lib import AutomaticAdapter, Mapper, Projector, Record
@@ -26,7 +26,7 @@ def fake_adapter_function() -> Iterable[Record]:
     raise Exception('Test Exception')
 
 
-def fake_mapper_function(record: Record) -> Union[Record, List[Record], None]:
+def fake_mapper_function(record: Record) -> Record | List[Record] | None:
     raise Exception('Test Exception')
 
 

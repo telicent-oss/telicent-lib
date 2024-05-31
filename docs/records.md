@@ -50,11 +50,11 @@ Typically, you work with records when implementing a function to pass to an acti
 where you define your function in terms of the `Record` type. For example consider the following map function:
 
 ```python
-from typing import List, Union
+from typing import List
 from telicent_lib import Record
 
 
-def to_upper(record: Record) -> Union[Record, List[Record], None]:
+def to_upper(record: Record) -> Record | List[Record] | None:
     if record.key == 0:
         return None
     if record.key == 1:
@@ -83,11 +83,11 @@ only exception to this is that functions may take keyword arguments as their fin
 rewrite our earlier example like so:
 
 ```python
-from typing import List, Union
+from typing import List
 from telicent_lib import Record
 
 
-def to_upper(record: Record, **kwargs) -> Union[Record, List[Record], None]:
+def to_upper(record: Record, **kwargs) -> Record | List[Record] | None:
     if record.key == 0:
         return None
     if record.key == 1:

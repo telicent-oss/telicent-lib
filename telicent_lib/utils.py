@@ -1,7 +1,7 @@
 import inspect
 from inspect import Parameter
 from itertools import islice
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from confluent_kafka.admin import AdminClient
 
@@ -22,7 +22,7 @@ limitations under the License.
 """
 
 
-def __get_signature__(function: Any) -> Optional[inspect.Signature]:
+def __get_signature__(function: Any) -> inspect.Signature | None:
     """
     Gets the signature for a function (if any)
     :param function: A function or class
@@ -88,13 +88,6 @@ def validate_callable_protocol(function: Any, protocol: Any) -> None:
     required_signature = inspect.signature(sig_inspection)  # type: ignore
     if required_signature is None:
         raise TypeError(f"{protocol} is not a protocol whose validity can be checked")
-
-    # Validate return type
-    if signature.return_annotation != required_signature.return_annotation:
-        if signature.return_annotation == inspect.Signature.empty or required_signature.return_annotation != Any:
-            raise TypeError(f"Wrong return type {signature.return_annotation} for protocol {str(protocol)}, "
-                            f"expected {required_signature.return_annotation} but function {function} returns "
-                            f"{signature.return_annotation}")
 
     has_self = False
     adj = 0

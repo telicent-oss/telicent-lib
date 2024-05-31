@@ -92,9 +92,9 @@ class KafkaSink(DataSink):
         :param kafka_config: Kafka configuration
         :type kafka_config: dict
         :param key_serializer: A serialization function/class used to serialize the record keys to bytes
-        :type key_serializer: Union[SerializerFunction, Serializer]
+        :type key_serializer: SerializerFunction | Serializer
         :param value_serializer: A serialization function/class used to serialize the record values to bytes
-        :type value_serializer: Union[SerializerFunction, Serializer]
+        :type value_serializer: SerializerFunction | Serializer
         """
         if broker is not None:
             warnings.warn(

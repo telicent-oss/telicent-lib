@@ -1,5 +1,5 @@
 
-from typing import Iterable, Optional
+from typing import Iterable
 
 from telicent_lib.records import Record
 
@@ -15,7 +15,7 @@ class DataSource:
         """Provides an iterable over the data"""
         raise NotImplementedError
 
-    def remaining(self) -> Optional[int]:
+    def remaining(self) -> int | None:
         """
         Returns the remaining number of records
 

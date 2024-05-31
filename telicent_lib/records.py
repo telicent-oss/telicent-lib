@@ -1,6 +1,6 @@
 import collections
 import json
-from typing import Any, Dict, Iterable, List, Optional, Protocol, Tuple, Union, runtime_checkable
+from typing import Any, Dict, Iterable, List, Protocol, Tuple, runtime_checkable
 
 __license__ = """
 Copyright (c) Telicent Ltd.
@@ -34,7 +34,7 @@ class RecordMapper(Protocol):
     Represents a callable function that maps an input record into zero or more output records.
     """
 
-    def __call__(self, record: Record) -> Union[Record, List[Record], None]:
+    def __call__(self, record: Record) -> Record | List[Record] | None:
         """
         Maps an input record into zero or more output records.
         :param record: Input record
@@ -80,7 +80,7 @@ class RecordUtils:
     """
 
     @staticmethod
-    def __decode_header_value__(value: Any) -> Optional[str]:
+    def __decode_header_value__(value: Any) -> str | None:
         if value is None:
             return None
 
@@ -92,7 +92,7 @@ class RecordUtils:
             raise TypeError("Header value is not a str/bytes")
 
     @staticmethod
-    def __encode_header_value(value: Union[str, bytes, dict, None]) -> Any:
+    def __encode_header_value(value: str | bytes | dict | None) -> Any:
         if value is None:
             return None
         elif isinstance(value, bytes):
@@ -102,7 +102,7 @@ class RecordUtils:
         return value.encode("utf-8")
 
     @staticmethod
-    def get_first_header(record: Record, header: str) -> Optional[str]:
+    def get_first_header(record: Record, header: str) -> str | None:
         """
         Gets the first value for a given header (if any)
 
@@ -127,7 +127,7 @@ class RecordUtils:
         return None
 
     @staticmethod
-    def get_last_header(record: Record, header: str) -> Optional[str]:
+    def get_last_header(record: Record, header: str) -> str | None:
         """
         Gets the last value for a given header (if any)
 
@@ -143,7 +143,7 @@ class RecordUtils:
             return None
 
     @staticmethod
-    def get_headers(record: Record, header: str) -> Iterable[Optional[str]]:
+    def get_headers(record: Record, header: str) -> Iterable[str | None]:
         """
         Gets all values for a given header (if any)
 
@@ -167,7 +167,7 @@ class RecordUtils:
         return
 
     @staticmethod
-    def add_header(record: Record, header: str, value: Union[str, dict, bytes, None]) -> Record:
+    def add_header(record: Record, header: str, value: str | dict | bytes | None) -> Record:
         """
         Adds a header, this produces a new copy of the Record with the new header added
 
@@ -191,7 +191,7 @@ class RecordUtils:
         return Record(new_headers, record.key, record.value, record.raw)
 
     @staticmethod
-    def add_headers(record: Record, headers: List[Tuple[str, Union[str, bytes, dict, None]]]) -> Record:
+    def add_headers(record: Record, headers: List[Tuple[str, str | bytes | dict | None]]) -> Record:
         """
         Adds multiple headers, this produces a new copy of the Record with the new headers added
 
@@ -218,7 +218,7 @@ class RecordUtils:
         return Record(new_headers, record.key, record.value, record.raw)
 
     @staticmethod
-    def replace_or_add_header(record: Record, header: str, value: Union[str, bytes, None] = None) -> Record:
+    def replace_or_add_header(record: Record, header: str, value: str | bytes | None = None) -> Record:
         """
         Replaces or adds a header to a new copy of the record.
 
@@ -250,7 +250,7 @@ class RecordUtils:
         return Record(new_headers, record.key, record.value, record.raw)
 
     @staticmethod
-    def remove_header(record: Record, header: str, value: Union[str, bytes, None] = None) -> Record:
+    def remove_header(record: Record, header: str, value: str | bytes | None = None) -> Record:
         """
         Removes a header, this produces a new copy of the Record with the header removed
 
@@ -282,9 +282,9 @@ class RecordUtils:
         return Record(new_headers, record.key, record.value, record.raw)
 
     @staticmethod
-    def to_headers(headers: Dict[str, Union[str, bytes, None]],
-                   existing_headers: List[Tuple[str, Union[str, bytes, None]]] = None) \
-            -> List[Tuple[str, Union[str, bytes, None]]]:
+    def to_headers(headers: Dict[str, str | bytes | None],
+                   existing_headers: List[Tuple[str, str | bytes | None]] = None) \
+            -> List[Tuple[str, str | bytes | None]]:
         """
         Convenience function to convert from a Python dictionary into the header list format that Record's use
 

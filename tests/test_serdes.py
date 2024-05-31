@@ -2,7 +2,7 @@
 import inspect
 import unittest
 from json import JSONDecodeError
-from typing import Any, Callable, List, Optional, Tuple
+from typing import Any, Callable, List, Tuple
 
 from confluent_kafka import KafkaException
 from confluent_kafka.serialization import Deserializer, Serializer
@@ -16,7 +16,7 @@ from telicent_lib.sources import Deserializers, KafkaSource
 from telicent_lib.sources.deserializers import DeserializerFunction, RdfDeserializer
 
 
-def __default_serdes__() -> List[Tuple[Callable[[Any], Optional[bytes]], Callable[[Optional[bytes]], Optional[Any]]]]:
+def __default_serdes__() -> List[Tuple[Callable[[Any], bytes | None], Callable[[bytes | None], bytes | Any]]]:
     return [
         (Serializers.to_binary, Deserializers.binary_to_string),
         (Serializers.to_zipped_binary, Deserializers.unzip_to_string),
@@ -64,7 +64,7 @@ def __compare_rdf_graphs__(a: Any, b: Any) -> bool:
 
 class ExtendedSerializerFunction(SerializerFunction):
 
-    def __call__(self, data: Optional[Any]) -> Optional[bytes]:
+    def __call__(self, data: Any | None) -> bytes | None:
         if data is None:
             return None
         return bytes(data)
@@ -72,15 +72,15 @@ class ExtendedSerializerFunction(SerializerFunction):
 
 class ExtendedDeserializerFunction(DeserializerFunction):
 
-    def __call__(self, data: Optional[bytes]) -> Any:
+    def __call__(self, data: bytes | None) -> Any:
         return data
 
 
 class TestSerdes(unittest.TestCase):
 
-    def _verify_round_trip(self, data: Any, serializer_function: Callable[[Any], Optional[bytes]] = None,
+    def _verify_round_trip(self, data: Any, serializer_function: Callable[[Any], bytes | None] = None,
                            serializer_class: Serializer = None,
-                           deserializer_function: Callable[[Optional[bytes]], Optional[Any]] = None,
+                           deserializer_function: Callable[[bytes | None], Any | None] = None,
                            deserializer_class: Deserializer = None,
                            comparison_function: Callable[[Any, Any], bool] = None):
         if serializer_function:

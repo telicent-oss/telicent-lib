@@ -1,5 +1,5 @@
 import uuid
-from typing import Iterable, Union
+from typing import Iterable
 
 from colored import fore
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
@@ -123,7 +123,7 @@ class AutomaticAdapter(OutputAction):
                  text_colour=fore.LIGHT_CYAN, reporting_batch_size=DEFAULT_REPORTING_BATCH_SIZE,
                  name: str = None, source_name: str = None, source_type: str = None, has_reporter: bool = True,
                  reporter_sink=None, has_error_handler: bool = True, error_handler=None,
-                 policy_information: Union[dict, None] = None,
+                 policy_information: dict | None = None,
                  **adapter_args):
         """
         Creates a new automatic adapter that imports data into a data sink.

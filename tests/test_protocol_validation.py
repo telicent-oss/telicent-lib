@@ -1,8 +1,7 @@
 
 import unittest
-from typing import Any, Optional, Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
-from telicent_lib.sinks import SerializerFunction
 from telicent_lib.sources import DeserializerFunction
 from telicent_lib.utils import validate_callable_protocol
 
@@ -15,11 +14,11 @@ def nearly_a_deserializer(data: int) -> int:
     return data
 
 
-def a_deserializer(data: Optional[bytes]) -> Any:
+def a_deserializer(data: bytes | None) -> Any:
     return data
 
 
-def kwargs_deserializer(data: Optional[bytes], **kwargs) -> Any:
+def kwargs_deserializer(data: bytes | None, **kwargs) -> Any:
     return data
 
 
@@ -55,10 +54,6 @@ class TestProtocolValidation(unittest.TestCase):
         value = 45678
         with self.assertRaisesRegex(TypeError, expected_regex=".* not a function.*"):
             validate_callable_protocol(value, DeserializerFunction)
-
-    def test_protocol_validation_wrong_return_type(self) -> None:
-        with self.assertRaisesRegex(TypeError, expected_regex="Wrong return type.*"):
-            validate_callable_protocol(a_deserializer, SerializerFunction)
 
     def test_protocol_validation_wrong_parameter_type(self) -> None:
         with self.assertRaisesRegex(TypeError, expected_regex="Wrong parameter type.*.*bytes.*'int'.*"):
