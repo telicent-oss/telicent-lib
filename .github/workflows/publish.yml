@@ -2,11 +2,11 @@ name: Release to PyPI
 
 on:
   push:
-    branches:
-      - "main"
-    paths:
-      - "CHANGELOG.md"
-  workflow_dispatch:
+#    branches:
+#      - "main"
+#    paths:
+#      - "CHANGELOG.md"
+#  workflow_dispatch:
 
 jobs:
   test:
@@ -25,38 +25,39 @@ jobs:
 
   build-pypi-pkg:
     name: Prepare and Build Release
-    uses: telicent-oss/shared-workflows/.github/workflows/python-build-pypi-pkg.yml@main
+    uses: telicent-oss/shared-workflows/.github/workflows/python-build-pypi-pkg.yml@TPT-99-telicent-lib-updated-to-newest-workflows
     needs:
       - get-version
     with:
       PACKAGE: telicent_lib
       VERSION: ${{ needs.get-version.outputs.version }}
 
-  publish-to-pypi:
-    name: Publish Python distribution to PyPI
-    needs:
-    - build-pypi-pkg
-    - test
-    runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/telicent-lib
-    permissions:
-      id-token: write
-    steps:
-    - name: Download all the dists
-      uses: actions/download-artifact@v4
-      with:
-        name: python-package-distributions
-        path: dist/
-
-    - name: Publish distribution to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
+#  publish-to-pypi:
+#    name: Publish Python distribution to PyPI
+#    needs:
+#    - build-pypi-pkg
+#    - test
+#    runs-on: ubuntu-latest
+#    environment:
+#      name: pypi
+#      url: https://pypi.org/p/telicent-lib
+#    permissions:
+#      id-token: write
+#    steps:
+#    - name: Download all the dists
+#      uses: actions/download-artifact@v4
+#      with:
+#        name: ${{ needs.build-pypi-pkg.outputs.application-sbom-artifact-name }}-dist
+#        path: dist/
+#
+#    - name: Publish distribution to PyPI
+#      uses: pypa/gh-action-pypi-publish@release/v1
 
   do-github-release:
     name: Do GitHub Release
     uses: telicent-oss/shared-workflows/.github/workflows/python-gh-release.yml@main
     needs:
+      - test
       - get-version
       - build-pypi-pkg
     with:

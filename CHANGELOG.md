@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.3-rc1](https://github.com/telicent-oss/telicent-lib/compare/v2.0.2...v2.0.3-rc1) (2024-05-22)
+
+
+### Miscellaneous
+
+* Testing new workflows
+
 ## [2.0.2](https://github.com/telicent-oss/telicent-lib/compare/v2.0.1...v2.0.2) (2024-05-22)
 
 
