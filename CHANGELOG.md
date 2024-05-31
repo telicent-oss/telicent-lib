@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.3](https://github.com/telicent-oss/telicent-lib/compare/v2.0.2...v2.0.3) (2024-05-31)
+
+
+### Miscellaneous
+
+* changed to PEP 604 annotations ([#20](https://github.com/telicent-oss/telicent-lib/issues/20)) ([07c7afe](https://github.com/telicent-oss/telicent-lib/commit/07c7afe9d0f3cd6af3e18cde6751af6766772dd4))
+* switched to builtin types ([#25](https://github.com/telicent-oss/telicent-lib/issues/25)) ([8858dbc](https://github.com/telicent-oss/telicent-lib/commit/8858dbca8b634e9bcbdb4f955cdc2c0ed7b5fa68))
+
 ## [2.0.2](https://github.com/telicent-oss/telicent-lib/compare/v2.0.1...v2.0.2) (2024-05-22)
 
 
