@@ -57,6 +57,7 @@ jobs:
     name: Do GitHub Release
     uses: telicent-oss/shared-workflows/.github/workflows/python-gh-release.yml@main
     needs:
+      - get-version
       - test
       - build-pypi-pkg
     with:
