@@ -182,7 +182,7 @@ class TestAdapter(RecordVerifier):
         patched_method.return_value = 'uuid4'
         sink = ListSink()
         adapter = AutomaticAdapter(target=sink, adapter_function=custom_range_generator, has_reporter=False,
-                                   has_error_handler=False, policy_information=self.test_policy,
+                                   has_error_handler=False, pbac_data=self.test_policy,
                                    start=100, stop=200)
         adapter.run()
         self.__validate_generated_range__(sink, 100, 200, headers=self.default_headers_edh)
