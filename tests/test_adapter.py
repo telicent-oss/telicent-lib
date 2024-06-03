@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from typing import Iterable
 from unittest.mock import patch
 
+from telicent_labels import TelicentModel
 from telicent_lib import Adapter, AutomaticAdapter, Record
 from telicent_lib.sinks.listSink import ListSink
 from tests.delaySink import DelaySink
@@ -74,7 +75,7 @@ class TestAdapter(RecordVerifier):
             "dissemination": ["news", "articles"]
         }
 
-        self.bytes_policy = json.dumps({'EDH': self.test_policy}, default=datetime_encoder).encode('utf-8')
+        self.bytes_policy = json.dumps({'PBAC': self.test_policy}, default=datetime_encoder).encode('utf-8')
         self.default_headers_edh = [('Exec-Path', b'Automatic Adapter-to-In-Memory List'),
                                     ('Request-Id', b'List:uuid4'), ('traceparent', b''),
                                     ('policyInformation', self.bytes_policy),
@@ -180,9 +181,10 @@ class TestAdapter(RecordVerifier):
     @patch('telicent_lib.adapter.uuid.uuid4')
     def test_automatic_adapter_with_security_policy_01(self, patched_method):
         patched_method.return_value = 'uuid4'
+        pbac = TelicentModel(**self.test_policy)
         sink = ListSink()
         adapter = AutomaticAdapter(target=sink, adapter_function=custom_range_generator, has_reporter=False,
-                                   has_error_handler=False, pbac_data=self.test_policy,
+                                   has_error_handler=False, pbac_obj=pbac,
                                    start=100, stop=200)
         adapter.run()
         self.__validate_generated_range__(sink, 100, 200, headers=self.default_headers_edh)
