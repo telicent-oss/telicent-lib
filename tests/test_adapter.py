@@ -5,6 +5,7 @@ from typing import Iterable
 from unittest.mock import patch
 
 from telicent_labels import TelicentModel
+
 from telicent_lib import Adapter, AutomaticAdapter, Record
 from telicent_lib.sinks.listSink import ListSink
 from tests.delaySink import DelaySink

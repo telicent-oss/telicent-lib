@@ -1,9 +1,8 @@
 import uuid
-from typing import Any, Callable, Iterable
+from typing import Iterable
 
 from colored import fore
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
-from telicent_labels.telicent_model import TelicentModel
 
 from telicent_lib.action import DEFAULT_REPORTING_BATCH_SIZE, OutputAction
 from telicent_lib.records import Record, RecordAdapter, RecordUtils
