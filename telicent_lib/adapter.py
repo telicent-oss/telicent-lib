@@ -140,7 +140,7 @@ class AutomaticAdapter(OutputAction):
         :type name: str
         :param source_name: The name of the data source, used in the startup banner
         :param pbac_obj: An instance of Security policy model populated with data
-        :type object
+        :type pbac_job: object
         :param adapter_args:
             Additional keyword arguments to pass to the adapter_function when calling it, the adapter_function must take
             keyword arguments for this to work
