@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
+from typing import Annotated
 
 from pydantic import AwareDatetime, BaseModel, PlainSerializer
-from typing_extensions import Annotated
 
 from telicent_lib.access.edhv2 import EDHSecurityLabelsV2
 from telicent_lib.access.security_labels import SecurityLabelBuilder

@@ -1,5 +1,5 @@
 import json
-from typing import Iterable
+from collections.abc import Iterable
 from unittest import TestCase, mock
 
 from telicent_lib import AutomaticAdapter, Mapper, Projector, Record

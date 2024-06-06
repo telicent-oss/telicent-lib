@@ -1,8 +1,9 @@
 
 import inspect
 import unittest
+from collections.abc import Callable
 from json import JSONDecodeError
-from typing import Any, Callable
+from typing import Any
 
 from confluent_kafka import KafkaException
 from confluent_kafka.serialization import Deserializer, Serializer

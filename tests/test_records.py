@@ -1,6 +1,7 @@
 import json
 import unittest
-from typing import Any, Callable, Iterable
+from collections.abc import Callable, Iterable
+from typing import Any
 
 from telicent_lib import Record, RecordUtils
 
