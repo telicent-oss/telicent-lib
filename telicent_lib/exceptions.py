@@ -30,3 +30,12 @@ class ConfigurationException(Exception):
         self.config = config
         self.message = message
         super().__init__(self.message)
+
+class KafkaTopicNotFoundException(Exception):
+    """
+    Raised when a specified topic (DataSource or DataSink) is not find on the specified server
+    """
+    def __init__(self, topic_name, message=None):
+        self.topic_name = topic_name
+        self.message = message if message else f"Kafka topic {topic_name} not found on the specified bootstrap server, are you sure this topic exists ?"
+        super().__init__(self.message)
