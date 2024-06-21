@@ -5,12 +5,12 @@ from colored import fore
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
 from telicent_lib.action import DEFAULT_REPORTING_BATCH_SIZE, InputOutputAction
+from telicent_lib.exceptions import KafkaTopicNotFoundException
 from telicent_lib.records import RecordMapper, RecordUtils
 from telicent_lib.sinks import DataSink
 from telicent_lib.sources import DataSource
 from telicent_lib.status import Status
 from telicent_lib.utils import validate_callable_protocol
-from telicent_lib.exceptions import KafkaTopicNotFoundException
 
 __license__ = """
 Copyright (c) Telicent Ltd.
@@ -175,7 +175,8 @@ class Mapper(InputOutputAction):
                 self.update_status(Status.ERRORING)
                 self.aborted()
                 if "UNKNOWN_TOPIC" in e.__str__():
-                    raise KafkaTopicNotFoundException(topic_name=self.source.get_source_name() if self.source.get_source_name() in e.__str__() else self.target.get_sink_name()) from e
+                    raise KafkaTopicNotFoundException(topic_name=self.source.get_source_name()
+                    if self.source.get_source_name() in e.__str__() else self.target.get_sink_name()) from e
                 else:
                     raise
             except Exception as e:

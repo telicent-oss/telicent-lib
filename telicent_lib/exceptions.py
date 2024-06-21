@@ -37,5 +37,6 @@ class KafkaTopicNotFoundException(Exception):
     """
     def __init__(self, topic_name, message=None):
         self.topic_name = topic_name
-        self.message = message if message else f"Kafka topic {topic_name} not found on the specified bootstrap server, are you sure this topic exists ?"
+        self.message = (message if message else f"Kafka topic {topic_name} not found on the specified bootstrap" +
+                        "server, are you sure this topic exists ?")
         super().__init__(self.message)
