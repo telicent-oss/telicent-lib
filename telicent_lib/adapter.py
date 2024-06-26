@@ -121,9 +121,7 @@ class AutomaticAdapter(OutputAction):
     def __init__(self, target: DataSink, adapter_function: RecordAdapter,
                  text_colour=fore.LIGHT_CYAN, reporting_batch_size=DEFAULT_REPORTING_BATCH_SIZE,
                  name: str = None, source_name: str = None, source_type: str = None, has_reporter: bool = True,
-                 reporter_sink=None, has_error_handler: bool = True, error_handler=None,
-                 pbac_obj=None,
-                 **adapter_args):
+                 reporter_sink=None, has_error_handler: bool = True, error_handler=None, **adapter_args):
         """
         Creates a new automatic adapter that imports data into a data sink.
 
@@ -139,8 +137,6 @@ class AutomaticAdapter(OutputAction):
         :param name: The name of the Adapter
         :type name: str
         :param source_name: The name of the data source, used in the startup banner
-        :param pbac_obj: An instance of Security policy model populated with data
-        :type pbac_job: object
         :param adapter_args:
             Additional keyword arguments to pass to the adapter_function when calling it, the adapter_function must take
             keyword arguments for this to work
@@ -149,7 +145,6 @@ class AutomaticAdapter(OutputAction):
         self.adapter_args = adapter_args
         self.source_name = source_name
         self.source_type = source_type
-        self.pbac_obj = pbac_obj
 
         if adapter_function is None:
             raise ValueError('Adapter Function cannot be None')
@@ -214,15 +209,6 @@ class AutomaticAdapter(OutputAction):
                                 ('Request-Id', request_id),
                                 ('traceparent', carrier.get('traceparent', ''))
                             ]
-
-                            if self.pbac_obj:
-                                security_label = self.pbac_obj.build_security_labels()
-                                default_headers.append(
-                                    ('policyInformation', {'PBAC': self.pbac_obj.model_dump()}),
-                                )
-                                default_headers.append(
-                                    ('Security-Label', security_label)
-                                )
 
                             record = RecordUtils.add_headers(record, default_headers)
 
