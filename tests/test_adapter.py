@@ -27,9 +27,8 @@ def custom_range_generator(**range_args) -> Iterable[Record]:
     for i in range(range_args["start"], range_args["stop"]):
         record = Record(headers=None, key=i, value=str(i))
         if {'data_header_model', 'security_labels'}.issubset(range_args):
-            headers = list()
-            headers.append(('policyInformation', {'DH': range_args['data_header_model'].model_dump()}))
-            headers.append(('Security-Label', range_args['security_labels']))
+            headers = [('policyInformation', {'DH': range_args['data_header_model'].model_dump()}),
+                       ('Security-Label', range_args['security_labels'])]
             record = RecordUtils.add_headers(record, headers)
         yield record
 
