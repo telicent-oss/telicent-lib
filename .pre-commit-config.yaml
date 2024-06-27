@@ -17,7 +17,3 @@ repos:
     hooks:
       - id: mypy
         types: [python]
-        additional_dependencies:
-          - types-pytz
-          - types-python-dateutil
-
