@@ -18,4 +18,4 @@ A `DataSource` provides input from a source (e.g. a Kafka consumer), whilst a `D
 
 telicent-lib provides a number of features out of the box to support development, configuration, error handling and audit logging.
 
-[Configuration](configuration.md) | [Logging](logging.md) | [Error Handling](error-handling.md) | [Provenance and Audit](provenance.md) | [Telemetry](telemetry.md) | [Access/UKHIM](access-edh-ukhim.md)
+[Configuration](configuration.md) | [Logging](logging.md) | [Error Handling](error-handling.md) | [Provenance and Audit](provenance.md) | [Telemetry](telemetry.md) | [SecurityLabel modules](security-label-modules)

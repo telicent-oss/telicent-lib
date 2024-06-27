@@ -4,7 +4,6 @@ from typing import Iterable
 from colored import fore
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
-from telicent_lib.access import EDHModel
 from telicent_lib.action import DEFAULT_REPORTING_BATCH_SIZE, OutputAction
 from telicent_lib.records import Record, RecordAdapter, RecordUtils
 from telicent_lib.sinks.dataSink import DataSink
@@ -122,9 +121,7 @@ class AutomaticAdapter(OutputAction):
     def __init__(self, target: DataSink, adapter_function: RecordAdapter,
                  text_colour=fore.LIGHT_CYAN, reporting_batch_size=DEFAULT_REPORTING_BATCH_SIZE,
                  name: str = None, source_name: str = None, source_type: str = None, has_reporter: bool = True,
-                 reporter_sink=None, has_error_handler: bool = True, error_handler=None,
-                 policy_information: dict | None = None,
-                 **adapter_args):
+                 reporter_sink=None, has_error_handler: bool = True, error_handler=None, **adapter_args):
         """
         Creates a new automatic adapter that imports data into a data sink.
 
@@ -148,7 +145,7 @@ class AutomaticAdapter(OutputAction):
         self.adapter_args = adapter_args
         self.source_name = source_name
         self.source_type = source_type
-        self.policy_information = policy_information
+
         if adapter_function is None:
             raise ValueError('Adapter Function cannot be None')
         validate_callable_protocol(adapter_function, RecordAdapter)
@@ -187,10 +184,11 @@ class AutomaticAdapter(OutputAction):
                                 flush=True)
         else:
             self.print_coloured(f"Waiting for data - will write out to {self.target}", flush=True)
-        print("")
+
         if self.reporter is not None:
             self.reporter.run()
             self.print_coloured(f"Telicent Live Reporter registered to send heartbeats to {self.reporter.sink}")
+
         try:
             self.started()
             with self.target:
@@ -211,16 +209,6 @@ class AutomaticAdapter(OutputAction):
                                 ('Request-Id', request_id),
                                 ('traceparent', carrier.get('traceparent', ''))
                             ]
-
-                            if self.policy_information:
-                                edh_model = EDHModel(**self.policy_information)
-                                security_label = edh_model.build_security_labels()
-                                default_headers.append(
-                                    ('policyInformation', {'EDH': edh_model.model_dump()}),
-                                )
-                                default_headers.append(
-                                    ('Security-Label', security_label)
-                                )
 
                             record = RecordUtils.add_headers(record, default_headers)
 
