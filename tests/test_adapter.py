@@ -50,7 +50,7 @@ class TestAdapter(RecordVerifier):
 
         self.test_data_header = {
             "apiVersion": "v1alpha",
-            "specification": "UKIC v3.0",
+            "specification": "v3.0",
             "identifier": "ItemA",
             "classification": "S",
             "permittedOrgs": [
