@@ -15,7 +15,7 @@ an implementation of the TelicentModel. Label-builder is not a dependency of tel
 ```python
 data_header = {
             "apiVersion": "v1alpha",
-            "specification": "UKIC v3.0",
+            "specification": "v3.0",
             "identifier": "ItemA",
             "classification": "S",
             "permittedOrgs": [
