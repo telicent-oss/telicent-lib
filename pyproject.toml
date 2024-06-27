@@ -89,7 +89,7 @@ exclude = [
 line-length = 120
 
 [project.urls]
-Repository = "https://github.com/Telicent-io/map-lib"
+Repository = "https://github.com/telicent-oss/telicent-lib"
 
 [tool.distutils.bdist_wheel]
 universal = true
