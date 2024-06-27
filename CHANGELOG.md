@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.0.4](https://github.com/telicent-oss/telicent-lib/compare/v2.0.3...v2.0.4) (2024-06-27)
+
+
+### Miscellaneous
+
+* add types-pytz and types-python-dateutil to pre-commit config ([6f91762](https://github.com/telicent-oss/telicent-lib/commit/6f9176294b0ba2a96bc6ca540d061d6904f914fd))
+* Remove SecurityLabels funtionality - now a dependency ([#27](https://github.com/telicent-oss/telicent-lib/issues/27)) ([1924284](https://github.com/telicent-oss/telicent-lib/commit/19242843fa723b8262a0b7708a9a43ca4f5f5e63))
+* update repository url in pyproject ([2b534c2](https://github.com/telicent-oss/telicent-lib/commit/2b534c200a75542ab0c6094dc4a02e40f515dc58))
+
 ## [2.0.3](https://github.com/telicent-oss/telicent-lib/compare/v2.0.2...v2.0.3) (2024-05-31)
 
 
