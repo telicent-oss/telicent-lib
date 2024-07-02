@@ -169,16 +169,6 @@ class Mapper(InputOutputAction):
                 self.__print_source_status__(self.source)
                 self.update_status(Status.TERMINATED)
                 self.aborted()
-            except RuntimeError as e:
-                self.send_exception(e)
-                self.__print_source_status__(self.source)
-                self.update_status(Status.ERRORING)
-                self.aborted()
-                if "UNKNOWN_TOPIC" in e.__str__():
-                    raise KafkaTopicNotFoundException(topic_name=self.source.get_source_name()
-                    if self.source.get_source_name() in e.__str__() else self.target.get_sink_name()) from e
-                else:
-                    raise
             except Exception as e:
                 self.send_exception(e)
                 self.__print_source_status__(self.source)
