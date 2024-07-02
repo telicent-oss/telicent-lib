@@ -5,7 +5,6 @@ from colored import fore
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
 from telicent_lib.action import DEFAULT_REPORTING_BATCH_SIZE, InputOutputAction
-from telicent_lib.exceptions import KafkaTopicNotFoundException
 from telicent_lib.records import RecordMapper, RecordUtils
 from telicent_lib.sinks import DataSink
 from telicent_lib.sources import DataSource

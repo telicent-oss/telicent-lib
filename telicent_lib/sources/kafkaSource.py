@@ -10,11 +10,11 @@ from confluent_kafka import OFFSET_BEGINNING, OFFSET_END, Consumer, Message, Top
 from confluent_kafka.serialization import Deserializer
 
 from telicent_lib.config import Configurator, OnError
+from telicent_lib.exceptions import SourceNotFoundException
 from telicent_lib.records import Record
 from telicent_lib.sources.dataSource import DataSource
 from telicent_lib.sources.deserializers import DeserializerFunction, Deserializers
 from telicent_lib.utils import check_kafka_broker_available, validate_callable_protocol
-from telicent_lib.exceptions import SourceNotFoundException
 
 logger = logging.getLogger(__name__)
 
