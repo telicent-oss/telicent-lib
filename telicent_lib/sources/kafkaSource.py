@@ -14,6 +14,7 @@ from telicent_lib.records import Record
 from telicent_lib.sources.dataSource import DataSource
 from telicent_lib.sources.deserializers import DeserializerFunction, Deserializers
 from telicent_lib.utils import check_kafka_broker_available, validate_callable_protocol
+from telicent_lib.exceptions import SourceNotFoundException
 
 logger = logging.getLogger(__name__)
 
@@ -243,7 +244,10 @@ class KafkaSource(DataSource):
                 continue
 
             if record.error() is not None:
-                raise RuntimeError(record.error())
+                if "UNKNOWN_TOPIC_OR_PART" in record.error().__str__():
+                    raise SourceNotFoundException(source_name=self.get_source_name())
+                else:
+                    raise RuntimeError(record.error())
 
             self.last_offsets[TopicPartition(record.topic(), record.partition())] = record
 
