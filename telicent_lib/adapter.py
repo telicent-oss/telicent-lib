@@ -1,5 +1,5 @@
 import uuid
-from typing import Iterable
+from collections.abc import Iterable
 
 from colored import fore
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator

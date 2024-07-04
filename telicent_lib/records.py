@@ -1,6 +1,7 @@
 import collections
 import json
-from typing import Any, Iterable, Protocol, runtime_checkable
+from collections.abc import Iterable
+from typing import Any, Protocol, runtime_checkable
 
 __license__ = """
 Copyright (c) Telicent Ltd.

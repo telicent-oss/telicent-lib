@@ -1,5 +1,5 @@
 
-from typing import Iterable
+from collections.abc import Iterable
 
 from telicent_lib.records import Record
 

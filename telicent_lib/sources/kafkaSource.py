@@ -4,7 +4,7 @@ import inspect
 import logging
 import re
 import warnings
-from typing import Iterable
+from collections.abc import Iterable
 
 from confluent_kafka import OFFSET_BEGINNING, OFFSET_END, Consumer, Message, TopicPartition
 from confluent_kafka.serialization import Deserializer
