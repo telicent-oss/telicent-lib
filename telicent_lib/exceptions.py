@@ -30,3 +30,10 @@ class ConfigurationException(Exception):
         self.config = config
         self.message = message
         super().__init__(self.message)
+
+class SourceNotFoundException(Exception):
+    def __init__(self, source_name, message=None):
+        self.source_name = source_name
+        self.message = (message if message else f"Source {source_name} not found on the specified bootstrap" \
+                         " server, are you sure this source exists?")
+        super().__init__(self.message)

@@ -10,6 +10,7 @@ from confluent_kafka import OFFSET_BEGINNING, OFFSET_END, Consumer, Message, Top
 from confluent_kafka.serialization import Deserializer
 
 from telicent_lib.config import Configurator, OnError
+from telicent_lib.exceptions import SourceNotFoundException
 from telicent_lib.records import Record
 from telicent_lib.sources.dataSource import DataSource
 from telicent_lib.sources.deserializers import DeserializerFunction, Deserializers
@@ -243,7 +244,10 @@ class KafkaSource(DataSource):
                 continue
 
             if record.error() is not None:
-                raise RuntimeError(record.error())
+                if "UNKNOWN_TOPIC_OR_PART" in record.error().__str__():
+                    raise SourceNotFoundException(source_name=self.get_source_name())
+                else:
+                    raise RuntimeError(record.error())
 
             self.last_offsets[TopicPartition(record.topic(), record.partition())] = record
 
