@@ -4,7 +4,9 @@ from collections.abc import Iterable
 from datetime import datetime, timezone
 from unittest.mock import patch
 
-from telicent_lib import Adapter, AutomaticAdapter, Record
+from telicent_labels import TelicentModel
+
+from telicent_lib import Adapter, AutomaticAdapter, Record, RecordUtils
 from telicent_lib.sinks.listSink import ListSink
 from tests.delaySink import DelaySink
 from tests.test_records import RecordVerifier
@@ -15,6 +17,7 @@ def datetime_encoder(obj):
         return obj.isoformat()
     raise TypeError("Type not serializable")
 
+
 def integer_generator() -> Iterable[Record]:
     for i in range(0, 10):
         yield Record(headers=None, key=i, value=str(i))
@@ -22,7 +25,12 @@ def integer_generator() -> Iterable[Record]:
 
 def custom_range_generator(**range_args) -> Iterable[Record]:
     for i in range(range_args["start"], range_args["stop"]):
-        yield Record(headers=None, key=i, value=str(i))
+        record = Record(headers=None, key=i, value=str(i))
+        if {'data_header_model', 'security_labels'}.issubset(range_args):
+            headers = [('policyInformation', {'DH': range_args['data_header_model'].model_dump()}),
+                       ('Security-Label', range_args['security_labels'])]
+            record = RecordUtils.add_headers(record, headers)
+        yield record
 
     if "raise_error" in range_args.keys():
         raise ValueError(range_args["raise_error"])
@@ -40,9 +48,9 @@ class TestAdapter(RecordVerifier):
             ('Exec-Path', b'Automatic Adapter-to-In-Memory List'), ('Request-Id', b'List:uuid4'), ('traceparent', b'')
         ]
 
-        self.test_policy = {
+        self.test_data_header = {
             "apiVersion": "v1alpha",
-            "specification": "UKIC v3.0",
+            "specification": "v3.0",
             "identifier": "ItemA",
             "classification": "S",
             "permittedOrgs": [
@@ -69,20 +77,21 @@ class TestAdapter(RecordVerifier):
             "policyRef": "TestPolicyRef",
             "dataSet": ["ds1", "ds2"],
             "authRef": ["ref1", "ref2"],
-            "dispositionDate": datetime(2023,1,1,23,11,11).astimezone(timezone.utc),
+            "dispositionDate": datetime(2023, 1, 1, 23, 11, 11).astimezone(timezone.utc),
             "dispositionProcess": "disp-process-1",
             "dissemination": ["news", "articles"]
         }
 
-        self.bytes_policy = json.dumps({'EDH': self.test_policy}, default=datetime_encoder).encode('utf-8')
-        self.default_headers_edh = [('Exec-Path', b'Automatic Adapter-to-In-Memory List'),
-                                    ('Request-Id', b'List:uuid4'), ('traceparent', b''),
-                                    ('policyInformation', self.bytes_policy),
-                                    ('Security-Label', b'(classification=S&(permitted_organisations=ABC|'
-                                                       b'permitted_organisations=DEF|permitted_organisations=HIJ)&'
-                                                       b'(permitted_nationalities=GBR|permitted_nationalities=FRA|'
-                                                       b'permitted_nationalities=IRL)&doctor:and&admin:and&(Apple:or|'
-                                                       b'SOMETHING:or))')]
+        self.bytes_data_header = json.dumps({'DH': self.test_data_header}, default=datetime_encoder).encode('utf-8')
+        self.default_headers_with_dh = [('policyInformation', self.bytes_data_header),
+                                        ('Security-Label', b'(classification=S&(permitted_organisations=ABC|'
+                                                           b'permitted_organisations=DEF|permitted_organisations=HIJ)&'
+                                                           b'(permitted_nationalities=GBR|permitted_nationalities=FRA|'
+                                                           b'permitted_nationalities=IRL)&doctor:and&admin:and&(Apple:or|'
+                                                           b'SOMETHING:or))'),
+                                        ('Exec-Path', b'Automatic Adapter-to-In-Memory List'),
+                                        ('Request-Id', b'List:uuid4'), ('traceparent', b'')
+                                        ]
 
     def __validate_generated_range__(self, sink: ListSink, start: int = 0, stop: int = 10, headers=None):
         self.assertEqual(len(sink.get()), stop - start)
@@ -180,12 +189,14 @@ class TestAdapter(RecordVerifier):
     @patch('telicent_lib.adapter.uuid.uuid4')
     def test_automatic_adapter_with_security_policy_01(self, patched_method):
         patched_method.return_value = 'uuid4'
+        data_header_model = TelicentModel(**self.test_data_header)
+        security_labels = data_header_model.build_security_labels()
         sink = ListSink()
         adapter = AutomaticAdapter(target=sink, adapter_function=custom_range_generator, has_reporter=False,
-                                   has_error_handler=False, policy_information=self.test_policy,
-                                   start=100, stop=200)
+                                   has_error_handler=False, data_header_model=data_header_model,
+                                   security_labels=security_labels, start=100, stop=200)
         adapter.run()
-        self.__validate_generated_range__(sink, 100, 200, headers=self.default_headers_edh)
+        self.__validate_generated_range__(sink, 100, 200, headers=self.default_headers_with_dh)
 
     @patch('telicent_lib.adapter.uuid.uuid4')
     def test_automatic_adapter_with_args_01(self, patched_method):

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "telicent-lib"
-version = "2.0.3"
+version = "2.0.4"
 authors = [{name = "Telicent Ltd", email = "opensource@telicent.io"}]
 description = "A helper package for building Adapters, Mappers and Projectors for Telicent Core"
 requires-python = ">=3.10"
@@ -19,8 +19,7 @@ dependencies = [
     "pytz==2022.6",
     "confluent-kafka==2.3.0",
     "opentelemetry-api==1.20.0",
-    "opentelemetry-sdk==1.20.0",
-    "pydantic==2.5.2",
+    "opentelemetry-sdk==1.20.0"
 ]
 classifiers = [
     "Programming Language :: Python :: 3.10",
@@ -43,7 +42,8 @@ dev = [
     "types-requests==2.31.0.10",
     "mypy==1.7.0",
     "mkdocs==1.5.3",
-    "cyclonedx-bom==4.4.3"
+    "cyclonedx-bom==4.4.3",
+    "telicent-label-builder==0.1.0"
 ]
 
 [tool.setuptools.dynamic]
