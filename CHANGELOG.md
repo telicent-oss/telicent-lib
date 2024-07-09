@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.0.5](https://github.com/telicent-oss/telicent-lib/compare/v2.0.4...v2.0.5) (2024-07-09)
+
+
+### Bug Fixes
+
+* handled topic not found exception ([#29](https://github.com/telicent-oss/telicent-lib/issues/29)) ([55b7a84](https://github.com/telicent-oss/telicent-lib/commit/55b7a848785fa4a24cd420ada397d55fd860a317))
+
+
+### Miscellaneous
+
+* pr scanning and updated ruff checks to py310 ([#28](https://github.com/telicent-oss/telicent-lib/issues/28)) ([0c88188](https://github.com/telicent-oss/telicent-lib/commit/0c88188a6593309a9ddb627e3cab4b943efa950f))
+* update requests dependency add urllib3 to override older version provided by types-requests ([#34](https://github.com/telicent-oss/telicent-lib/issues/34)) ([c5bbb25](https://github.com/telicent-oss/telicent-lib/commit/c5bbb25f0948bdefbf38e94a8771341444e5743c))
+
 ## [2.0.4](https://github.com/telicent-oss/telicent-lib/compare/v2.0.3...v2.0.4) (2024-06-27)
 
 
