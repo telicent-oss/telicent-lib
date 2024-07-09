@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "telicent-lib"
-version = "2.0.4"
+version = "2.0.5"
 authors = [{name = "Telicent Ltd", email = "opensource@telicent.io"}]
 description = "A helper package for building Adapters, Mappers and Projectors for Telicent Core"
 requires-python = ">=3.10"
