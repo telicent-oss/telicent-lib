@@ -207,7 +207,9 @@ class AutomaticAdapter(OutputAction):
                             default_headers = [
                                 ('Exec-Path', self.generated_id),
                                 ('Request-Id', request_id),
-                                ('traceparent', carrier.get('traceparent', ''))
+                                ('traceparent', carrier.get('traceparent', '')),
+                                ('source-name', self.source_name),
+                                ('source-type', self.source_type)
                             ]
 
                             record = RecordUtils.add_headers(record, default_headers)
