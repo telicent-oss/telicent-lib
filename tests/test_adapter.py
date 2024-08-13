@@ -45,7 +45,11 @@ class TestAdapter(RecordVerifier):
     def setUp(self) -> None:
         super().setUp()
         self.default_headers = [
-            ('Exec-Path', b'Automatic Adapter-to-In-Memory List'), ('Request-Id', b'List:uuid4'), ('traceparent', b'')
+            ('Exec-Path', b'Automatic Adapter-to-In-Memory List'),
+            ('Request-Id', b'List:uuid4'),
+            ('traceparent', b''),
+            ('source-name', None),
+            ('source-type', None)
         ]
 
         self.test_data_header = {
