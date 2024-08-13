@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 import inspect
 import unittest
@@ -65,7 +66,7 @@ def __compare_rdf_graphs__(a: Any, b: Any) -> bool:
 
 class ExtendedSerializerFunction(SerializerFunction):
 
-    def __call__(self, data: Any | None) -> bytes | None:
+    def __call__(self, data: Any) -> bytes | None:
         if data is None:
             return None
         return bytes(data)

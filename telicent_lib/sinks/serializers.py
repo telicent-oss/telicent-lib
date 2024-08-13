@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import zlib
 from typing import Any, Protocol, runtime_checkable

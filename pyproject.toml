@@ -44,7 +44,7 @@ dev = [
     "mypy==1.7.0",
     "mkdocs==1.5.3",
     "cyclonedx-bom==4.4.3",
-    "telicent-label-builder==0.1.0",
+#    "telicent-label-builder==0.1.0",
 ]
 
 [tool.setuptools.dynamic]

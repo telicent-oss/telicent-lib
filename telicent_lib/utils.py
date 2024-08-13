@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import inspect
 from inspect import Parameter
 from itertools import islice

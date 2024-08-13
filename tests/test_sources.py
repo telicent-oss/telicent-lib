@@ -1,4 +1,3 @@
-
 import unittest
 
 from confluent_kafka import KafkaException
