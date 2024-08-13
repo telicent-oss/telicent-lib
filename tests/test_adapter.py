@@ -94,7 +94,7 @@ class TestAdapter(RecordVerifier):
                                                            b'permitted_nationalities=IRL)&doctor:and&admin:and&(Apple:or|'
                                                            b'SOMETHING:or))'),
                                         ('Exec-Path', b'Automatic Adapter-to-In-Memory List'),
-                                        ('Request-Id', b'List:uuid4'), ('traceparent', b'')
+                                        ('Request-Id', b'List:uuid4'), ('traceparent', b''),
                                         ('Data-Source-Name', None), ('Data-Source-Type', None)
                                         ]
 
