@@ -48,8 +48,8 @@ class TestAdapter(RecordVerifier):
             ('Exec-Path', b'Automatic Adapter-to-In-Memory List'),
             ('Request-Id', b'List:uuid4'),
             ('traceparent', b''),
-            ('Data-Source-Name', str(None)),
-            ('Data-Source-Type', str(None))
+            ('Data-Source-Name', b'None'),
+            ('Data-Source-Type', b'None')
         ]
 
         self.test_data_header = {
@@ -95,7 +95,7 @@ class TestAdapter(RecordVerifier):
                                                            b'SOMETHING:or))'),
                                         ('Exec-Path', b'Automatic Adapter-to-In-Memory List'),
                                         ('Request-Id', b'List:uuid4'), ('traceparent', b''),
-                                        ('Data-Source-Name', str(None)), ('Data-Source-Type', str(None))
+                                        ('Data-Source-Name', b'None'), ('Data-Source-Type', b'None')
                                         ]
 
     def __validate_generated_range__(self, sink: ListSink, start: int = 0, stop: int = 10, headers=None):
