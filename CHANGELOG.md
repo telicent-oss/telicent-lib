@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.6](https://github.com/telicent-oss/telicent-lib/compare/v2.0.5...v2.0.6) (2024-08-14)
+
+
+### Miscellaneous
+
+* limited support for python 3.9 ([#35](https://github.com/telicent-oss/telicent-lib/issues/35)) ([0868e99](https://github.com/telicent-oss/telicent-lib/commit/0868e99efacf41452fc6b0e7874a7b4c91580299))
+
 ## [2.0.5](https://github.com/telicent-oss/telicent-lib/compare/v2.0.4...v2.0.5) (2024-07-09)
 
 
