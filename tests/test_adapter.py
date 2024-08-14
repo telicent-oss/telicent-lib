@@ -241,7 +241,8 @@ class TestAdapter(RecordVerifier):
         patched_method.return_value = 'uuid4'
         sink = ListSink()
         adapter = AutomaticAdapter(target=sink, adapter_function=custom_range_generator, has_reporter=False,
-                                   has_error_handler=False, start=100, stop=200, source_name='foo.csv', source_type='file')
+                                   has_error_handler=False, start=100, stop=200,
+                                   source_name='foo.csv', source_type='file')
         adapter.run()
         self.__validate_generated_range__(sink, 100, 200, headers=self.default_headers_with_source)
 
