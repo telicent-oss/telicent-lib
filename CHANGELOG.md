@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.7](https://github.com/telicent-oss/telicent-lib/compare/v2.0.6...v2.0.7) (2024-08-14)
+
+
+### Bug Fixes
+
+* allow full install on Python 3.9 ([#38](https://github.com/telicent-oss/telicent-lib/issues/38)) ([f176f56](https://github.com/telicent-oss/telicent-lib/commit/f176f56618ce0af7b7775a77b599885ba92801a8))
+
 ## [2.0.6](https://github.com/telicent-oss/telicent-lib/compare/v2.0.5...v2.0.6) (2024-08-14)
 
 
