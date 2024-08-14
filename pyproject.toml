@@ -43,8 +43,7 @@ dev = [
     "types-requests==2.32.0.20240622",
     "mypy==1.7.0",
     "mkdocs==1.5.3",
-    "cyclonedx-bom==4.4.3",
-    "telicent-label-builder==0.1.0",
+    "cyclonedx-bom==4.4.3"
 ]
 
 [tool.setuptools.dynamic]

@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 import unittest
 from typing import Any, Protocol, runtime_checkable
@@ -56,7 +57,7 @@ class TestProtocolValidation(unittest.TestCase):
             validate_callable_protocol(value, DeserializerFunction)
 
     def test_protocol_validation_wrong_parameter_type(self) -> None:
-        with self.assertRaisesRegex(TypeError, expected_regex="Wrong parameter type.*.*bytes.*'int'.*"):
+        with self.assertRaisesRegex(TypeError, expected_regex="Wrong parameter type.*.*bytes.*int.*"):
             validate_callable_protocol(not_a_deserializer, DeserializerFunction)
 
     def test_protocol_validation_good(self) -> None:

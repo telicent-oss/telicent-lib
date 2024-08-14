@@ -4,8 +4,6 @@ from collections.abc import Iterable
 from datetime import datetime, timezone
 from unittest.mock import patch
 
-from telicent_labels import TelicentModel
-
 from telicent_lib import Adapter, AutomaticAdapter, Record, RecordUtils
 from telicent_lib.sinks.listSink import ListSink
 from tests.delaySink import DelaySink
@@ -185,18 +183,6 @@ class TestAdapter(RecordVerifier):
                                    has_error_handler=False)
         adapter.run()
         self.assertEqual(len(sink.get()), 10)
-
-    @patch('telicent_lib.adapter.uuid.uuid4')
-    def test_automatic_adapter_with_security_policy_01(self, patched_method):
-        patched_method.return_value = 'uuid4'
-        data_header_model = TelicentModel(**self.test_data_header)
-        security_labels = data_header_model.build_security_labels()
-        sink = ListSink()
-        adapter = AutomaticAdapter(target=sink, adapter_function=custom_range_generator, has_reporter=False,
-                                   has_error_handler=False, data_header_model=data_header_model,
-                                   security_labels=security_labels, start=100, stop=200)
-        adapter.run()
-        self.__validate_generated_range__(sink, 100, 200, headers=self.default_headers_with_dh)
 
     @patch('telicent_lib.adapter.uuid.uuid4')
     def test_automatic_adapter_with_args_01(self, patched_method):
