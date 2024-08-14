@@ -47,9 +47,15 @@ class TestAdapter(RecordVerifier):
         self.default_headers = [
             ('Exec-Path', b'Automatic Adapter-to-In-Memory List'),
             ('Request-Id', b'List:uuid4'),
+            ('traceparent', b'')
+        ]
+
+        self.default_headers_with_source = [
+            ('Exec-Path', b'Automatic Adapter-to-In-Memory List'),
+            ('Request-Id', b'List:uuid4'),
             ('traceparent', b''),
-            ('Data-Source-Name', b'None'),
-            ('Data-Source-Type', b'None')
+            ('Data-Source-Name', 'foo.csv'),
+            ('Data-Source-Type', 'file')
         ]
 
         self.test_data_header = {
@@ -94,8 +100,7 @@ class TestAdapter(RecordVerifier):
                                                            b'permitted_nationalities=IRL)&doctor:and&admin:and&(Apple:or|'
                                                            b'SOMETHING:or))'),
                                         ('Exec-Path', b'Automatic Adapter-to-In-Memory List'),
-                                        ('Request-Id', b'List:uuid4'), ('traceparent', b''),
-                                        ('Data-Source-Name', b'None'), ('Data-Source-Type', b'None')
+                                        ('Request-Id', b'List:uuid4'), ('traceparent', b'')
                                         ]
 
     def __validate_generated_range__(self, sink: ListSink, start: int = 0, stop: int = 10, headers=None):
@@ -221,6 +226,24 @@ class TestAdapter(RecordVerifier):
         with self.assertRaisesRegex(ValueError, expected_regex="Bad source"):
             adapter.run()
         self.__validate_generated_range__(sink, 50, 70, headers=self.default_headers)
+
+    @patch('telicent_lib.adapter.uuid.uuid4')
+    def test_automatic_adapter_with_source_headers(self, patched_method):
+        patched_method.return_value = 'uuid4'
+        sink = ListSink()
+        adapter = AutomaticAdapter(target=sink, adapter_function=custom_range_generator, has_reporter=False,
+                                   has_error_handler=False, start=100, stop=200)
+        adapter.run()
+        self.__validate_generated_range__(sink, 100, 200, headers=self.default_headers)
+
+    @patch('telicent_lib.adapter.uuid.uuid4')
+    def test_automatic_adapter_with_empty_source_headers(self, patched_method):
+        patched_method.return_value = 'uuid4'
+        sink = ListSink()
+        adapter = AutomaticAdapter(target=sink, adapter_function=custom_range_generator, has_reporter=False,
+                                   has_error_handler=False, start=100, stop=200, source_name='foo.csv', source_type='file')
+        adapter.run()
+        self.__validate_generated_range__(sink, 100, 200, headers=self.default_headers_with_source)
 
 
 if __name__ == '__main__':
