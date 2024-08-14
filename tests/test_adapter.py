@@ -54,8 +54,8 @@ class TestAdapter(RecordVerifier):
             ('Exec-Path', b'Automatic Adapter-to-In-Memory List'),
             ('Request-Id', b'List:uuid4'),
             ('traceparent', b''),
-            ('Data-Source-Name', 'foo.csv'),
-            ('Data-Source-Type', 'file')
+            ('Data-Source-Name', b'foo.csv'),
+            ('Data-Source-Type', b'file')
         ]
 
         self.test_data_header = {
