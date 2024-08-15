@@ -228,7 +228,7 @@ class TestAdapter(RecordVerifier):
         self.__validate_generated_range__(sink, 50, 70, headers=self.default_headers)
 
     @patch('telicent_lib.adapter.uuid.uuid4')
-    def test_automatic_adapter_with_source_headers(self, patched_method):
+    def test_automatic_adapter_with_empty_source_headers(self, patched_method):
         patched_method.return_value = 'uuid4'
         sink = ListSink()
         adapter = AutomaticAdapter(target=sink, adapter_function=custom_range_generator, has_reporter=False,
@@ -237,7 +237,7 @@ class TestAdapter(RecordVerifier):
         self.__validate_generated_range__(sink, 100, 200, headers=self.default_headers)
 
     @patch('telicent_lib.adapter.uuid.uuid4')
-    def test_automatic_adapter_with_empty_source_headers(self, patched_method):
+    def test_automatic_adapter_with_source_headers(self, patched_method):
         patched_method.return_value = 'uuid4'
         sink = ListSink()
         adapter = AutomaticAdapter(target=sink, adapter_function=custom_range_generator, has_reporter=False,
