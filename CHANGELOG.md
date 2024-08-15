@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/telicent-oss/telicent-lib/compare/v2.0.7...v2.1.0) (2024-08-15)
+
+
+### Features
+
+* added source headers ([#36](https://github.com/telicent-oss/telicent-lib/issues/36)) ([1f0c60f](https://github.com/telicent-oss/telicent-lib/commit/1f0c60f5cb45848668ca1469d81f4390118a91d3))
+
 ## [2.0.7](https://github.com/telicent-oss/telicent-lib/compare/v2.0.6...v2.0.7) (2024-08-14)
 
 
