@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 import json
 import logging
@@ -65,7 +67,7 @@ class BaseAdapter(OutputAction):
             self.data_catalogue_sink.close()
         super().aborted()
 
-    def update_data_catalogue(self, headers: dict[str, str | bytes | None]) -> bool:
+    def update_data_catalogue(self, headers: list[tuple[str, str | bytes | None]] | None) -> bool:
         if not self.has_data_catalogue:
             logger.warning("Cannot create data catalogue update as 'has_data_catalogue' is False")
             return False
@@ -75,7 +77,7 @@ class BaseAdapter(OutputAction):
             "data-source-last-update": datetime.datetime.now().astimezone().isoformat(),
             "component-name": self.name
         }
-        record = Record(headers=RecordUtils.to_headers(headers), key=None, value=json.dumps(payload), raw=None)
+        record = Record(headers=headers, key=None, value=json.dumps(payload), raw=None)
         self.data_catalogue_sink.send(record)
         return True
 
