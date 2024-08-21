@@ -96,7 +96,7 @@ each record a unique ID, which component wrote the record, and in the case of a 
 
 ## Data Catalogue
 
-By default, [Adapters and AutomaticAdapters](adapters.md) provide a method to notify a data catalogue that as data source has been updated.
+By default, [Adapters and AutomaticAdapters](adapters.md) provide a method to notify a data catalogue that a data source has been updated.
 
 ```python
 ...
