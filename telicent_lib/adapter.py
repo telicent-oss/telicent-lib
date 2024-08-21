@@ -1,3 +1,6 @@
+import datetime
+import json
+import logging
 import uuid
 from collections.abc import Iterable
 
@@ -5,7 +8,9 @@ from colored import fore
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
 from telicent_lib.action import DEFAULT_REPORTING_BATCH_SIZE, OutputAction
+from telicent_lib.config import Configurator
 from telicent_lib.records import Record, RecordAdapter, RecordUtils
+from telicent_lib.sinks import KafkaSink
 from telicent_lib.sinks.dataSink import DataSink
 from telicent_lib.status import Status
 from telicent_lib.utils import validate_callable_protocol
@@ -27,7 +32,55 @@ limitations under the License.
 """
 
 
-class Adapter(OutputAction):
+logger = logging.getLogger(__name__)
+
+
+class BaseAdapter(OutputAction):
+
+    def __init__(self, target, text_colour, reporting_batch_size, action, name, source_name, source_type, has_reporter,
+                 reporter_sink, has_error_handler, error_handler, disable_metrics, has_data_catalogue,
+                 data_catalogue_sink):
+        self.source_name = source_name
+        self.source_type = source_type
+
+        config = Configurator()
+        self.has_data_catalogue = has_data_catalogue
+        self.data_catalogue_sink = data_catalogue_sink
+        if self.has_data_catalogue and self.data_catalogue_sink is None:
+            self.data_catalogue_sink = KafkaSink(topic=config.get("DATA_CATALOGUE_TOPIC", "dc"))
+
+        super().__init__(
+            target, text_colour=text_colour, reporting_batch_size=reporting_batch_size,
+            action=action, name=name, has_reporter=has_reporter, reporter_sink=reporter_sink,
+            has_error_handler=has_error_handler, error_handler=error_handler, disable_metrics=disable_metrics
+        )
+
+    def finished(self) -> None:
+        if self.has_data_catalogue:
+            self.data_catalogue_sink.close()
+        super().finished()
+
+    def aborted(self) -> None:
+        if self.has_data_catalogue:
+            self.data_catalogue_sink.close()
+        super().aborted()
+
+    def update_data_catalogue(self, headers: dict[str, str | bytes | None]) -> bool:
+        if not self.has_data_catalogue:
+            logger.warning("Cannot create data catalogue update as 'has_data_catalogue' is False")
+            return False
+        payload = {
+            "data-source-name": self.source_name,
+            "data-source-type": self.source_type,
+            "data-source-last-update": datetime.datetime.now().astimezone().isoformat(),
+            "component-name": self.name
+        }
+        record = Record(headers=RecordUtils.to_headers(headers), key=None, value=json.dumps(payload), raw=None)
+        self.data_catalogue_sink.send(record)
+        return True
+
+
+class Adapter(BaseAdapter):
     """
     An adapter is an action for importing data to a Data Sink.
 
@@ -37,7 +90,8 @@ class Adapter(OutputAction):
 
     def __init__(self, target: DataSink, text_colour=fore.LIGHT_CYAN, reporting_batch_size=DEFAULT_REPORTING_BATCH_SIZE,
                  name: str = None, source_name: str = None, source_type: str = None, has_reporter: bool = True,
-                 reporter_sink=None, has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False):
+                 reporter_sink=None, has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False,
+                 has_data_catalogue: bool = True, data_catalogue_sink: DataSink = None):
         """
         Creates a new adapter that imports data into a data sink.
 
@@ -51,13 +105,13 @@ class Adapter(OutputAction):
         :type name: str
         :param source_name: The name of the data source
         """
-        self.source_name = source_name
-        self.source_type = source_type
 
         super().__init__(target, text_colour=text_colour, reporting_batch_size=reporting_batch_size,
-                         action="Manual Adapter", name=name, has_reporter=has_reporter, reporter_sink=reporter_sink,
+                         action="Manual Adapter", name=name, source_name=source_name, source_type=source_type,
+                         has_reporter=has_reporter, reporter_sink=reporter_sink,
                          has_error_handler=has_error_handler, error_handler=error_handler,
-                         disable_metrics=disable_metrics)
+                         disable_metrics=disable_metrics, has_data_catalogue=has_data_catalogue,
+                         data_catalogue_sink=data_catalogue_sink)
 
     def reporter_kwargs(self):
         return {
@@ -103,7 +157,7 @@ class Adapter(OutputAction):
         super().aborted()
 
 
-class AutomaticAdapter(OutputAction):
+class AutomaticAdapter(BaseAdapter):
     """
     An adapter is an action for importing data to a Data Sink.
 
@@ -121,7 +175,8 @@ class AutomaticAdapter(OutputAction):
     def __init__(self, target: DataSink, adapter_function: RecordAdapter,
                  text_colour=fore.LIGHT_CYAN, reporting_batch_size=DEFAULT_REPORTING_BATCH_SIZE,
                  name: str = None, source_name: str = None, source_type: str = None, has_reporter: bool = True,
-                 reporter_sink=None, has_error_handler: bool = True, error_handler=None, **adapter_args):
+                 reporter_sink=None, has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False,
+                 has_data_catalogue: bool = True, data_catalogue_sink: DataSink = None, **adapter_args):
         """
         Creates a new automatic adapter that imports data into a data sink.
 
@@ -140,18 +195,22 @@ class AutomaticAdapter(OutputAction):
         :param adapter_args:
             Additional keyword arguments to pass to the adapter_function when calling it, the adapter_function must take
             keyword arguments for this to work
+        :param has_data_catalogue:
+            Whether to provide a mechanism to notify a data catalogue of data source updates
+        :param data_catalogue_sink:
+            The sink to write data catalogue updates to
         """
         self.adapter_function = adapter_function
         self.adapter_args = adapter_args
-        self.source_name = source_name
-        self.source_type = source_type
 
         if adapter_function is None:
             raise ValueError('Adapter Function cannot be None')
         validate_callable_protocol(adapter_function, RecordAdapter)
         super().__init__(target, text_colour=text_colour, reporting_batch_size=reporting_batch_size,
-                         action="Automatic Adapter", name=name, has_reporter=has_reporter, reporter_sink=reporter_sink,
-                         has_error_handler=has_error_handler, error_handler=error_handler)
+                         action="Automatic Adapter", name=name, source_name=source_name, source_type=source_type,
+                         has_reporter=has_reporter, reporter_sink=reporter_sink, disable_metrics=disable_metrics,
+                         has_error_handler=has_error_handler, error_handler=error_handler,
+                         has_data_catalogue=has_data_catalogue, data_catalogue_sink=data_catalogue_sink)
 
     def reporter_kwargs(self):
         return {
