@@ -67,7 +67,7 @@ class BaseAdapter(OutputAction):
             self.data_catalogue_sink.close()
         super().aborted()
 
-    def update_data_catalogue(self, headers: list[tuple[str, str | bytes | None]] | None) -> bool:
+    def update_data_catalogue(self, headers: list[tuple[str, str | bytes | None]] | None = None) -> bool:
         if not self.has_data_catalogue:
             logger.warning("Cannot create data catalogue update as 'has_data_catalogue' is False")
             return False
