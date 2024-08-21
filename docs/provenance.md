@@ -132,7 +132,7 @@ adapter = Adapter(target=sink, name="Adapter", source_name="Legacy Data", source
 
 The `update_data_catalogue` method will not write to the sink and will log a warning when `has_data_catalogue` is set to False.
 
-### Specifying a customer data catalogue target
+### Specifying a custom data catalogue target
 
 By default, the data catalogue notifications will be sent to a topic called "dc". This may be overridden by specifying
 a configuration value `DATA_CATALOGUE_TOPIC`.
@@ -145,4 +145,14 @@ kafka_config = {
 }
 dc_sink = KafkaSink(topic="my-topic", kafka_config=kafka_config)
 adapter = Adapter(target=sink, name="Adapter", source_name="Legacy Data", source_type="csv", data_catalogue_sink=dc_sink)
+```
+
+### Specifying headers for the data catalogue record
+
+Headers may be provided to the `update_data_catalogue` method.
+
+```python
+from telicent_lib import RecordUtils
+headers = {"header-key": "header value"}
+adapter.update_data_catalogue(headers=RecordUtils.to_headers(headers))
 ```
