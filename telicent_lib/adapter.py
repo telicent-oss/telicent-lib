@@ -106,6 +106,10 @@ class Adapter(BaseAdapter):
         :param name: The name of the Adapter, used in the startup banner
         :type name: str
         :param source_name: The name of the data source
+        :param has_data_catalogue:
+            Whether to provide a mechanism to notify a data catalogue of data source updates
+        :param data_catalogue_sink:
+            The sink to write data catalogue updates to
         """
 
         super().__init__(target, text_colour=text_colour, reporting_batch_size=reporting_batch_size,
