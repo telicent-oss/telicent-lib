@@ -161,6 +161,15 @@ class Mapper(InputOutputAction):
                                             self.target.send(output_record)
                                     else:
                                         output_data = RecordUtils.add_headers(output_data, output_headers)
+                                        if not RecordUtils.has_header(output_data, 'Security-Label'):
+                                            # No labels on the output record, see if they were on the input record
+                                            if RecordUtils.has_header(record, 'Security-Label'):
+                                                for header_value in RecordUtils.get_headers(record, 'Security-Label'):
+                                                    output_data = RecordUtils.add_header(
+                                                        output_data,
+                                                        'Security-Label',
+                                                        header_value
+                                                    )
                                         self.target.send(output_data)
                                     self.record_output()
                 self.finished()
