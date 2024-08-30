@@ -163,17 +163,16 @@ class Mapper(InputOutputAction):
                                     else:
                                         output_data = RecordUtils.add_headers(output_data, output_headers)
                                         conf = Configurator()
-                                        if conf.get("DISABLE_PERSISTENT_HEADERS", "0") != "1":
-                                            if not RecordUtils.has_header(output_data, 'Security-Label'):
-                                                # No labels on the output record, see if they were on the input record
-                                                if RecordUtils.has_header(record, 'Security-Label'):
-                                                    label_headers = RecordUtils.get_headers(record, 'Security-Label')
-                                                    for header_value in label_headers:
-                                                        output_data = RecordUtils.add_header(
-                                                            output_data,
-                                                            'Security-Label',
-                                                            header_value
-                                                        )
+                                        if conf.get("DISABLE_PERSISTENT_HEADERS", "0") != "1" and \
+                                                not RecordUtils.has_header(output_data, 'Security-Label') and \
+                                                RecordUtils.has_header(record, 'Security-Label'):
+                                            label_headers = RecordUtils.get_headers(record, 'Security-Label')
+                                            for header_value in label_headers:
+                                                output_data = RecordUtils.add_header(
+                                                    output_data,
+                                                    'Security-Label',
+                                                    header_value
+                                                )
                                         self.target.send(output_data)
                                     self.record_output()
                 self.finished()
