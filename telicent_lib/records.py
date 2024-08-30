@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import collections
 import json
+import logging
 from collections.abc import Iterable, Mapping
 from typing import Any, Protocol, runtime_checkable
 
@@ -20,6 +21,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+
+
+logger = logging.getLogger(__name__)
 
 
 Record = collections.namedtuple("Record", ["headers", "key", "value", "raw"], defaults=[None])
@@ -318,6 +322,7 @@ class RecordUtils:
         """
         if record.headers is None:
             return False
+
         header = header.casefold()
         for key, _ in record.headers:
             if key.casefold() == header:

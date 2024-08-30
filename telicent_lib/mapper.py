@@ -5,6 +5,7 @@ from colored import fore
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
 from telicent_lib.action import DEFAULT_REPORTING_BATCH_SIZE, InputOutputAction
+from telicent_lib.config.configurator import Configurator
 from telicent_lib.records import RecordMapper, RecordUtils
 from telicent_lib.sinks import DataSink
 from telicent_lib.sources import DataSource
@@ -161,15 +162,18 @@ class Mapper(InputOutputAction):
                                             self.target.send(output_record)
                                     else:
                                         output_data = RecordUtils.add_headers(output_data, output_headers)
-                                        if not RecordUtils.has_header(output_data, 'Security-Label'):
-                                            # No labels on the output record, see if they were on the input record
-                                            if RecordUtils.has_header(record, 'Security-Label'):
-                                                for header_value in RecordUtils.get_headers(record, 'Security-Label'):
-                                                    output_data = RecordUtils.add_header(
-                                                        output_data,
-                                                        'Security-Label',
-                                                        header_value
-                                                    )
+                                        conf = Configurator()
+                                        if conf.get("DISABLE_PERSISTENT_HEADERS", "0") != "1":
+                                            if not RecordUtils.has_header(output_data, 'Security-Label'):
+                                                # No labels on the output record, see if they were on the input record
+                                                if RecordUtils.has_header(record, 'Security-Label'):
+                                                    label_headers = RecordUtils.get_headers(record, 'Security-Label')
+                                                    for header_value in label_headers:
+                                                        output_data = RecordUtils.add_header(
+                                                            output_data,
+                                                            'Security-Label',
+                                                            header_value
+                                                        )
                                         self.target.send(output_data)
                                     self.record_output()
                 self.finished()
