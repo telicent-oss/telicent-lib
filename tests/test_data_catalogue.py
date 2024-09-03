@@ -15,7 +15,7 @@ def __adapter_function_no_headers__() -> Record | list[Record] | None:
 
 class DataCatalogueTestCase(TestCase):
 
-    def test_automatic_adapter_with_source_headers(self):
+    def test_dc_sink_writes_data(self):
         sink = ListSink()
         dc_sink = ListSink()
         adapter = AutomaticAdapter(target=sink, adapter_function=__adapter_function_no_headers__, has_reporter=False,
