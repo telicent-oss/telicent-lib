@@ -24,6 +24,7 @@ limitations under the License.
 
 logger = logging.getLogger(__name__)
 
+
 class OnError(Enum):
     """
     Possible on error behaviours.

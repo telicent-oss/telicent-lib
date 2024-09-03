@@ -113,16 +113,16 @@ class TestAdapter(RecordVerifier):
     def test_bad_adapter_01(self):
         with self.assertRaisesRegex(ValueError, expected_regex=".* cannot be None"):
             AutomaticAdapter(target=None, adapter_function=integer_generator, has_reporter=False,
-                             has_error_handler=False)
+                             has_error_handler=False, has_data_catalogue=False)
 
     def test_bad_adapter_02(self):
         with self.assertRaisesRegex(TypeError, expected_regex=".*Data Sink as required"):
             AutomaticAdapter(target=TestAdapter, adapter_function=integer_generator, has_reporter=False,
-                             has_error_handler=False)
+                             has_error_handler=False, has_data_catalogue=False)
 
     def test_adapter_01(self):
         sink = ListSink()
-        adapter = Adapter(target=sink, has_reporter=False, has_error_handler=False)
+        adapter = Adapter(target=sink, has_reporter=False, has_error_handler=False, has_data_catalogue=False)
         adapter.run()
         for i in range(0, 10):
             adapter.send(Record(None, i, str(i)))
@@ -132,7 +132,7 @@ class TestAdapter(RecordVerifier):
 
     def test_adapter_02(self):
         sink = ListSink()
-        adapter = Adapter(target=sink, has_reporter=False, has_error_handler=False)
+        adapter = Adapter(target=sink, has_reporter=False, has_error_handler=False, has_data_catalogue=False)
         adapter.run()
         for _ in range(0, 10):
             adapter.send(None)
@@ -142,7 +142,7 @@ class TestAdapter(RecordVerifier):
 
     def test_adapter_03(self):
         sink = DelaySink()
-        adapter = Adapter(target=sink, has_reporter=False, has_error_handler=False)
+        adapter = Adapter(target=sink, has_reporter=False, has_error_handler=False, has_data_catalogue=False)
         adapter.run()
         for i in range(0, 10):
             adapter.send(Record(None, i, str(i)))
@@ -152,7 +152,7 @@ class TestAdapter(RecordVerifier):
 
     def test_adapter_04(self):
         sink = DelaySink()
-        adapter = Adapter(target=sink, has_reporter=False, has_error_handler=False)
+        adapter = Adapter(target=sink, has_reporter=False, has_error_handler=False, has_data_catalogue=False)
         adapter.run()
         for i in range(0, 10):
             adapter.send(Record(None, i, str(i)))
@@ -162,27 +162,29 @@ class TestAdapter(RecordVerifier):
 
     def test_bad_automatic_adapter_01(self):
         with self.assertRaisesRegex(TypeError, expected_regex=".*required positional argument.*adapter_function.*"):
-            AutomaticAdapter(target=ListSink(), has_reporter=False, has_error_handler=False)
+            AutomaticAdapter(target=ListSink(), has_reporter=False, has_error_handler=False, has_data_catalogue=False)
 
     def test_bad_automatic_adapter_02(self):
         with self.assertRaisesRegex(ValueError, expected_regex=".*cannot be None"):
-            AutomaticAdapter(target=ListSink(), adapter_function=None, has_reporter=False, has_error_handler=False)
+            AutomaticAdapter(target=ListSink(), adapter_function=None, has_reporter=False, has_error_handler=False,
+                             has_data_catalogue=False)
 
     def test_bad_mapper_03(self):
         with self.assertRaisesRegex(TypeError, expected_regex=".*for protocol.*RecordAdapter.*"):
-            AutomaticAdapter(target=ListSink(), adapter_function=str, has_reporter=False, has_error_handler=False)
+            AutomaticAdapter(target=ListSink(), adapter_function=str, has_reporter=False, has_error_handler=False,
+                             has_data_catalogue=False)
 
     def test_automatic_adapter_01(self):
         sink = ListSink()
         adapter = AutomaticAdapter(target=sink, adapter_function=integer_generator, has_reporter=False,
-                                   has_error_handler=False)
+                                   has_error_handler=False, has_data_catalogue=False)
         adapter.run()
         self.assertEqual(len(sink.get()), 10)
 
     def test_automatic_adapter_02(self):
         sink = ListSink()
         adapter = AutomaticAdapter(target=sink, adapter_function=error_generator, has_reporter=False,
-                                   has_error_handler=False)
+                                   has_error_handler=False, has_data_catalogue=False)
         with self.assertRaisesRegex(expected_exception=RuntimeError, expected_regex="Failed"):
             adapter.run()
         self.assertEqual(len(sink.get()), 0)
@@ -190,7 +192,7 @@ class TestAdapter(RecordVerifier):
     def test_automatic_adapter_03(self):
         sink = DelaySink()
         adapter = AutomaticAdapter(target=sink, adapter_function=integer_generator, has_reporter=False,
-                                   has_error_handler=False)
+                                   has_error_handler=False, has_data_catalogue=False)
         adapter.run()
         self.assertEqual(len(sink.get()), 10)
 
@@ -199,7 +201,7 @@ class TestAdapter(RecordVerifier):
         patched_method.return_value = 'uuid4'
         sink = ListSink()
         adapter = AutomaticAdapter(target=sink, adapter_function=custom_range_generator, has_reporter=False,
-                                   has_error_handler=False, start=100, stop=200)
+                                   has_error_handler=False, start=100, stop=200, has_data_catalogue=False)
         adapter.run()
         self.__validate_generated_range__(sink, 100, 200, headers=self.default_headers)
 
@@ -208,7 +210,8 @@ class TestAdapter(RecordVerifier):
         patched_method.return_value = 'uuid4'
         sink = DelaySink()
         adapter = AutomaticAdapter(target=sink, adapter_function=custom_range_generator, has_reporter=False,
-                                   has_error_handler=False, start=50, stop=70, raise_error="Bad source")
+                                   has_error_handler=False, start=50, stop=70, raise_error="Bad source",
+                                   has_data_catalogue=False)
         with self.assertRaisesRegex(ValueError, expected_regex="Bad source"):
             adapter.run()
         self.__validate_generated_range__(sink, 50, 70, headers=self.default_headers)
@@ -218,7 +221,7 @@ class TestAdapter(RecordVerifier):
         patched_method.return_value = 'uuid4'
         sink = ListSink()
         adapter = AutomaticAdapter(target=sink, adapter_function=custom_range_generator, has_reporter=False,
-                                   has_error_handler=False, start=100, stop=200)
+                                   has_error_handler=False, start=100, stop=200, has_data_catalogue=False)
         adapter.run()
         self.__validate_generated_range__(sink, 100, 200, headers=self.default_headers)
 
@@ -227,7 +230,7 @@ class TestAdapter(RecordVerifier):
         patched_method.return_value = 'uuid4'
         sink = ListSink()
         adapter = AutomaticAdapter(target=sink, adapter_function=custom_range_generator, has_reporter=False,
-                                   has_error_handler=False, start=100, stop=200,
+                                   has_error_handler=False, start=100, stop=200, has_data_catalogue=False,
                                    source_name='foo.csv', source_type='file')
         adapter.run()
         self.__validate_generated_range__(sink, 100, 200, headers=self.default_headers_with_source)

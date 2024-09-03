@@ -90,3 +90,69 @@ each record a unique ID, which component wrote the record, and in the case of a 
 | `Request-Id`       | Unique ID for the request composed of the topic and a UUID                                                                       |
 | `Exec-Path`        | ID of the component processing the record                                                                                        |
 | `Input-Request-Id` | Input record's request ID, where present. Header may be repeated if there are multiple input requests, e.g. when merging records |
+| `Data-Source-Name` | The name of the data source, as provided to the Action                                                                           |
+| `Data-Source-Type` | The data source's type, as provided by the Action                                                                                |
+
+
+## Data Catalogue
+
+By default, [Adapters and AutomaticAdapters](adapters.md) provide a method to notify a data catalogue that a data source has been updated.
+
+```python
+...
+adapter = Adapter(target=sink, name="Adapter", source_name="Legacy Data", source_type="csv")
+adapter.update_data_catalogue()
+```
+
+The above code would yield a message on a topic (default: "dc") with the following body:
+
+```json
+{
+    "data-source-name": "Legacy Data",
+    "data-source-type": "csv",
+    "data-source-last-update": "2000-01-01T09:00:00+01:00",
+    "component-name": "Adapter"
+}
+```
+(timestamp value for illustration purposes)
+
+| Status                  | Type         | Definition                                                           |
+|-------------------------|--------------|----------------------------------------------------------------------|
+| data-source-name        | string       | The name of the data source, taken from the Adapter's `source_name`. |
+| data-source-type        | string       | The type of the data source, taken from the Adapter's `source_type`. |
+| data-source-last-update | XSD datetime | The current datetime.                                                |
+| component-name          | string       | The adapter's name.                                                  | 
+
+
+### Disable the data catalogue sink
+
+```python
+adapter = Adapter(target=sink, name="Adapter", source_name="Legacy Data", source_type="csv", has_data_catalogue=False)
+```
+
+The `update_data_catalogue` method will not write to the sink and will log a warning when `has_data_catalogue` is set to False.
+
+### Specifying a custom data catalogue target
+
+By default, the data catalogue notifications will be sent to a topic called "dc". This may be overridden by specifying
+a configuration value `DATA_CATALOGUE_TOPIC`.
+
+Alternatively, where more fine-grained control over the target sink is required, you may initialise your own sink.
+
+```python
+kafka_config = {
+    ...  # a custom Kafka config
+}
+dc_sink = KafkaSink(topic="my-topic", kafka_config=kafka_config)
+adapter = Adapter(target=sink, name="Adapter", source_name="Legacy Data", source_type="csv", data_catalogue_sink=dc_sink)
+```
+
+### Specifying headers for the data catalogue record
+
+Headers may be provided to the `update_data_catalogue` method.
+
+```python
+from telicent_lib import RecordUtils
+headers = {"header-key": "header value"}
+adapter.update_data_catalogue(headers=RecordUtils.to_headers(headers))
+```
