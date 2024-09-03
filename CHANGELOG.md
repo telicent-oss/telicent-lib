@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.0](https://github.com/telicent-oss/telicent-lib/compare/v2.1.0...v2.2.0) (2024-09-03)
+
+
+### Features
+
+* data source update notifications can be sent to a specified sink ([#41](https://github.com/telicent-oss/telicent-lib/issues/41)) ([d7987fb](https://github.com/telicent-oss/telicent-lib/commit/d7987fba9393bbc8ae6fe730a87cef5da9e24fb2))
+* security labels from input record persisted to output record in mappers ([#42](https://github.com/telicent-oss/telicent-lib/issues/42)) ([98cc604](https://github.com/telicent-oss/telicent-lib/commit/98cc604613ddbeb115ed4ce8b5d4c8b800dd2c24))
+
 ## [2.1.0](https://github.com/telicent-oss/telicent-lib/compare/v2.0.7...v2.1.0) (2024-08-15)
 
 
