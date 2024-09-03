@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import collections
 import json
-from collections.abc import Iterable
+import logging
+from collections.abc import Iterable, Mapping
 from typing import Any, Protocol, runtime_checkable
 
 __license__ = """
@@ -20,6 +21,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+
+
+logger = logging.getLogger(__name__)
 
 
 Record = collections.namedtuple("Record", ["headers", "key", "value", "raw"], defaults=[None])
@@ -126,7 +130,6 @@ class RecordUtils:
         for key, value in record.headers:
             if key.casefold() == header:
                 return RecordUtils.__decode_header_value__(value)
-
         return None
 
     @staticmethod
@@ -285,7 +288,7 @@ class RecordUtils:
         return Record(new_headers, record.key, record.value, record.raw)
 
     @staticmethod
-    def to_headers(headers: dict[str, str | bytes | None],
+    def to_headers(headers: Mapping[str, str | bytes | None],
                    existing_headers: list[tuple[str, str | bytes | None]] = None) \
             -> list[tuple[str, str | bytes | None]]:
         """
@@ -308,3 +311,20 @@ class RecordUtils:
         for key, value in headers.items():
             new_headers.append((key, RecordUtils.__encode_header_value(value)))
         return new_headers
+
+    @staticmethod
+    def has_header(record: Record, header: str) -> bool:
+        """
+        Checks if a record has a given header.
+
+        :param record: Record
+        :param header: Header key to check for, this is matched in a case-insensitive manner
+        """
+        if record.headers is None:
+            return False
+
+        header = header.casefold()
+        for key, _ in record.headers:
+            if key.casefold() == header:
+                return True
+        return False
