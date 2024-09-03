@@ -23,7 +23,8 @@ class OutActionTestCase(TestCase):
         self.assertEqual('None-to-In-Memory List', action.generate_id())
 
     def test_id_is_name_adapter(self):
-        action = Adapter(target=ListSink(), has_error_handler=False, has_reporter=False, disable_metrics=True)
+        action = Adapter(target=ListSink(), has_error_handler=False, has_reporter=False, disable_metrics=True,
+                         has_data_catalogue=False)
         self.assertEqual('Manual Adapter-to-In-Memory List', action.generate_id())
 
     def test_id_is_name_automatic_adapter(self):
@@ -31,7 +32,7 @@ class OutActionTestCase(TestCase):
             yield Record(None, None, None, None)
         action = AutomaticAdapter(
             adapter_function=my_func, target=ListSink(), has_reporter=False, has_error_handler=False,
-            disable_metrics=True
+            disable_metrics=True, has_data_catalogue=False
         )
         self.assertEqual('Automatic Adapter-to-In-Memory List', action.generate_id())
 
@@ -40,7 +41,7 @@ class OutActionTestCase(TestCase):
             yield Record(None, None, None, None)
         action = AutomaticAdapter(
             adapter_function=my_func, target=ListSink(), has_error_handler=False, has_reporter=False,
-            name='Test Action', disable_metrics=True
+            name='Test Action', disable_metrics=True, has_data_catalogue=False
         )
         self.assertEqual('Test-Action', action.generate_id())
 
