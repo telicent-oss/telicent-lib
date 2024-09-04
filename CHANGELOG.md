@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.1](https://github.com/telicent-oss/telicent-lib/compare/v2.2.0...v2.2.1) (2024-09-04)
+
+
+### Bug Fixes
+
+* changed catalogue to catalog and updated dc default topic ([#44](https://github.com/telicent-oss/telicent-lib/issues/44)) ([c8825b3](https://github.com/telicent-oss/telicent-lib/commit/c8825b3d502a778f4d2729fc0e95e41b15ccd4e6))
+
 ## [2.2.0](https://github.com/telicent-oss/telicent-lib/compare/v2.1.0...v2.2.0) (2024-09-03)
 
 
