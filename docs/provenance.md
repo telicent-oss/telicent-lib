@@ -94,14 +94,14 @@ each record a unique ID, which component wrote the record, and in the case of a 
 | `Data-Source-Type` | The data source's type, as provided by the Action                                                                                |
 
 
-## Data Catalogue
+## Data Catalog
 
-By default, [Adapters and AutomaticAdapters](adapters.md) provide a method to notify a data catalogue that a data source has been updated.
+By default, [Adapters and AutomaticAdapters](adapters.md) provide a method to notify a data catalog that a data source has been updated.
 
 ```python
 ...
 adapter = Adapter(target=sink, name="Adapter", source_name="Legacy Data", source_type="csv")
-adapter.update_data_catalogue()
+adapter.update_data_catalog()
 ```
 
 The above code would yield a message on a topic (default: "dc") with the following body:
@@ -124,18 +124,18 @@ The above code would yield a message on a topic (default: "dc") with the followi
 | component-name          | string       | The adapter's name.                                                  | 
 
 
-### Disable the data catalogue sink
+### Disable the data catalog sink
 
 ```python
-adapter = Adapter(target=sink, name="Adapter", source_name="Legacy Data", source_type="csv", has_data_catalogue=False)
+adapter = Adapter(target=sink, name="Adapter", source_name="Legacy Data", source_type="csv", has_data_catalog=False)
 ```
 
-The `update_data_catalogue` method will not write to the sink and will log a warning when `has_data_catalogue` is set to False.
+The `update_data_catalog` method will not write to the sink and will log a warning when `has_data_catalog` is set to False.
 
-### Specifying a custom data catalogue target
+### Specifying a custom data catalog target
 
-By default, the data catalogue notifications will be sent to a topic called "dc". This may be overridden by specifying
-a configuration value `DATA_CATALOGUE_TOPIC`.
+By default, the data catalog notifications will be sent to a topic called "catalog". This may be overridden by specifying
+a configuration value `DATA_CATALOG_TOPIC`.
 
 Alternatively, where more fine-grained control over the target sink is required, you may initialise your own sink.
 
@@ -144,15 +144,15 @@ kafka_config = {
     ...  # a custom Kafka config
 }
 dc_sink = KafkaSink(topic="my-topic", kafka_config=kafka_config)
-adapter = Adapter(target=sink, name="Adapter", source_name="Legacy Data", source_type="csv", data_catalogue_sink=dc_sink)
+adapter = Adapter(target=sink, name="Adapter", source_name="Legacy Data", source_type="csv", data_catalog_sink=dc_sink)
 ```
 
-### Specifying headers for the data catalogue record
+### Specifying headers for the data catalog record
 
-Headers may be provided to the `update_data_catalogue` method.
+Headers may be provided to the `update_data_catalog` method.
 
 ```python
 from telicent_lib import RecordUtils
 headers = {"header-key": "header value"}
-adapter.update_data_catalogue(headers=RecordUtils.to_headers(headers))
+adapter.update_data_catalog(headers=RecordUtils.to_headers(headers))
 ```

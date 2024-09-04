@@ -83,7 +83,7 @@ class ErrorHandlerUseCaseTestCase(ErrorHandlerTestCaseStub):
         adapter = AutomaticAdapter(
             adapter_function=fake_adapter_function,
             target=ListSink(), name='test-name', source_name='test-source', error_handler=self.error_handler,
-            has_reporter=False, has_data_catalogue=False,
+            has_reporter=False, has_data_catalog=False,
         )
         try:
             adapter.run()

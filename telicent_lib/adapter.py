@@ -40,16 +40,16 @@ logger = logging.getLogger(__name__)
 class BaseAdapter(OutputAction):
 
     def __init__(self, target, text_colour, reporting_batch_size, action, name, source_name, source_type, has_reporter,
-                 reporter_sink, has_error_handler, error_handler, disable_metrics, has_data_catalogue,
-                 data_catalogue_sink):
+                 reporter_sink, has_error_handler, error_handler, disable_metrics, has_data_catalog,
+                 data_catalog_sink):
         self.source_name = source_name
         self.source_type = source_type
 
         config = Configurator()
-        self.has_data_catalogue = has_data_catalogue
-        self.data_catalogue_sink = data_catalogue_sink
-        if self.has_data_catalogue and self.data_catalogue_sink is None:
-            self.data_catalogue_sink = KafkaSink(topic=config.get("DATA_CATALOGUE_TOPIC", "dc"))
+        self.has_data_catalog = has_data_catalog
+        self.data_catalog_sink = data_catalog_sink
+        if self.has_data_catalog and self.data_catalog_sink is None:
+            self.data_catalog_sink = KafkaSink(topic=config.get("DATA_CATALOG_TOPIC", "catalog"))
 
         super().__init__(
             target, text_colour=text_colour, reporting_batch_size=reporting_batch_size,
@@ -58,17 +58,17 @@ class BaseAdapter(OutputAction):
         )
 
     def finished(self) -> None:
-        if self.has_data_catalogue:
-            self.data_catalogue_sink.close()
+        if self.has_data_catalog:
+            self.data_catalog_sink.close()
         super().finished()
 
     def aborted(self) -> None:
-        if self.has_data_catalogue:
-            self.data_catalogue_sink.close()
+        if self.has_data_catalog:
+            self.data_catalog_sink.close()
         super().aborted()
 
-    def update_data_catalogue(self, headers: list[tuple[str, str | bytes | None]] | None = None) -> bool:
-        if not self.has_data_catalogue:
+    def update_data_catalog(self, headers: list[tuple[str, str | bytes | None]] | None = None) -> bool:
+        if not self.has_data_catalog:
             logger.warning("Cannot create data catalogue update as 'has_data_catalogue' is False")
             return False
         payload = {
@@ -78,7 +78,7 @@ class BaseAdapter(OutputAction):
             "component-name": self.name
         }
         record = Record(headers=headers, key=None, value=json.dumps(payload), raw=None)
-        self.data_catalogue_sink.send(record)
+        self.data_catalog_sink.send(record)
         return True
 
 
@@ -93,7 +93,7 @@ class Adapter(BaseAdapter):
     def __init__(self, target: DataSink, text_colour=fore.LIGHT_CYAN, reporting_batch_size=DEFAULT_REPORTING_BATCH_SIZE,
                  name: str = None, source_name: str = None, source_type: str = None, has_reporter: bool = True,
                  reporter_sink=None, has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False,
-                 has_data_catalogue: bool = True, data_catalogue_sink: DataSink = None):
+                 has_data_catalog: bool = True, data_catalog_sink: DataSink = None):
         """
         Creates a new adapter that imports data into a data sink.
 
@@ -106,9 +106,9 @@ class Adapter(BaseAdapter):
         :param name: The name of the Adapter, used in the startup banner
         :type name: str
         :param source_name: The name of the data source
-        :param has_data_catalogue:
+        :param has_data_catalog:
             Whether to provide a mechanism to notify a data catalogue of data source updates
-        :param data_catalogue_sink:
+        :param data_catalog_sink:
             The sink to write data catalogue updates to
         """
 
@@ -116,8 +116,8 @@ class Adapter(BaseAdapter):
                          action="Manual Adapter", name=name, source_name=source_name, source_type=source_type,
                          has_reporter=has_reporter, reporter_sink=reporter_sink,
                          has_error_handler=has_error_handler, error_handler=error_handler,
-                         disable_metrics=disable_metrics, has_data_catalogue=has_data_catalogue,
-                         data_catalogue_sink=data_catalogue_sink)
+                         disable_metrics=disable_metrics, has_data_catalog=has_data_catalog,
+                         data_catalog_sink=data_catalog_sink)
 
     def reporter_kwargs(self):
         return {
@@ -182,7 +182,7 @@ class AutomaticAdapter(BaseAdapter):
                  text_colour=fore.LIGHT_CYAN, reporting_batch_size=DEFAULT_REPORTING_BATCH_SIZE,
                  name: str = None, source_name: str = None, source_type: str = None, has_reporter: bool = True,
                  reporter_sink=None, has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False,
-                 has_data_catalogue: bool = True, data_catalogue_sink: DataSink = None, **adapter_args):
+                 has_data_catalog: bool = True, data_catalog_sink: DataSink = None, **adapter_args):
         """
         Creates a new automatic adapter that imports data into a data sink.
 
@@ -201,10 +201,10 @@ class AutomaticAdapter(BaseAdapter):
         :param adapter_args:
             Additional keyword arguments to pass to the adapter_function when calling it, the adapter_function must take
             keyword arguments for this to work
-        :param has_data_catalogue:
+        :param has_data_catalog:
             Whether to provide a mechanism to notify a data catalogue of data source updates
         :param data_catalogue_sink:
-            The sink to write data catalogue updates to
+            The sink to write data catalog updates to
         """
         self.adapter_function = adapter_function
         self.adapter_args = adapter_args
@@ -216,7 +216,7 @@ class AutomaticAdapter(BaseAdapter):
                          action="Automatic Adapter", name=name, source_name=source_name, source_type=source_type,
                          has_reporter=has_reporter, reporter_sink=reporter_sink, disable_metrics=disable_metrics,
                          has_error_handler=has_error_handler, error_handler=error_handler,
-                         has_data_catalogue=has_data_catalogue, data_catalogue_sink=data_catalogue_sink)
+                         has_data_catalog=has_data_catalog, data_catalog_sink=data_catalog_sink)
 
     def reporter_kwargs(self):
         return {
