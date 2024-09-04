@@ -104,7 +104,7 @@ adapter = Adapter(target=sink, name="Adapter", source_name="Legacy Data", source
 adapter.update_data_catalog()
 ```
 
-The above code would yield a message on a topic (default: "dc") with the following body:
+The above code would yield a message on a topic (default: "catalog") with the following body:
 
 ```json
 {
