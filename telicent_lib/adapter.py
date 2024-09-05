@@ -1,16 +1,15 @@
 from __future__ import annotations
 
-import datetime
-import json
 import logging
 import uuid
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 
 from colored import fore
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
 from telicent_lib.action import DEFAULT_REPORTING_BATCH_SIZE, OutputAction
 from telicent_lib.config import Configurator
+from telicent_lib.datasets.datasets import SimpleDataSet
 from telicent_lib.records import Record, RecordAdapter, RecordUtils
 from telicent_lib.sinks import KafkaSink
 from telicent_lib.sinks.dataSink import DataSink
@@ -39,12 +38,14 @@ logger = logging.getLogger(__name__)
 
 class BaseAdapter(OutputAction):
 
-    def __init__(self, target, text_colour, reporting_batch_size, action, name, source_name, source_type, has_reporter,
-                 reporter_sink, has_error_handler, error_handler, disable_metrics, has_data_catalog,
-                 data_catalog_sink):
-        self.source_name = source_name
-        self.source_type = source_type
+    def __init__(self, target: DataSink, action, name,
+                 text_colour, reporting_batch_size,
+                 has_reporter, reporter_sink: DataSink, has_error_handler, error_handler,
+                 disable_metrics, has_data_catalog, data_catalog_sink, dataset=None):
 
+        self.dataset = dataset
+        if self.dataset is None:
+            self.dataset = SimpleDataSet(dataset_id=__name__, title=__name__, source_mime_type='unknown')
         config = Configurator()
         self.has_data_catalog = has_data_catalog
         self.data_catalog_sink = data_catalog_sink
@@ -67,17 +68,19 @@ class BaseAdapter(OutputAction):
             self.data_catalog_sink.close()
         super().aborted()
 
-    def update_data_catalog(self, headers: list[tuple[str, str | bytes | None]] | None = None) -> bool:
+    def update_data_catalog(self, headers: Mapping = None) -> bool:
         if not self.has_data_catalog:
             logger.warning("Cannot create data catalogue update as 'has_data_catalogue' is False")
             return False
-        payload = {
-            "data-source-name": self.source_name,
-            "data-source-type": self.source_type,
-            "data-source-last-update": datetime.datetime.now().astimezone().isoformat(),
-            "component-name": self.name
-        }
-        record = Record(headers=headers, key=None, value=json.dumps(payload), raw=None)
+        record = self.dataset.update_record(headers)
+        self.data_catalog_sink.send(record)
+        return True
+
+    def register_data_catalog(self, registration_fields: Mapping, headers: Mapping = None) -> bool:
+        if not self.has_data_catalog:
+            logger.warning("Cannot create data catalogue update as 'has_data_catalogue' is False")
+            return False
+        record = self.dataset.registration_record(registration_fields, headers)
         self.data_catalog_sink.send(record)
         return True
 
@@ -91,9 +94,9 @@ class Adapter(BaseAdapter):
     """
 
     def __init__(self, target: DataSink, text_colour=fore.LIGHT_CYAN, reporting_batch_size=DEFAULT_REPORTING_BATCH_SIZE,
-                 name: str = None, source_name: str = None, source_type: str = None, has_reporter: bool = True,
+                 name: str = None, dataset=None, has_reporter: bool = True,
                  reporter_sink=None, has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False,
-                 has_data_catalog: bool = True, data_catalog_sink: DataSink = None):
+                 has_data_catalog: bool = True, data_catalog_sink = None):
         """
         Creates a new adapter that imports data into a data sink.
 
@@ -113,7 +116,7 @@ class Adapter(BaseAdapter):
         """
 
         super().__init__(target, text_colour=text_colour, reporting_batch_size=reporting_batch_size,
-                         action="Manual Adapter", name=name, source_name=source_name, source_type=source_type,
+                         action="Manual Adapter", name=name, dataset=dataset,
                          has_reporter=has_reporter, reporter_sink=reporter_sink,
                          has_error_handler=has_error_handler, error_handler=error_handler,
                          disable_metrics=disable_metrics, has_data_catalog=has_data_catalog,
@@ -124,8 +127,8 @@ class Adapter(BaseAdapter):
             'action_name': self.name,
             'target_name': self.target.get_sink_name(),
             'target_type': 'topic',
-            'source_name': self.source_name,
-            'source_type': self.source_type,
+            'source_name': self.dataset.title,
+            'source_type': self.dataset.source_mime_type,
             'action': "adapter",
             'action_id': self.generate_id(),
             'sink': self.reporter_sink,
@@ -142,11 +145,8 @@ class Adapter(BaseAdapter):
         """
         self.display_startup_banner()
 
-        if self.source_name is not None:
-            self.print_coloured("Waiting for data from " + self.source_name +
-                                " - will write out to " + str(self.target))
-        else:
-            self.print_coloured("Waiting for data - will write out to " + str(self.target))
+        self.print_coloured("Waiting for data from " + self.dataset.title +
+                            " - will write out to " + str(self.target))
 
         if self.reporter is not None:
             self.reporter.run()
@@ -178,11 +178,11 @@ class AutomaticAdapter(BaseAdapter):
     function cannot do as easily.
     """
 
-    def __init__(self, target: DataSink, adapter_function: RecordAdapter,
+    def __init__(self, target: DataSink, adapter_function: RecordAdapter, dataset=None, name: str = None,
                  text_colour=fore.LIGHT_CYAN, reporting_batch_size=DEFAULT_REPORTING_BATCH_SIZE,
-                 name: str = None, source_name: str = None, source_type: str = None, has_reporter: bool = True,
-                 reporter_sink=None, has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False,
-                 has_data_catalog: bool = True, data_catalog_sink: DataSink = None, **adapter_args):
+                 has_reporter: bool = True, reporter_sink=None,
+                 has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False,
+                 has_data_catalog: bool = True, data_catalog_sink = None, **adapter_args):
         """
         Creates a new automatic adapter that imports data into a data sink.
 
@@ -212,8 +212,8 @@ class AutomaticAdapter(BaseAdapter):
         if adapter_function is None:
             raise ValueError('Adapter Function cannot be None')
         validate_callable_protocol(adapter_function, RecordAdapter)
-        super().__init__(target, text_colour=text_colour, reporting_batch_size=reporting_batch_size,
-                         action="Automatic Adapter", name=name, source_name=source_name, source_type=source_type,
+        super().__init__(target, action="Automatic Adapter", name=name, dataset=dataset,
+                         text_colour=text_colour, reporting_batch_size=reporting_batch_size,
                          has_reporter=has_reporter, reporter_sink=reporter_sink, disable_metrics=disable_metrics,
                          has_error_handler=has_error_handler, error_handler=error_handler,
                          has_data_catalog=has_data_catalog, data_catalog_sink=data_catalog_sink)
@@ -223,8 +223,8 @@ class AutomaticAdapter(BaseAdapter):
             'action_name': self.name,
             'target_name': self.target.get_sink_name(),
             'target_type': 'topic',
-            'source_name': self.source_name,
-            'source_type': self.source_type,
+            'source_name': self.dataset.title,
+            'source_type': self.dataset.source_mime_type,
             'action': "adapter",
             'action_id': self.generate_id(),
             'sink': self.reporter_sink,
@@ -244,11 +244,8 @@ class AutomaticAdapter(BaseAdapter):
         Runs the adapter
         """
         self.display_startup_banner()
-        if self.source_name is not None:
-            self.print_coloured(f"Waiting for data from {self.source_name} - will write out to {self.target}",
-                                flush=True)
-        else:
-            self.print_coloured(f"Waiting for data - will write out to {self.target}", flush=True)
+        self.print_coloured(f"Waiting for data from {self.dataset.title} - will write out to {self.target}",
+                            flush=True)
 
         if self.reporter is not None:
             self.reporter.run()
@@ -273,12 +270,9 @@ class AutomaticAdapter(BaseAdapter):
                                 ('Exec-Path', self.generated_id),
                                 ('Request-Id', request_id),
                                 ('traceparent', carrier.get('traceparent', '')),
+                                ('Data-Source-Name', self.dataset.title),
+                                ('Data-Source-Type', self.dataset.source_mime_type),
                             ]
-                            if self.source_name:
-                                default_headers.append(('Data-Source-Name', self.source_name))
-                            if self.source_type:
-                                default_headers.append(('Data-Source-Type', self.source_type))
-
                             record = RecordUtils.add_headers(record, default_headers)
 
                         with self.tracer.start_as_current_span("send to kafka"):
