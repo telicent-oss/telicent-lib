@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
@@ -20,8 +22,7 @@ class DataSet(ABC):
         self.source_mime_type = source_mime_type
 
     @abstractmethod
-    def registration_record(self, registration_fields: Mapping,
-                            headers: list[str | bytes | None] = None) -> Record:
+    def registration_record(self, registration_fields: Mapping, headers: list[str | bytes | None] = None) -> Record:
         pass
 
     @abstractmethod
@@ -31,8 +32,7 @@ class DataSet(ABC):
 
 class DCATDataSet(DataSet):
 
-    def registration_record(self, registration_fields: Mapping,
-                            headers: list[str | bytes | None] = None) -> Record:
+    def registration_record(self, registration_fields: Mapping, headers: list[str | bytes | None] = None) -> Record:
         expected_fields = [
             'description', 'publication_datetime', 'published_id', 'published_name', 'publisher_email',
             'owner_id', 'rights_title', 'rights_description', 'distribution_title', 'distribution_id'
@@ -41,23 +41,29 @@ class DCATDataSet(DataSet):
             if registration_fields.get(field) is None:
                 raise DataSetFieldError(f'field "{field}" is required to register dataset')
         g = Graph()
+        # create graph
         return Record(headers, None, g.serialize(format="turtle"), None)
 
     def update_record(self, headers: list[str | bytes | None] = None) -> Record:
         g = Graph()
+        # create graph
         return Record(headers, None, g.serialize(format="turtle"), None)
 
 
 class SimpleDataSet(DataSet):
 
-    def registration_record(self, registration_fields: Mapping,
-                            headers: list[str | bytes | None] = None) -> Record:
-        core_data = {'id': self.dataset_id, 'title': self.title, 'source_mime_type': self.source_mime_type}
+    def registration_record(self, registration_fields: Mapping, headers: list[str | bytes | None] = None) -> Record:
+        core_data = {
+            'id': self.dataset_id,
+            'title': self.title,
+            'source_mime_type': self.source_mime_type
+        }
         record_data = {**core_data, **registration_fields}
         return Record(headers, None, json.dumps(record_data), None)
 
     def update_record(self, headers: list[str | bytes | None] = None) -> Record:
         record_data = {
-            'id': self.dataset_id, 'last_updated_at': datetime.now().astimezone().isoformat()
+            'id': self.dataset_id,
+            'last_updated_at': datetime.now().astimezone().isoformat()
         }
         return Record(headers, None, json.dumps(record_data), None)
