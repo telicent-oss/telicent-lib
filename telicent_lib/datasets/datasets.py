@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Mapping
 from datetime import datetime
 
-from rdflib import Graph
+from rdflib import DCAT, DCTERMS, RDF, XSD, Graph, Literal, URIRef
 
 from telicent_lib.records import Record
 
@@ -46,7 +46,17 @@ class DCATDataSet(DataSet):
 
     def update_record(self, headers: list[str | bytes | None] = None) -> Record:
         g = Graph()
-        # create graph
+
+        tcat = 'http://telicent.io/catalog#'
+        g.bind('tcat', URIRef(tcat))
+
+        g.add((URIRef(f'{tcat}{self.dataset_id}'), RDF.type, URIRef(f'{DCAT}Dataset')))
+        g.add((
+            URIRef(f'{tcat}{self.dataset_id}'),
+            URIRef(f'{DCTERMS}modified'),
+            Literal(datetime.now().astimezone().isoformat(), datatype=XSD.dateTime)
+        ))
+
         return Record(headers, None, g.serialize(format="turtle"), None)
 
 
