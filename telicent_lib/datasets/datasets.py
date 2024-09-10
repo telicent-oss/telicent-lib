@@ -54,6 +54,11 @@ class DCATDataSet(DataSet):
         g.add((self.dataset_id_dataset, URIRef(f'{DCTERMS}identifier'), Literal(self.dataset_id)))
         g.add((
             self.dataset_id_dataset,
+            URIRef(f'{DCTERMS}publisher'),
+            URIRef(f'{self.tcat}{registration_fields["publisher_id"]}')
+        ))
+        g.add((
+            self.dataset_id_dataset,
             URIRef(f'{DCTERMS}issued'),
             Literal(registration_fields['publication_datetime'], datatype=XSD.dateTime)
         ))
