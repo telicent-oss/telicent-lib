@@ -105,7 +105,7 @@ class DCATDataSet(DataSet):
         g.add((
             URIRef(f'{self.tcat}{registration_fields["publisher_id"]}'),
             URIRef(f'{SDO}email'),
-            Literal(f'{registration_fields["publisher_email"]}')
+            URIRef(f'{registration_fields["publisher_email"]}')
         ))
         return Record(headers, None, g.serialize(format="turtle"), None)
 

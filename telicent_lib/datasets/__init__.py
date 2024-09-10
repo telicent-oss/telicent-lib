@@ -1,4 +1,4 @@
-from telicent_lib.datasets.datasets import SimpleDataSet
+from telicent_lib.datasets.datasets import DCATDataSet, SimpleDataSet
 
 __license__ = """
 Copyright (c) Telicent Ltd.
@@ -18,5 +18,6 @@ limitations under the License.
 
 
 __all__ = [
-    'SimpleDataSet'
+    'DCATDataSet',
+    'SimpleDataSet',
 ]

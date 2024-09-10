@@ -1,5 +1,5 @@
 from telicent_lib.adapter import Adapter, AutomaticAdapter
-from telicent_lib.datasets import SimpleDataSet
+from telicent_lib.datasets import DCATDataSet, SimpleDataSet
 from telicent_lib.mapper import Mapper
 from telicent_lib.projector import Projector
 from telicent_lib.records import Record, RecordAdapter, RecordMapper, RecordProjector, RecordUtils
@@ -24,6 +24,7 @@ limitations under the License.
 __all__ = [
     'Adapter',
     'AutomaticAdapter',
+    'DCATDataSet',
     'Mapper',
     'Projector',
     'Record',
