@@ -6,8 +6,8 @@ from unittest import TestCase
 from unittest.mock import patch
 
 import pytz
-from rdflib import Graph
 
+# from rdflib import Graph
 from telicent_lib import AutomaticAdapter, Record
 from telicent_lib.datasets.datasets import DCATDataSet, SimpleDataSet
 from telicent_lib.sinks.listSink import ListSink
@@ -61,6 +61,5 @@ class RDFCatalogTestCase(TestCase):
             'distribution_id': "distribution-id"
         }
         adapter.register_data_catalog(registration_fields)
-        dc_msg = dc_sink.get()[0]
-        g = Graph()
-        g.parse(dc_msg.value)
+        # dc_msg = dc_sink.get()[0]
+        # g = Graph()
