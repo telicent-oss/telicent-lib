@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Mapping
 from datetime import datetime
 
-from rdflib import DCAT, DCTERMS, RDF, SDO, XSD, Graph, Literal, URIRef
+from rdflib import DCAT, DCTERMS, PROV, RDF, SDO, XSD, BNode, Graph, Literal, URIRef
 
 from telicent_lib.records import Record
 
@@ -41,7 +41,7 @@ class DCATDataSet(DataSet):
     def registration_record(self, registration_fields: Mapping, headers: list[str | bytes | None] = None) -> Record:
         expected_fields = [
             'description', 'publication_datetime', 'publisher_id', 'publisher_name', 'publisher_email',
-            'owner_id', 'rights_title', 'rights_description', 'distribution_title', 'distribution_id'
+            'owner_id', 'rights_title', 'rights_description', 'distribution_title', 'distribution_id',
         ]
         for field in expected_fields:
             if registration_fields.get(field) is None:
@@ -57,8 +57,22 @@ class DCATDataSet(DataSet):
             URIRef(f'{DCTERMS}issued'),
             Literal(registration_fields['publication_datetime'], datatype=XSD.dateTime)
         ))
-        # HELP
-        # HELP
+
+        qualified_attribution_bnode = BNode()
+        g.add((self.dataset_id_dataset, URIRef(f'{PROV}qualifiedAttribution'), qualified_attribution_bnode))
+        g.add((qualified_attribution_bnode, RDF.type, URIRef(f'{PROV}Attribution')))
+        g.add((qualified_attribution_bnode, URIRef(f'{PROV}agent'), Literal(registration_fields['owner_id'])))
+        g.add((
+            qualified_attribution_bnode,
+            URIRef(f'{DCAT}hadRole'),
+            URIRef('http://standards.iso.org/iso/19115/resources/Codelist/cat/codelists.xml#CI_RoleCode/owner')
+        ))
+
+        rights_bnode = BNode()
+        g.add((self.dataset_id_dataset, URIRef(f'{DCTERMS}rights'), rights_bnode))
+        g.add((rights_bnode, URIRef(f'{DCTERMS}title'), Literal(registration_fields['rights_title'])))
+        g.add((rights_bnode, URIRef(f'{DCTERMS}description'), Literal(registration_fields['rights_description'])))
+
         g.add((self.dataset_id_dataset, URIRef(f'{DCAT}distribution'), self.dataset_id_distribution))
 
         g.add((self.dataset_id_distribution, RDF.type, URIRef(f'{DCAT}Distribution')))
@@ -88,37 +102,6 @@ class DCATDataSet(DataSet):
             URIRef(f'{SDO}email'),
             Literal(f'{registration_fields["publisher_email"]}')
         ))
-        """
-        tcat:{{dataset_id}}_dataset
-            a dcat:Dataset ;
-            dcterms:description "{{dataset_description}}" ;
-            dcterms:title "{{dataset_title}}"@en ;
-            dcterms:identifier "{{dataset_id}}" ;
-            dcterms:issued "{{dateset_publication_datetime}}"^^xsd:dateTime ;
-            dcterms:publisher tcat:{{dataset_publisher_id}} ;
-            prov:qualifiedAttribution [
-                a prov:Attribution ;
-                prov:agent tcat:{{dataset_owner_id}} ;
-                dcat:hadRole
-                    <http://standards.iso.org/iso/19115/resources/Codelist/cat/codelists.xml#CI_RoleCode/owner> ;
-            ] ;
-            dcterms:rights [
-                dcterms:title "{{rights_title}}" ;
-                dcterms:description "{{rights_description}}" ;
-            ] ;
-            dcat:distribution tcat:{{dataset_id}}_distribution ;
-        .
-        tcat:{{dataset_id}}_distribution
-            a dcat:Distribution ;
-            dcterms:title "{{distribution_title}}"@en ;
-            dcterms:identifier "{{distribution_id}}" ;
-            # dcat:downloadURL <file:///adapter/test_data/faux_africa.csv> ; # TBC
-            dcat:mediaType <http://www.iana.org/assignments/media-types/{{source_mime_type}}> ;
-        .
-        tcat:{{dataset_publisher_id}}
-            sdo:name "{{dataset_publisher_name}}"@en ;
-            sdo:email <{{dataset_publisher_email}}> ;
-        """
         return Record(headers, None, g.serialize(format="turtle"), None)
 
     def update_record(self, headers: list[str | bytes | None] = None) -> Record:
