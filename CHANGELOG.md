@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/telicent-oss/telicent-lib/compare/v2.2.1...v3.0.0) (2024-09-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* Dataset objects used to provide additional meta data about a dataset to adapters ([#46](https://github.com/telicent-oss/telicent-lib/issues/46))
+
+### Features
+
+* Dataset objects used to provide additional meta data about a dataset to adapters ([#46](https://github.com/telicent-oss/telicent-lib/issues/46)) ([d6817cd](https://github.com/telicent-oss/telicent-lib/commit/d6817cd791cfb02f9bd3458924b44c3c3113799d))
+
 ## [2.2.1](https://github.com/telicent-oss/telicent-lib/compare/v2.2.0...v2.2.1) (2024-09-04)
 
 
