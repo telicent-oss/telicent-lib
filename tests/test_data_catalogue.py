@@ -46,16 +46,16 @@ class DataCatalogTestCase(TestCase):
                                    has_error_handler=False, has_data_catalog=True, dataset=dataset,
                                    data_catalog_sink=dc_sink, name='TestAdapter')
         registration_fields = {
-            'description': "This is my data",
+            'description': "Dataset's description",
             'publication_datetime': "2000-01-01T07:00:00+00:00",
-            'publisher_id': "ACLED-Org",
+            'publisher_id': "COMPANY-Org",
             'publisher_name': "Mr Owner",
             'publisher_email': "owner@example.com",
             'owner_id': "Data Owner",
             'rights_title': "test",
             'rights_description': "test",
             'distribution_title': "Distribution Title",
-            'distribution_id': "distribution-id"
+            'distribution_id': "14343-232-90019"
         }
         adapter.register_data_catalog(registration_fields)
         expected_message = {

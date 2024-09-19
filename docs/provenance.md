@@ -128,9 +128,18 @@ The above will create a message on a topic (default: "catalog") with the followi
 
 Additional data may be provided to the `register_data_catalog()` method which will be included in the output message.
 
-```json
+```python
 registration_fields = {'author':  'John Doe'}
 adapter.register_data_catalog()
+```
+
+```json
+{
+	"id": "telicent_lib.adapter",
+	"title": "telicent_lib.adapter",
+	"source_mime_type": "unknown",
+    "author":  "John Doe"
+}
 ```
 
 ### Updating a Dataset
@@ -192,4 +201,89 @@ from telicent_lib import RecordUtils
 headers = {"header-key": "header value"}
 adapter.register_data_catalog(headers=RecordUtils.to_headers(headers))
 adapter.update_data_catalog(headers=RecordUtils.to_headers(headers))
+```
+
+
+### DCATDataSet
+
+telicent-lib also provides a `DCATDataSet` class. It can be used in the same way as `SimpleDataSet`, but its output
+is RDF Turtle instead of JSON. `DCATDataSet` also requires certain keys be present in `registration_fields`.
+
+- description
+- publication_datetime
+- publisher_id
+- publisher_name
+- publisher_email
+- owner_id
+- rights_title
+- rights_description
+- distribution_title
+- distribution_id
+
+```python
+from telicent_lib import DCATDataSet
+
+dataset = DCATDataSet(dataset_id='my-data-set', title='myfile.csv', source_mime_type='text/csv')
+adapter = AutomaticAdapter(target=sink, dataset=dataset)
+registration_fields = {
+    'description': "Dataset's description",
+    'publication_datetime': "2000-01-01T07:00:00+00:00",
+    'publisher_id': "COMPANY-Org",
+    'publisher_name': "Mr Owner",
+    'publisher_email': "owner@example.com",
+    'owner_id': "Data Owner",
+    'rights_title': "Copyright 2000",
+    'rights_description': "All rights reserved",
+    'distribution_title': "My Pipeline Distribution",
+    'distribution_id': "14343-232-90019"
+}
+adapter.register_data_catalog(registration_fields=registration_fields)
+```
+
+Produces the following turtle:
+
+```
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix tcat: <http://telicent.io/catalog#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+tcat:my-data-set_dataset a dcat:Dataset ;
+    dcterms:description "Dataset's description" ;
+    dcterms:identifier "my-data-set" ;
+    dcterms:issued "2000-01-01T07:00:00+00:00"^^xsd:dateTime ;
+    dcterms:publisher tcat:COMPANY-Org ;
+    dcterms:rights [ dcterms:description "All rights reserved" ;
+            dcterms:title "Copyright 2000" ] ;
+    dcterms:title "myfile.csv"@en ;
+    dcat:distribution tcat:my-data-set_distribution ;
+    prov:qualifiedAttribution [ a prov:Attribution ;
+            dcat:hadRole <http://standards.iso.org/iso/19115/resources/Codelist/cat/codelists.xml#CI_RoleCode/owner> ;
+            prov:agent "Data Owner" ] .
+
+tcat:COMPANY-Org schema:email <owner@example.com> ;
+    schema:name "Mr Owner"@en .
+
+tcat:my-data-set_distribution a dcat:Distribution ;
+    dcterms:identifier "14343-232-90019" ;
+    dcterms:title "My Pipeline Distribution"@en ;
+    dcat:mediaType <http://www.iana.org/assignments/media-types/text/csv> .
+```
+
+```python
+adapter.register_data_catalog(registration_fields=registration_fields)
+```
+
+Produces the following turtle:
+
+```
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix tcat: <http://telicent.io/catalog#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+tcat:my-data-set_dataset a dcat:Dataset ;
+    dcterms:modified "2000-01-01T00:00:00+00:00"^^xsd:dateTime .
 ```
