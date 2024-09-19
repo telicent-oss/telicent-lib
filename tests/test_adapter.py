@@ -4,7 +4,7 @@ from collections.abc import Iterable
 from datetime import datetime, timezone
 from unittest.mock import patch
 
-from telicent_lib import Adapter, AutomaticAdapter, Record, RecordUtils
+from telicent_lib import Adapter, AutomaticAdapter, Record, RecordUtils, SimpleDataSet
 from telicent_lib.sinks.listSink import ListSink
 from tests.delaySink import DelaySink
 from tests.test_records import RecordVerifier
@@ -45,7 +45,9 @@ class TestAdapter(RecordVerifier):
         self.default_headers = [
             ('Exec-Path', b'Automatic Adapter-to-In-Memory List'),
             ('Request-Id', b'List:uuid4'),
-            ('traceparent', b'')
+            ('traceparent', b''),
+            ('Data-Source-Name', b'telicent_lib.adapter'),
+            ('Data-Source-Type', b'unknown')
         ]
 
         self.default_headers_with_source = [
@@ -231,7 +233,7 @@ class TestAdapter(RecordVerifier):
         sink = ListSink()
         adapter = AutomaticAdapter(target=sink, adapter_function=custom_range_generator, has_reporter=False,
                                    has_error_handler=False, start=100, stop=200, has_data_catalog=False,
-                                   source_name='foo.csv', source_type='file')
+                                   dataset=SimpleDataSet(dataset_id='id', title='foo.csv', source_mime_type='file'))
         adapter.run()
         self.__validate_generated_range__(sink, 100, 200, headers=self.default_headers_with_source)
 

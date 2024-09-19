@@ -1,8 +1,4 @@
-from telicent_lib.adapter import Adapter, AutomaticAdapter
-from telicent_lib.datasets import DCATDataSet, SimpleDataSet
-from telicent_lib.mapper import Mapper
-from telicent_lib.projector import Projector
-from telicent_lib.records import Record, RecordAdapter, RecordMapper, RecordProjector, RecordUtils
+from telicent_lib.datasets.datasets import DCATDataSet, SimpleDataSet
 
 __license__ = """
 Copyright (c) Telicent Ltd.
@@ -22,15 +18,6 @@ limitations under the License.
 
 
 __all__ = [
-    'Adapter',
-    'AutomaticAdapter',
     'DCATDataSet',
-    'Mapper',
-    'Projector',
-    'Record',
-    'RecordMapper',
-    'RecordProjector',
-    'RecordAdapter',
-    'RecordUtils',
     'SimpleDataSet',
 ]
