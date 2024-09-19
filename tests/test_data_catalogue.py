@@ -9,7 +9,7 @@ import pytz
 
 # from rdflib import Graph
 from telicent_lib import AutomaticAdapter, Record
-from telicent_lib.datasets.datasets import DCATDataSet, SimpleDataSet
+from telicent_lib.datasets.datasets import SimpleDataSet
 from telicent_lib.sinks.listSink import ListSink
 
 
@@ -19,7 +19,7 @@ def __adapter_function_no_headers__() -> Record | list[Record] | None:
 
 class DataCatalogTestCase(TestCase):
 
-    def test_dc_sink_writes_data(self):
+    def test_dc_sink_writes_update(self):
         sink = ListSink()
         dc_sink = ListSink()
         dataset = SimpleDataSet(dataset_id='id', title='foo.csv', source_mime_type='file')
@@ -38,13 +38,10 @@ class DataCatalogTestCase(TestCase):
         }
         self.assertEqual(json.loads(dc_msg.value), expected_message)
 
-
-class RDFCatalogTestCase(TestCase):
-
-    def test_dcat_registration(self):
+    def test_dc_sink_writes_registration(self):
         sink = ListSink()
         dc_sink = ListSink()
-        dataset = DCATDataSet(dataset_id='id', title='foo.csv', source_mime_type='file')
+        dataset = SimpleDataSet(dataset_id='id', title='foo.csv', source_mime_type='file')
         adapter = AutomaticAdapter(target=sink, adapter_function=__adapter_function_no_headers__, has_reporter=False,
                                    has_error_handler=False, has_data_catalog=True, dataset=dataset,
                                    data_catalog_sink=dc_sink, name='TestAdapter')
@@ -61,5 +58,9 @@ class RDFCatalogTestCase(TestCase):
             'distribution_id': "distribution-id"
         }
         adapter.register_data_catalog(registration_fields)
-        # dc_msg = dc_sink.get()[0]
-        # g = Graph()
+        expected_message = {
+            **{'id': 'id', 'source_mime_type': 'file', 'title': 'foo.csv'},
+            **registration_fields
+        }
+        dc_msg = dc_sink.get()[0]
+        self.assertEqual(json.loads(dc_msg.value), expected_message)
