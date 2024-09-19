@@ -82,7 +82,7 @@ class ErrorHandlerUseCaseTestCase(ErrorHandlerTestCaseStub):
     def test_adaptor_error_handler(self, mocked_send_exception):
         adapter = AutomaticAdapter(
             adapter_function=fake_adapter_function,
-            target=ListSink(), name='test-name', source_name='test-source', error_handler=self.error_handler,
+            target=ListSink(), name='test-name', error_handler=self.error_handler,
             has_reporter=False, has_data_catalog=False,
         )
         try:
@@ -96,7 +96,7 @@ class ErrorHandlerUseCaseTestCase(ErrorHandlerTestCaseStub):
     def test_mapper_error_handler(self, mocked_send_exception):
         mapper = Mapper(
             map_function=fake_mapper_function, source=ListSource(['one', 'two']),
-            target=ListSink(), name='test-name', source_name='test-source', error_handler=self.error_handler,
+            target=ListSink(), name='test-name', error_handler=self.error_handler,
             has_reporter=False,
         )
         try:
@@ -110,7 +110,7 @@ class ErrorHandlerUseCaseTestCase(ErrorHandlerTestCaseStub):
     def test_projector_error_handler(self, mocked_send_exception):
         projector = Projector(
             projector_function=fake_projector_function, source=ListSource(['one', 'two']),
-            target=ListSink(), name='test-name', source_name='test-source', error_handler=self.error_handler,
+            target=ListSink(), name='test-name', error_handler=self.error_handler,
             has_reporter=False, target_store='Test'
         )
         try:

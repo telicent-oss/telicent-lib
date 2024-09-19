@@ -98,36 +98,72 @@ each record a unique ID, which component wrote the record, and in the case of a 
 
 By default, [Adapters and AutomaticAdapters](adapters.md) provide a method to notify a data catalog that a data source has been updated.
 
+### Registering a Dataset
+
 ```python
 ...
-adapter = Adapter(target=sink, name="Adapter", source_name="Legacy Data", source_type="csv")
-adapter.update_data_catalog()
+from telicent_lib import Adapter, SimpleDataSet
+from telicent_lib.adapter import KafkaSink
+sink = KafkaSink(topic="raw-in")
+dataset = SimpleDataSet(id="my-id", title="My Adapter", source_mime_type='text/csv')
+adapter = Adapter(target=sink, dataset=dataset)
+adapter.register_data_catalog()
 ```
 
-The above code would yield a message on a topic (default: "catalog") with the following body:
+The above will create a message on a topic (default: "catalog") with the following body:
 
 ```json
 {
-    "data-source-name": "Legacy Data",
-    "data-source-type": "csv",
-    "data-source-last-update": "2000-01-01T09:00:00+01:00",
-    "component-name": "Adapter"
+	"id": "telicent_lib.adapter",
+	"title": "telicent_lib.adapter",
+	"source_mime_type": "unknown"
 }
 ```
-(timestamp value for illustration purposes)
 
-| Status                  | Type         | Definition                                                           |
-|-------------------------|--------------|----------------------------------------------------------------------|
-| data-source-name        | string       | The name of the data source, taken from the Adapter's `source_name`. |
-| data-source-type        | string       | The type of the data source, taken from the Adapter's `source_type`. |
-| data-source-last-update | XSD datetime | The current datetime.                                                |
-| component-name          | string       | The adapter's name.                                                  | 
+| Status           | Type   | Definition                |
+|------------------|--------|---------------------------|
+| id               | string | The dataset's id.         |
+| title            | string | The dataset's title.      |
+| source_mime_type | string | The source's mime-type.   |
+
+Additional data may be provided to the `register_data_catalog()` method which will be included in the output message.
+
+```json
+registration_fields = {'author':  'John Doe'}
+adapter.register_data_catalog()
+```
+
+### Updating a Dataset
+
+```python
+from telicent_lib import Adapter, SimpleDataSet
+from telicent_lib.adapter import KafkaSink
+sink = KafkaSink(topic="raw-in")
+dataset = SimpleDataSet(id="my-id", title="My Adapter", source_mime_type='text/csv')
+adapter = Adapter(target=sink, name="Adapter", dataset=dataset)
+adapter.update_data_catalog()
+```
+
+The above will create a message on a topic (default: "catalog") with the following body:
+
+```json
+{
+	"id": "<module name>",
+	"last_updated_at": "2000-01-01T00:00:00+00:00"
+}
+```
+The `last_updated_at` timestamp would be the current system time when the message was created.
+
+| Status          | Type         | Definition            |
+|-----------------|--------------|-----------------------|
+| is              | string       | The dataset's id.     |
+| last_updated_at | XSD datetime | The current datetime. |
 
 
 ### Disable the data catalog sink
 
 ```python
-adapter = Adapter(target=sink, name="Adapter", source_name="Legacy Data", source_type="csv", has_data_catalog=False)
+adapter = Adapter(target=sink, name="Adapter", has_data_catalog=False)
 ```
 
 The `update_data_catalog` method will not write to the sink and will log a warning when `has_data_catalog` is set to False.
@@ -144,15 +180,16 @@ kafka_config = {
     ...  # a custom Kafka config
 }
 dc_sink = KafkaSink(topic="my-topic", kafka_config=kafka_config)
-adapter = Adapter(target=sink, name="Adapter", source_name="Legacy Data", source_type="csv", data_catalog_sink=dc_sink)
+adapter = Adapter(target=sink, name="Adapter", data_catalog_sink=dc_sink)
 ```
 
 ### Specifying headers for the data catalog record
 
-Headers may be provided to the `update_data_catalog` method.
+Headers may be provided to the `update_data_catalog` and `register_data_catalog` methods.
 
 ```python
 from telicent_lib import RecordUtils
 headers = {"header-key": "header value"}
+adapter.register_data_catalog(headers=RecordUtils.to_headers(headers))
 adapter.update_data_catalog(headers=RecordUtils.to_headers(headers))
 ```
