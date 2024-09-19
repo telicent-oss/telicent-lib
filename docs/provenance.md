@@ -273,7 +273,11 @@ tcat:my-data-set_distribution a dcat:Distribution ;
 ```
 
 ```python
-adapter.register_data_catalog(registration_fields=registration_fields)
+from telicent_lib import DCATDataSet
+
+dataset = DCATDataSet(dataset_id='my-data-set', title='myfile.csv', source_mime_type='text/csv')
+adapter = AutomaticAdapter(target=sink, dataset=dataset)
+adapter.update_data_catalog()
 ```
 
 Produces the following turtle:
