@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import uuid
 from collections.abc import Iterable, Mapping
+from typing import Any
 
 from colored import fore
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
@@ -43,14 +44,15 @@ class BaseAdapter(OutputAction):
                  has_reporter, reporter_sink: DataSink, has_error_handler, error_handler,
                  disable_metrics, has_data_catalog, data_catalog_sink, dataset=None):
 
+        config = Configurator()
+        self.data_catalog_topic = config.get("DATA_CATALOG_TOPIC", "catalog")
         self.dataset = dataset
         if self.dataset is None:
             self.dataset = SimpleDataSet(dataset_id=__name__, title=__name__, source_mime_type='unknown')
-        config = Configurator()
         self.has_data_catalog = has_data_catalog
         self.data_catalog_sink = data_catalog_sink
         if self.has_data_catalog and self.data_catalog_sink is None:
-            self.data_catalog_sink = KafkaSink(topic=config.get("DATA_CATALOG_TOPIC", "catalog"))
+            self.data_catalog_sink = KafkaSink(topic=self.data_catalog_topic)
 
         super().__init__(
             target, text_colour=text_colour, reporting_batch_size=reporting_batch_size,
@@ -68,19 +70,28 @@ class BaseAdapter(OutputAction):
             self.data_catalog_sink.close()
         super().aborted()
 
-    def update_data_catalog(self, headers: Mapping = None) -> bool:
+    def update_data_catalog(self, headers: list[tuple[str, str | bytes | None]] = None) -> bool:
         if not self.has_data_catalog:
             logger.warning("Cannot create data catalogue update as 'has_data_catalogue' is False")
             return False
         record = self.dataset.update_record(headers)
-        self.data_catalog_sink.send(record)
-        return True
+        return self.deliver_catalog_record_to_broker(record)
 
-    def register_data_catalog(self, registration_fields: Mapping, headers: Mapping = None) -> bool:
+    def register_data_catalog(self, registration_fields: Mapping,
+                              headers: list[tuple[str, str | bytes | None]] = None) -> bool:
         if not self.has_data_catalog:
             logger.warning("Cannot create data catalogue update as 'has_data_catalogue' is False")
             return False
         record = self.dataset.registration_record(registration_fields, headers)
+        return self.deliver_catalog_record_to_broker(record)
+
+    def deliver_catalog_record_to_broker(self, record):
+        default_headers: list[tuple[str, str | bytes | dict[Any, Any] | None]] = [
+            ('Exec-Path', self.generated_id),
+            ('Request-Id', f'{self.data_catalog_topic}:{str(uuid.uuid4())}'),
+            ('Content-Type', self.dataset.content_type)
+        ]
+        record = RecordUtils.add_headers(record, default_headers)
         self.data_catalog_sink.send(record)
         return True
 

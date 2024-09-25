@@ -30,12 +30,20 @@ class DataCatalogTestCase(TestCase):
         with patch('telicent_lib.datasets.datasets.datetime') as frozen_datetime:
             mock_now = datetime(2000, 1, 1, 0, 0, 0, tzinfo=pytz.UTC)
             frozen_datetime.now.return_value = mock_now
-            adapter.update_data_catalog()
+            with patch('telicent_lib.adapter.uuid.uuid4') as patched_uuid:
+                patched_uuid.return_value = 'my-uuid'
+                adapter.update_data_catalog()
         dc_msg = dc_sink.get()[0]
+        expected_headers = [
+            ('Exec-Path', b'TestAdapter'),
+            ('Request-Id', b'catalog:my-uuid'),
+            ('Content-Type', b'application/json')
+        ]
         expected_message = {
             'id': 'id',
             'last_updated_at': '2000-01-01T00:00:00+00:00'
         }
+        self.assertEqual(expected_headers, dc_msg.headers)
         self.assertEqual(json.loads(dc_msg.value), expected_message)
 
     def test_dc_sink_writes_registration(self):
@@ -57,10 +65,18 @@ class DataCatalogTestCase(TestCase):
             'distribution_title': "Distribution Title",
             'distribution_id': "14343-232-90019"
         }
-        adapter.register_data_catalog(registration_fields)
+        with patch('telicent_lib.adapter.uuid.uuid4') as patched_uuid:
+            patched_uuid.return_value = 'my-uuid'
+            adapter.register_data_catalog(registration_fields)
         expected_message = {
             **{'id': 'id', 'source_mime_type': 'file', 'title': 'foo.csv'},
             **registration_fields
         }
         dc_msg = dc_sink.get()[0]
+        expected_headers = [
+            ('Exec-Path', b'TestAdapter'),
+            ('Request-Id', b'catalog:my-uuid'),
+            ('Content-Type', b'application/json')
+        ]
+        self.assertEqual(expected_headers, dc_msg.headers)
         self.assertEqual(json.loads(dc_msg.value), expected_message)

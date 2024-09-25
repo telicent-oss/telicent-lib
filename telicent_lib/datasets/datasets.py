@@ -29,6 +29,11 @@ class DataSet(ABC):
     def update_record(self, headers: list[str | bytes | None] = None) -> Record:
         pass
 
+    @property
+    @abstractmethod
+    def content_type(self):
+        pass
+
 
 class DCATDataSet(DataSet):
 
@@ -37,6 +42,10 @@ class DCATDataSet(DataSet):
         self.tcat = 'http://telicent.io/catalog#'
         self.dataset_id_dataset = URIRef(f'{self.tcat}{self.dataset_id}_dataset')
         self.dataset_id_distribution = URIRef(f'{self.tcat}{self.dataset_id}_distribution')
+
+    @property
+    def content_type(self):
+        return 'text/turtle'
 
     def registration_record(self, registration_fields: Mapping, headers: list[str | bytes | None] = None) -> Record:
         expected_fields = [
@@ -122,6 +131,13 @@ class DCATDataSet(DataSet):
 
 
 class SimpleDataSet(DataSet):
+
+    def __init__(self, dataset_id: str, title: str, source_mime_type: str):
+        super().__init__(dataset_id, title, source_mime_type)
+
+    @property
+    def content_type(self):
+        return 'application/json'
 
     def registration_record(self, registration_fields: Mapping, headers: list[str | bytes | None] = None) -> Record:
         core_data = {
