@@ -75,7 +75,7 @@ class BaseAdapter(OutputAction):
             logger.warning("Cannot create data catalogue update as 'has_data_catalogue' is False")
             return False
         record = self.dataset.update_record(headers)
-        return self.deliver_catalog_record_to_broker(record)
+        return self.send_catalog_record_to_broker(record)
 
     def register_data_catalog(self, registration_fields: Mapping,
                               headers: list[tuple[str, str | bytes | None]] = None) -> bool:
@@ -83,9 +83,9 @@ class BaseAdapter(OutputAction):
             logger.warning("Cannot create data catalogue update as 'has_data_catalogue' is False")
             return False
         record = self.dataset.registration_record(registration_fields, headers)
-        return self.deliver_catalog_record_to_broker(record)
+        return self.send_catalog_record_to_broker(record)
 
-    def deliver_catalog_record_to_broker(self, record):
+    def send_catalog_record_to_broker(self, record):
         default_headers: list[tuple[str, str | bytes | dict[Any, Any] | None]] = [
             ('Exec-Path', self.generated_id),
             ('Request-Id', f'{self.data_catalog_topic}:{str(uuid.uuid4())}'),
