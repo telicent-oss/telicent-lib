@@ -85,7 +85,7 @@ class BaseAdapter(OutputAction):
         record = self.dataset.registration_record(registration_fields, headers)
         return self.send_catalog_record_to_broker(record)
 
-    def send_catalog_record_to_broker(self, record):
+    def send_catalog_record_to_broker(self, record: Record):
         default_headers: list[tuple[str, str | bytes | dict[Any, Any] | None]] = [
             ('Exec-Path', self.generated_id),
             ('Request-Id', f'{self.data_catalog_topic}:{str(uuid.uuid4())}'),
