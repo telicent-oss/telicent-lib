@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/telicent-oss/telicent-lib/compare/v3.0.0...v3.0.1) (2024-09-25)
+
+
+### Bug Fixes
+
+* headers being set on data catalog messages ([#48](https://github.com/telicent-oss/telicent-lib/issues/48)) ([e4f2199](https://github.com/telicent-oss/telicent-lib/commit/e4f2199a9edcd556b9612b8422a87682656a9bab))
+
 ## [3.0.0](https://github.com/telicent-oss/telicent-lib/compare/v2.2.1...v3.0.0) (2024-09-19)
 
 
