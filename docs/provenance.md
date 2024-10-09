@@ -105,7 +105,7 @@ By default, [Adapters and AutomaticAdapters](adapters.md) provide a method to no
 from telicent_lib import Adapter, SimpleDataSet
 from telicent_lib.adapter import KafkaSink
 sink = KafkaSink(topic="raw-in")
-dataset = SimpleDataSet(id="my-id", title="My Adapter", source_mime_type='text/csv')
+dataset = SimpleDataSet(dataset_id="my-id", title="My Adapter", source_mime_type='text/csv')
 adapter = Adapter(target=sink, dataset=dataset)
 adapter.register_data_catalog()
 ```
@@ -148,7 +148,7 @@ adapter.register_data_catalog()
 from telicent_lib import Adapter, SimpleDataSet
 from telicent_lib.adapter import KafkaSink
 sink = KafkaSink(topic="raw-in")
-dataset = SimpleDataSet(id="my-id", title="My Adapter", source_mime_type='text/csv')
+dataset = SimpleDataSet(dataset_id="my-id", title="My Adapter", source_mime_type='text/csv')
 adapter = Adapter(target=sink, name="Adapter", dataset=dataset)
 adapter.update_data_catalog()
 ```
