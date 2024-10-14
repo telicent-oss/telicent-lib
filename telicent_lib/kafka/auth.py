@@ -47,8 +47,8 @@ class AuthConfigFactory:
         self._auth_methods = {}
         self.conf = Configurator()
 
-    def register_auth_method(self, format, creator):
-        self._auth_methods[format] = creator
+    def register_auth_method(self, auth_method, creator):
+        self._auth_methods[auth_method] = creator
 
     def get_auth_method(self, auth_method: str | None = None):
         if auth_method is None:
