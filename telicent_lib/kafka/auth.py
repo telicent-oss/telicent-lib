@@ -52,7 +52,7 @@ class AuthConfigFactory:
     def register_auth_method(self, auth_method: str, creator: type[KafkaAuth]):
         self._auth_methods[auth_method] = creator
 
-    def get_auth_method(self, auth_method: str | None = None):
+    def get_auth_method(self, auth_method: str | None = None) -> KafkaAuth:
         if auth_method is None:
             auth_method = self.conf.get('KAFKA_AUTH_MODE', 'plain').lower()
         auth_class = self._auth_methods.get(auth_method)
