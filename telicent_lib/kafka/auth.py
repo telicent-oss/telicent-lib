@@ -47,7 +47,7 @@ class AuthConfigFactory:
         self._auth_methods = {}
         self.conf = Configurator()
 
-    def register_auth_method(self, auth_method, creator):
+    def register_auth_method(self, auth_method: str, creator: type[KafkaAuth]):
         self._auth_methods[auth_method] = creator
 
     def get_auth_method(self, auth_method: str | None = None):
