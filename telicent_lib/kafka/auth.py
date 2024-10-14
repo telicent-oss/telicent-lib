@@ -46,11 +46,11 @@ class SSLKafkaAuth(KafkaAuth):
 class AuthConfigFactory:
 
     def __init__(self):
-        self._auth_methods = {}
+        self._auth_methods: dict[str, type[KafkaAuth]] = {}
         self.conf = Configurator()
 
-    def register_auth_method(self, auth_method: str, creator: type[KafkaAuth]):
-        self._auth_methods[auth_method] = creator
+    def register_auth_method(self, auth_method: str, auth_class: type[KafkaAuth]):
+        self._auth_methods[auth_method] = auth_class
 
     def get_auth_method(self, auth_method: str | None = None) -> KafkaAuth:
         if auth_method is None:
