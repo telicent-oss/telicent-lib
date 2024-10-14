@@ -19,4 +19,4 @@ pip install telicent-lib
 
 ## Usage
 
-For documentation on how to use telicent-lib, please see the [documentation index](docs/index.md).
+For documentation on how to use telicent-lib, please see the [documentation index](https://github.com/telicent-oss/telicent-lib/blob/main/docs/index.md).
