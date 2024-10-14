@@ -115,7 +115,7 @@ class KafkaSink(DataSink):
         __validate_kafka_serializer__(value_serializer, "value_serializer")
 
         if kafka_config is None:
-            kafka_config = get_auth_mode()().get_config()
+            kafka_config = {}
 
         broker = kafka_config.get('bootstrap.servers')
         if broker is None:
@@ -126,6 +126,10 @@ class KafkaSink(DataSink):
         self.broker = broker
         self.topic = topic
         self.debug = debug
+
+        # Get the auth config and merge, with user config as priority
+        auth_config = get_auth_mode()().get_config()
+        kafka_config = {**auth_config, **kafka_config}
 
         logging.debug(f"Configured KafkaSink to connect to {self}")
 
