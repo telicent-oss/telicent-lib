@@ -11,6 +11,7 @@ from confluent_kafka.serialization import Deserializer
 
 from telicent_lib.config import Configurator, OnError
 from telicent_lib.exceptions import SourceNotFoundException
+from telicent_lib.kafka.auth import get_auth_mode
 from telicent_lib.records import Record
 from telicent_lib.sources.dataSource import DataSource
 from telicent_lib.sources.deserializers import DeserializerFunction, Deserializers
@@ -164,6 +165,10 @@ class KafkaSource(DataSource):
         self.broker = kafka_config['bootstrap.servers']
         self.reset_position = kafka_config['auto.offset.reset']
         self.needs_seek = False
+
+        # Get the auth config and merge, with user config as priority
+        auth_config = get_auth_mode()().get_config()
+        kafka_config = {**auth_config, **kafka_config}
 
         # Create the consumer
         # NB We don't pass in our topics at this time as we want to explicitly subscribe and provide our rebalance

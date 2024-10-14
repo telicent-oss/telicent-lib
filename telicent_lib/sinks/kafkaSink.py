@@ -9,6 +9,7 @@ from confluent_kafka import Producer
 from confluent_kafka.serialization import Serializer
 
 from telicent_lib.config import Configurator, OnError
+from telicent_lib.kafka.auth import get_auth_mode
 from telicent_lib.records import Record
 from telicent_lib.sinks.dataSink import DataSink
 from telicent_lib.sinks.serializers import SerializerFunction, Serializers
@@ -114,7 +115,8 @@ class KafkaSink(DataSink):
         __validate_kafka_serializer__(value_serializer, "value_serializer")
 
         if kafka_config is None:
-            kafka_config = {}
+            kafka_config = get_auth_mode()().get_config()
+
         broker = kafka_config.get('bootstrap.servers')
         if broker is None:
             conf = Configurator()
