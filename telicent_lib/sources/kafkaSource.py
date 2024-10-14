@@ -11,7 +11,7 @@ from confluent_kafka.serialization import Deserializer
 
 from telicent_lib.config import Configurator, OnError
 from telicent_lib.exceptions import SourceNotFoundException
-from telicent_lib.kafka.auth import get_auth_mode
+from telicent_lib.kafka.auth import auth_config_factory
 from telicent_lib.records import Record
 from telicent_lib.sources.dataSource import DataSource
 from telicent_lib.sources.deserializers import DeserializerFunction, Deserializers
@@ -167,7 +167,7 @@ class KafkaSource(DataSource):
         self.needs_seek = False
 
         # Get the auth config and merge, with user config as priority
-        auth_config = get_auth_mode()().get_config()
+        auth_config = auth_config_factory.get_auth_method().get_config()
         kafka_config = {**auth_config, **kafka_config}
 
         # Create the consumer

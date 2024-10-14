@@ -9,7 +9,7 @@ from confluent_kafka import Producer
 from confluent_kafka.serialization import Serializer
 
 from telicent_lib.config import Configurator, OnError
-from telicent_lib.kafka.auth import get_auth_mode
+from telicent_lib.kafka.auth import auth_config_factory
 from telicent_lib.records import Record
 from telicent_lib.sinks.dataSink import DataSink
 from telicent_lib.sinks.serializers import SerializerFunction, Serializers
@@ -128,7 +128,7 @@ class KafkaSink(DataSink):
         self.debug = debug
 
         # Get the auth config and merge, with user config as priority
-        auth_config = get_auth_mode()().get_config()
+        auth_config = auth_config_factory.get_auth_method().get_config()
         kafka_config = {**auth_config, **kafka_config}
 
         logging.debug(f"Configured KafkaSink to connect to {self}")

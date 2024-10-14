@@ -41,15 +41,26 @@ class SSLKafkaAuth(KafkaAuth):
         }
 
 
-def get_auth_mode() -> type[KafkaAuth]:
-    auth_modes = {
-        'plain': PlainKafkaAuth,
-        'ssl': SSLKafkaAuth,
-    }
-    config = Configurator()
-    kafka_auth_mode = config.get('KAFKA_AUTH_MODE', 'plain').lower()
-    if kafka_auth_mode not in auth_modes:
-        raise Exception(
-            f'{kafka_auth_mode} is not a valid auth mode. Valid options: {", ".join(auth_modes.keys())}'
-        )
-    return auth_modes['kafka_auth_mode']
+class AuthConfigFactory:
+
+    def __init__(self):
+        self._auth_methods = {}
+        self.conf = Configurator()
+
+    def register_auth_method(self, format, creator):
+        self._auth_methods[format] = creator
+
+    def get_auth_method(self, auth_method: str | None = None):
+        if auth_method is None:
+            auth_method = self.conf.get('KAFKA_AUTH_MODE', 'plain').lower()
+        auth_class = self._auth_methods.get(auth_method)
+        if not auth_class:
+            raise ValueError(
+                f'{auth_method} is not a valid auth mode. Valid options: {", ".join(self._auth_methods.keys())}'
+            )
+        return auth_class()
+
+
+auth_config_factory = AuthConfigFactory()
+auth_config_factory.register_auth_method('plain', PlainKafkaAuth)
+auth_config_factory.register_auth_method('ssl', SSLKafkaAuth)
