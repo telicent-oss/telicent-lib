@@ -8,8 +8,7 @@ import warnings
 from confluent_kafka import Producer
 from confluent_kafka.serialization import Serializer
 
-from telicent_lib.config import Configurator, OnError
-from telicent_lib.kafka.auth import auth_config_factory
+from telicent_lib.kafka.kafka import kafka_config_factory
 from telicent_lib.records import Record
 from telicent_lib.sinks.dataSink import DataSink
 from telicent_lib.sinks.serializers import SerializerFunction, Serializers
@@ -114,27 +113,17 @@ class KafkaSink(DataSink):
         __validate_kafka_serializer__(key_serializer, "key_serializer")
         __validate_kafka_serializer__(value_serializer, "value_serializer")
 
-        if kafka_config is None:
-            kafka_config = {}
-
-        broker = kafka_config.get('bootstrap.servers')
-        if broker is None:
-            conf = Configurator()
-            broker = conf.get('BOOTSTRAP_SERVERS', required=True, on_error=OnError.RAISE_EXCEPTION)
-            kafka_config['bootstrap.servers'] = broker
+        kafka_config_instance = kafka_config_factory.create()
+        kafka_config_dict = kafka_config_instance.get_config()
 
         self.broker = broker
         self.topic = topic
         self.debug = debug
 
-        # Get the auth config and merge, with user config as priority
-        auth_config = auth_config_factory.get_auth_method().get_config()
-        kafka_config = {**auth_config, **kafka_config}
-
         logging.debug(f"Configured KafkaSink to connect to {self}")
 
-        check_kafka_broker_available(kafka_config)
-        self.target = Producer(kafka_config)
+        check_kafka_broker_available(kafka_config_dict)
+        self.target = Producer(kafka_config_dict)
 
         self.key_serializer = key_serializer
         self.value_serializer = value_serializer

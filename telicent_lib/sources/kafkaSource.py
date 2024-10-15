@@ -11,7 +11,7 @@ from confluent_kafka.serialization import Deserializer
 
 from telicent_lib.config import Configurator, OnError
 from telicent_lib.exceptions import SourceNotFoundException
-from telicent_lib.kafka.auth import auth_config_factory
+from telicent_lib.kafka.kafka import auth_config_factory
 from telicent_lib.records import Record
 from telicent_lib.sources.dataSource import DataSource
 from telicent_lib.sources.deserializers import DeserializerFunction, Deserializers
