@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import logging
 from abc import ABC, abstractmethod
 
 from telicent_lib.config import Configurator, OnError
+
+logger = logging.getLogger(__name__)
 
 
 class KafkaConfig(ABC):
@@ -22,7 +25,9 @@ class PlainKafkaConfig(KafkaConfig):
 
     def get_config(self) -> dict:
         return {
-            'bootstrap.servers': self.conf.get('BOOTSTRAP_SERVERS', required=True, on_error=OnError.RAISE_EXCEPTION)
+            'bootstrap.servers': self.conf.get('BOOTSTRAP_SERVERS', required=True, on_error=OnError.RAISE_EXCEPTION),
+            'auto.offset.reset': 'earliest',
+            'enable.auto.commit': False,
         }
 
 
@@ -30,6 +35,7 @@ class FileKafkaConfig(KafkaConfig):
 
     def get_config(self) -> dict:
         config_file_path = self.conf.get('KAFKA_CONFIG_FILE_PATH', required=True, on_error=OnError.RAISE_EXCEPTION)
+        logger.debug(f'loading kafka config from: {config_file_path}')
         with open(config_file_path):
             ...
         return {}

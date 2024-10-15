@@ -8,7 +8,7 @@ import warnings
 from confluent_kafka import Producer
 from confluent_kafka.serialization import Serializer
 
-from telicent_lib.kafka.kafka import kafka_config_factory
+from telicent_lib.config.kafka import kafka_config_factory
 from telicent_lib.records import Record
 from telicent_lib.sinks.dataSink import DataSink
 from telicent_lib.sinks.serializers import SerializerFunction, Serializers
