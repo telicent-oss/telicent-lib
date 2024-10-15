@@ -115,11 +115,11 @@ class KafkaSink(DataSink):
 
         kafka_config = kafka_config_factory.create().get_config()
         # There are likely to be some config options specifically for consumers that will raise warnings.
-        # These can sensibly predicted and mitigated.
-        if 'auto.offset.reset' in kafka_config:
-            del kafka_config['auto.offset.reset']
-        if 'enable.auto.commit' in kafka_config:
-            del kafka_config['enable.auto.commit']
+        # These can be sensibly predicted and mitigated.
+        consumer_specific_config = ['auto.offset.reset', 'enable.auto.commit']
+        for exp_config in consumer_specific_config:
+            if exp_config in kafka_config:
+                del kafka_config[exp_config]
 
         self.broker = broker
         self.topic = topic
