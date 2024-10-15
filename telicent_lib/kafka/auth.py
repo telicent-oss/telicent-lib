@@ -29,8 +29,8 @@ class SSLKafkaAuth(KafkaAuth):
         ssl_certificate_location = self.conf.get('SSL_CERTIFICATE_LOCATION', required=True)
         ssl_key_location = self.conf.get('SSL_KEY_LOCATION', required=True)
         ssl_key_password = self.conf.get('SSL_KEY_PASSWORD', required=True)
-        ssl_endpoint_identification_algorithm = self.conf.get(
-            'SSL_ENDPOINT_IDENTIFICATION_ALGORITHM', required=False, default='https'
+        enable_ssl_certificate_verification = self.conf.get(
+            'ENABLE_SSL_CERTIFICATE_VERIFICATION', required=False, default='true', converter=Configurator.string_to_bool
         )
         return {
             'metadata.broker.list': broker,
@@ -39,7 +39,24 @@ class SSLKafkaAuth(KafkaAuth):
             'ssl.certificate.location': ssl_certificate_location,
             'ssl.key.location': ssl_key_location,
             'ssl.key.password': ssl_key_password,
-            'ssl.endpoint.identification.algorithm': ssl_endpoint_identification_algorithm,
+            'enable.ssl.certificate.verification': enable_ssl_certificate_verification,
+        }
+
+
+class SASLKafkaAuth(KafkaAuth):
+
+    def get_config(self) -> dict:
+        sasl_username = self.conf.get('SASL_USER_NAME', required=True)
+        sasl_password = self.conf.get('SASL_PASSWORD', required=True)
+        enable_ssl_certificate_verification = self.conf.get(
+            'ENABLE_SSL_CERTIFICATE_VERIFICATION', required=False, default='true', converter=Configurator.string_to_bool
+        )
+        return {
+            'security.protocol': 'SASL_SSL',
+            'sasl.mechanisms': 'SCRAM-SHA-256',
+            'sasl.username': sasl_username,
+            'sasl.password': sasl_password,
+            'enable.ssl.certificate.verification': enable_ssl_certificate_verification,
         }
 
 
@@ -66,3 +83,4 @@ class AuthConfigFactory:
 auth_config_factory = AuthConfigFactory()
 auth_config_factory.register_auth_method('plain', PlainKafkaAuth)
 auth_config_factory.register_auth_method('ssl', SSLKafkaAuth)
+auth_config_factory.register_auth_method('sasl', SASLKafkaAuth)
