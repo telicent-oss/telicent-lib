@@ -19,12 +19,15 @@ class KafkaConfig(ABC):
         pass
 
 
-class PlainKafkaConfig(KafkaConfig):
+class BasicKafkaConfig(KafkaConfig):
     """
-    This class provides the generic base configuration for an action.
+    A basic, default Kafka configuration intended to get up and running with a local broker.
+
+    It is not possible to customise this configuration with authentication, or any other bespoke configuration.
     """
 
     def get_config(self) -> dict:
+        logger.warning('Basic kafka config has been selected. This is intended for development purposes only.')
         return {
             'bootstrap.servers': self.conf.get('BOOTSTRAP_SERVERS', required=True, on_error=OnError.RAISE_EXCEPTION),
             'auto.offset.reset': 'earliest',
@@ -32,7 +35,7 @@ class PlainKafkaConfig(KafkaConfig):
         }
 
 
-class FileKafkaConfig(KafkaConfig):
+class TomlKafkaConfig(KafkaConfig):
 
     def get_config(self) -> dict:
         config_file_path = self.conf.get('KAFKA_CONFIG_FILE_PATH', required=True, on_error=OnError.RAISE_EXCEPTION)
@@ -58,7 +61,7 @@ class KafkaConfigFactory:
 
     def create(self, auth_method: str | None = None) -> KafkaConfig:
         if auth_method is None:
-            auth_method = self.conf.get('KAFKA_CONFIG_MODE', 'plain').lower()
+            auth_method = self.conf.get('KAFKA_CONFIG_MODE', 'basic').lower()
         auth_class = self._auth_methods.get(auth_method)
         if not auth_class:
             raise ValueError(
@@ -68,5 +71,5 @@ class KafkaConfigFactory:
 
 
 kafka_config_factory = KafkaConfigFactory()
-kafka_config_factory.register_auth_method('plain', PlainKafkaConfig)
-kafka_config_factory.register_auth_method('file', FileKafkaConfig)
+kafka_config_factory.register_auth_method('basic', BasicKafkaConfig)
+kafka_config_factory.register_auth_method('toml', TomlKafkaConfig)

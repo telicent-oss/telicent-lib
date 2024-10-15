@@ -114,6 +114,12 @@ class KafkaSink(DataSink):
         __validate_kafka_serializer__(value_serializer, "value_serializer")
 
         kafka_config = kafka_config_factory.create().get_config()
+        # There are likely to be some config options specifically for consumers that will raise warnings.
+        # These can sensibly predicted and mitigated.
+        if 'auto.offset.reset' in kafka_config:
+            del kafka_config['auto.offset.reset']
+        if 'enable.auto.commit' in kafka_config:
+            del kafka_config['enable.auto.commit']
 
         self.broker = broker
         self.topic = topic
