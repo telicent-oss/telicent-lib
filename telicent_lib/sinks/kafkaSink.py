@@ -113,8 +113,7 @@ class KafkaSink(DataSink):
         __validate_kafka_serializer__(key_serializer, "key_serializer")
         __validate_kafka_serializer__(value_serializer, "value_serializer")
 
-        kafka_config_instance = kafka_config_factory.create()
-        kafka_config_dict = kafka_config_instance.get_config()
+        kafka_config = kafka_config_factory.create().get_config()
 
         self.broker = broker
         self.topic = topic
@@ -122,8 +121,8 @@ class KafkaSink(DataSink):
 
         logging.debug(f"Configured KafkaSink to connect to {self}")
 
-        check_kafka_broker_available(kafka_config_dict)
-        self.target = Producer(kafka_config_dict)
+        check_kafka_broker_available(kafka_config)
+        self.target = Producer(kafka_config)
 
         self.key_serializer = key_serializer
         self.value_serializer = value_serializer

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import configparser
 import logging
 from abc import ABC, abstractmethod
 
@@ -36,9 +37,14 @@ class FileKafkaConfig(KafkaConfig):
     def get_config(self) -> dict:
         config_file_path = self.conf.get('KAFKA_CONFIG_FILE_PATH', required=True, on_error=OnError.RAISE_EXCEPTION)
         logger.debug(f'loading kafka config from: {config_file_path}')
-        with open(config_file_path):
-            ...
-        return {}
+        parser = configparser.ConfigParser()
+        with open(config_file_path) as stream:
+            # prepend a section header. Note: toml parser would be better, but we need to support pre-3.11
+            parser.read_string("[kafka]\n" + stream.read())
+            conf = {}
+            for (key, value) in parser['kafka'].items():
+                conf[key] = value
+        return conf
 
 
 class KafkaConfigFactory:
