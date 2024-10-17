@@ -2,9 +2,6 @@
 
 This guide is intended to provide information about deploying telicent-lib actions.
 
-Run-time configuration of telicent-lib is provided by a configurator, which in most cases will expect run-time
-options to be set via ENV variables.
-
 ## Configuring Kafka in a live environment
 
 telicent-lib has a dependency on [confluent-kafka](https://github.com/confluentinc/confluent-kafka-python/), which is a wrapper around [librdkafka](https://github.com/confluentinc/librdkafka/). 
