@@ -42,7 +42,7 @@ Example of a configuration file for an SSL enabled broker:
 bootstrap.servers=my-kafka.network:5608
 metadata.broker.list=my-kafka.network:5608
 security.protocol=SSL
-ssl.ca.locationssl_ca_location={PATH_TO_CA_BUNDLE}
+ssl_ca_location={PATH_TO_CA_BUNDLE}
 ssl.certificate.location={PATH_TO_CLIENT_CERT}
 ssl.key.location={PATH_TO_CLIENT_KEY}
 ssl.key.password={pass1234}
