@@ -7,7 +7,7 @@ options to be set via ENV variables.
 
 ## Configuring Kafka in a live environment
 
-telicent-lib has a dependency on `confluent-kafka`, which is a wrapper around librdkafka. 
+telicent-lib has a dependency on [confluent-kafka](https://github.com/confluentinc/confluent-kafka-python/), which is a wrapper around [librdkafka](https://github.com/confluentinc/librdkafka/). 
   
  * [confluent-kafka configuration guide](https://docs.confluent.io/platform/current/clients/confluent-kafka-python/html/index.html#pythonclient-configuration)
  * [librdkafka configuration reference](https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md)
@@ -18,8 +18,8 @@ deployed.
 
 To provide a configuration file for librdkafka to telicent-lib, two configuration variables must be set for telcient-lib.
 
- * `KAFKA_CONFIG_MODE` _(default: basic)_: set to `toml`
- * `KAFKA_CONFIG_FILE_PATH`: set to the path to configuration file
+ * `KAFKA_CONFIG_MODE`: toml
+ * `KAFKA_CONFIG_FILE_PATH`: path to the configuration file
 
 **WARNING**: it is strongly recommended that librdkafka properties `auto.offset.reset` and `enable.auto.commit` never be set 
 through configuration. telicent-lib will manage these properties itself.
@@ -33,14 +33,14 @@ The file is a series of key-value pairs, with the keys being valid librdkafka pr
 
 Example configuration file:
 ```toml
-bootstrap.servers={my-kafka.network:5608}
+bootstrap.servers={my-kafka.network:9092}
 group.id={my-group}
 ```
 
 Example of a configuration file for an SSL enabled broker:
 ```toml
-bootstrap.servers=my-kafka.network:5608
-metadata.broker.list=my-kafka.network:5608
+bootstrap.servers=my-kafka.network:9092
+metadata.broker.list=my-kafka.network:9092
 security.protocol=SSL
 ssl.ca.location={PATH_TO_CA_BUNDLE}
 ssl.certificate.location={PATH_TO_CLIENT_CERT}
@@ -51,11 +51,11 @@ ssl.endpoint.identification.algorithm=https
 
 Example of a configuration file for a SASL/SCRAM enabled broker:
 ```toml
-bootstrap.servers={my-kafka.network:5608}
+bootstrap.servers={my-kafka.network:9092}
 security.protocol=SASL_SSL
 sasl.mechanisms=SCRAM-SHA-256
-sasl.password={pass1234}
 sasl.username={username}
+sasl.password={pass1234}
 ```
 
 Values in {brackets} indicate variables that must be set for your environment.
