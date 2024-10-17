@@ -34,7 +34,7 @@ The file is a series of key-value pairs, with the keys being valid librdkafka pr
 Example configuration file:
 ```toml
 bootstrap.servers={my-kafka.network:9092}
-group.id={my-group}
+group.id={consumer-group}
 ```
 
 Example of a configuration file for an SSL enabled broker:
@@ -45,7 +45,7 @@ security.protocol=SSL
 ssl.ca.location={PATH_TO_CA_BUNDLE}
 ssl.certificate.location={PATH_TO_CLIENT_CERT}
 ssl.key.location={PATH_TO_CLIENT_KEY}
-ssl.key.password={pass1234}
+ssl.key.password={password}
 ssl.endpoint.identification.algorithm=https
 ```
 
@@ -55,7 +55,7 @@ bootstrap.servers={my-kafka.network:9092}
 security.protocol=SASL_SSL
 sasl.mechanisms=SCRAM-SHA-256
 sasl.username={username}
-sasl.password={pass1234}
+sasl.password={password}
 ```
 
 Values in {brackets} indicate variables that must be set for your environment.
