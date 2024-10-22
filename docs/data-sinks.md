@@ -37,8 +37,10 @@ kafka_config = {
 sink = KafkaSink(topic="output-topic", kafka_config=kafka_config)
 ```
 
-If `BOOTSTRAP_SERVERS` is not found by the configurator, and it is not provided by kafka_config either, then
+By default, if `BOOTSTRAP_SERVERS` is not found by the configurator, and it is not provided by kafka_config either, then
 an error will be raised and your action will fail to initialise.
+
+For more complex deployments with custom Kafka configurations, please see the [deployment notes](deployment.md).
 
 ### Controlling how Data is Serialized
 
