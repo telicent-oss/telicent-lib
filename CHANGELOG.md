@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0](https://github.com/telicent-oss/telicent-lib/compare/v3.0.1...v3.1.0) (2024-10-22)
+
+
+### Features
+
+* file based config for Kafka ([#53](https://github.com/telicent-oss/telicent-lib/issues/53)) ([1a26dc7](https://github.com/telicent-oss/telicent-lib/commit/1a26dc7df450a116035d2e04f26b6f6eb87f3901))
+
 ## [3.0.1](https://github.com/telicent-oss/telicent-lib/compare/v3.0.0...v3.0.1) (2024-09-25)
 
 
