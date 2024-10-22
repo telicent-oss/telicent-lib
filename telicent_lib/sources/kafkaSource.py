@@ -9,7 +9,7 @@ from collections.abc import Iterable
 from confluent_kafka import OFFSET_BEGINNING, OFFSET_END, Consumer, Message, TopicPartition
 from confluent_kafka.serialization import Deserializer
 
-from telicent_lib.config import Configurator, OnError
+from telicent_lib.config.kafka import kafka_config_factory
 from telicent_lib.exceptions import SourceNotFoundException
 from telicent_lib.records import Record
 from telicent_lib.sources.dataSource import DataSource
@@ -127,13 +127,8 @@ class KafkaSource(DataSource):
         self.value_deserializer = value_deserializer
 
         if kafka_config is None:
-            kafka_config = {}
+            kafka_config = kafka_config_factory.create().get_config()
 
-        broker = kafka_config.get('bootstrap.servers')
-        if broker is None:
-            conf = Configurator()
-            broker = conf.get('BOOTSTRAP_SERVERS', required=True, on_error=OnError.RAISE_EXCEPTION)
-            kafka_config['bootstrap.servers'] = broker
         check_kafka_broker_available(kafka_config)
 
         reset_position = kafka_config.get('auto.offset.reset')

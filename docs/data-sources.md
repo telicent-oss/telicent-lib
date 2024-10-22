@@ -54,6 +54,8 @@ The minimum configuration required for a `KafkaSource` is to specify the broker 
 manually by passing it as part of the `kafka_config`, or by setting the `BOOTSTRAP_SERVERS` [configuration](configuration.md) 
 variable. The latter is advised to prevent repetitively specifying the broker for all sinks and sources.
 
+For more complex deployments with custom Kafka configurations, please see the [deployment notes](deployment.md).
+
 ```python
 from telicent_lib.sources import KafkaSource
 
