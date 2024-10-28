@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.1](https://github.com/telicent-oss/telicent-lib/compare/v3.1.0...v3.1.1) (2024-10-28)
+
+
+### Bug Fixes
+
+* **kafka-source:** prevent clashing groupids when one not provided ([#55](https://github.com/telicent-oss/telicent-lib/issues/55)) ([675dbe7](https://github.com/telicent-oss/telicent-lib/commit/675dbe7d74bab3381afde629a7bd33670188f370))
+
 ## [3.1.0](https://github.com/telicent-oss/telicent-lib/compare/v3.0.1...v3.1.0) (2024-10-22)
 
 
