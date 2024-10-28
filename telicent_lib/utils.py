@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import hashlib
 import inspect
+import os
+import re
+import socket
 from inspect import Parameter
 from itertools import islice
 from typing import Any
@@ -147,3 +151,51 @@ def check_kafka_broker_available(kafka_conf: dict):
     """
     admin_client = AdminClient(kafka_conf)
     admin_client.list_topics(timeout=10)
+
+
+def clean_hostname(hostname):
+    if "KUBERNETES_SERVICE_HOST" in os.environ:
+        return clean_hostname_k8s(hostname)
+
+    # 255 characters limit on group.id, but we prepend to it
+    cleaned_hostname = re.sub(r"[^\w]+", "_", hostname)
+    return cleaned_hostname[:200]
+
+
+def clean_hostname_k8s(hostname):
+
+    segments = re.split(r"[-\W_]+", hostname)
+
+    if len(segments) == 1:
+        # hash or something we cannot split
+        hostname = re.sub(r"[\s\W,]+", "_", segments[0])
+        return hostname
+
+    filtered_segments = []
+    if len(segments) >= 2:
+        # e.g mop-bridge-planner-dc66bbd44-aaswz last element needs dropped
+        last_two = segments[-2:]
+        segments = segments[:-2]
+
+        # second last elem is char only needs checking
+        if re.fullmatch(r"[a-zA-Z]+", last_two[0]):
+            # add them back to the list - maybe no hash at all
+            segments.extend(last_two)
+
+        filtered_segments = [segment for segment in segments if re.fullmatch(r"[a-zA-Z]+", segment)]
+        return "_".join(filtered_segments)
+
+    # not enough segments
+    return "_".join(segments)
+
+
+def generate_group_id():
+    hostname = socket.gethostname()
+    frame = inspect.stack()[1]
+    filename, lineno = frame.filename, frame.lineno
+    del frame
+    unique_string = f"{filename}:{lineno}"
+    unique_hash = hashlib.sha256(unique_string.encode()).hexdigest()[:10]
+    hostname = clean_hostname(hostname)
+    group_id = f"{hostname}_{unique_hash}"
+    return group_id

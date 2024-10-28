@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import inspect
 import logging
-import re
 import warnings
 from collections.abc import Iterable
 
@@ -14,7 +13,7 @@ from telicent_lib.exceptions import SourceNotFoundException
 from telicent_lib.records import Record
 from telicent_lib.sources.dataSource import DataSource
 from telicent_lib.sources.deserializers import DeserializerFunction, Deserializers
-from telicent_lib.utils import check_kafka_broker_available, validate_callable_protocol
+from telicent_lib.utils import check_kafka_broker_available, generate_group_id, validate_callable_protocol
 
 logger = logging.getLogger(__name__)
 
@@ -137,20 +136,16 @@ class KafkaSource(DataSource):
 
         group_id = kafka_config.get('group.id')
         if group_id is None or len(group_id) == 0:
-            frames = inspect.stack()
+            logger.warning("No consumer group.id was provided, attempting to set one.")
             try:
-                group_id = frames[1].filename
-                if group_id is not None:
-                    group_id = re.sub(r"^.*/", "", group_id)
-                    group_id = re.sub(r"\..*$", "", group_id)
-                    group_id = group_id.lower()
-            finally:
-                del frames
-            logger.debug(f"Automatically selected consumer_group as {group_id}")
+                group_id = generate_group_id()
+            except Exception:
+                logger.exception("Failed to automatically create group.id")
 
             if group_id is None or len(group_id) == 0:
-                raise ValueError("No consumer_group was provided or could be automatically selected")
+                raise ValueError("No consumer group.id was provided or could be automatically selected")
             kafka_config['group.id'] = group_id
+            logger.info(f"Automatically selected consumer group.id as {group_id}")
 
         enable_auto_commit = kafka_config.get('enable.auto.commit')
         if enable_auto_commit is None:
