@@ -255,7 +255,6 @@ class Action:
         :param end: The end character to add to the output, default is the newline character.
         :type end: str
         """
-
         if self.colors_enabled:
             print(self.text_colour + line + style.RESET, end=end, flush=flush)
         else:
@@ -309,7 +308,7 @@ class Action:
         If this isn't an automatic action then the caller should call this and then perform further logic, see
         individual Action subclasses for more specific documentation.
         """
-        raise RuntimeError('run() is not implemented')
+        raise RuntimeError('run() is not implemented')  # Todo: should be NotImplemented
 
     def record_processed(self) -> None:
         """
@@ -401,6 +400,7 @@ class Action:
         rate = __calculate_rate__(self.counter, elapsed)
         self.print_coloured(
             f"Aborted!  Processed {self.counter:,} records in {elapsed:,.2f} seconds at {rate:,.2f} records/seconds")
+
         if self.reporter is not None:
             self.reporter.stop_heartbeat()
             self.print_coloured(f"Telicent Live Reporter unregistered from {self.reporter.sink}")
@@ -620,7 +620,7 @@ class InputOutputAction(OutputAction):
         :type name: str
         """
         self.source = source
-        self.records_output = 0
+        self.records_output = 0  # todo: does this do anything?
         super().__init__(target=target, text_colour=text_colour, reporting_batch_size=reporting_batch_size,
                          action=action, name=name, has_reporter=has_reporter, reporter_sink=reporter_sink,
                          has_error_handler=has_error_handler, error_handler=error_handler,
