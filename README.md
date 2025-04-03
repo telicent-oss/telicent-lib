@@ -4,7 +4,7 @@ telicent-lib provides useful helper libraries for building Adaptors, Mappers and
 
 ## Dependencies
 
-- Python \>=3.10
+- Python 3.10 =\< 3.13
 - Kafka*
 
 telicent-lib uses `confluent-kafka` to manage connections to Kafka. 
