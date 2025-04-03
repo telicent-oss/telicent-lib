@@ -8,7 +8,7 @@ on:
       - edited
       - transferred
       - reopened
-d
+
 jobs:
   sync-to-jira:
     uses: telicent-oss/shared-workflows/.github/workflows/jira-sync.yml@main
