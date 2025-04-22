@@ -16,7 +16,7 @@ jobs:
       fail-fast: true
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-    uses: telicent-oss/shared-workflows/.github/workflows/python-ci-qa.yml@TPT-305-windows-runners
+    uses: telicent-oss/shared-workflows/.github/workflows/python-ci-qa.yml@main
     with:
       PYTHON_VERSION: ${{ matrix.python-version }}
       TEST_WINDOWS: true
