@@ -6,6 +6,7 @@
 ### Miscellaneous
 
 * **deps:** updated to confluent-kafka 2.8.2 to provide 3.13 support ([#59](https://github.com/telicent-oss/telicent-lib/issues/59)) ([899ca76](https://github.com/telicent-oss/telicent-lib/commit/899ca767504ffa5d7982d9bcfb7bc896ead45dc1))
+* **deps:** removed decode token and its dependencies ([#61](https://github.com/telicent-oss/telicent-lib/pull/59)) ([fae3965](https://github.com/telicent-oss/telicent-lib/commit/fae396532d458cd341e0b018e4d43dc4f9060e79))
 
 ## [3.1.1](https://github.com/telicent-oss/telicent-lib/compare/v3.1.0...v3.1.1) (2024-10-28)
 
