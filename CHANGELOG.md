@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.0](https://github.com/telicent-oss/telicent-lib/compare/v3.1.2...v3.2.0) (2025-05-07)
+
+
+### Features
+
+* deprecated RdfSerializer and RdfDeserializer ([#63](https://github.com/telicent-oss/telicent-lib/issues/63)) ([ea8b741](https://github.com/telicent-oss/telicent-lib/commit/ea8b7417489705789a79b532059dad88b9fc85a6))
+
 ## [3.1.2](https://github.com/telicent-oss/telicent-lib/compare/v3.1.1...v3.1.2) (2025-04-22)
 
 
