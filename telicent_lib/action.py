@@ -183,6 +183,20 @@ class Action:
                 description="The count of records output",
             )
 
+        self.dlq_target: DataSink | None = None
+
+    def set_dlq_target(self, target: DataSink):
+        self.dlq_target = target
+
+    def send_dlq_record(self, record: Record, dlq_reason: str):
+        if self.dlq_target is not None:
+            record = RecordUtils.add_headers(record, [('Dead-Letter-Reason', dlq_reason)])
+            self.dlq_target.send(record)
+        else:
+            error_message = 'Unable to send record to DLQ as not dlq_target has been set.'
+            logger.error(error_message)
+            raise RuntimeError('Unable to send record to DLQ as not dlq_target has been set.')
+
     @property
     def telemetry_id(self):
         return f"telicent_lib.{self.action_type}.{self.generate_id()}"
@@ -588,15 +602,14 @@ class InputAction(Action):
             has_error_handler=has_error_handler, error_handler=error_handler, disable_metrics=disable_metrics
         )
 
-        self.dlq_target: DataSink | None = None
         config = Configurator()
         if not config.get('DISABLE_DLQ', default='false', converter=Configurator.string_to_bool):
             if isinstance(source, KafkaSource):
                 self.set_dlq_target(self.init_dlq_target(source))
             else:
                 logger.warning(
-                    'Dead letter queue sink can only be automatically initialised when the action\'s target is a '
-                    'KafkaSink. To provide a dead letter queue sink manually, call `set_dql_target(target: DataSink)'
+                    'Dead letter queue sink can only be automatically initialised when the action\'s source is a '
+                    'KafkaSource. To provide a dead letter queue sink manually, call `set_dql_target(target: DataSink)'
                 )
 
     @staticmethod
@@ -606,14 +619,6 @@ class InputAction(Action):
         targeting a topic based on the action's source's topic.
         """
         return KafkaSink(f'{source.topic}.dlq')
-
-    def set_dlq_target(self, target: DataSink):
-        self.dlq_target = target
-
-    def send_dlq_record(self, record: Record, dlq_reason: str):
-        if self.dlq_target is not None:
-            record = RecordUtils.add_headers(record, [('Dead-Letter-Reason', dlq_reason)])
-            self.dlq_target.send(record)
 
     def generate_id(self):
         if self.name is not None:
@@ -665,15 +670,14 @@ class InputOutputAction(OutputAction):
         if not isinstance(source, DataSource):
             raise TypeError('Did not receive a Data Source as required')
 
-        self.dlq_target: DataSink | None = None
         config = Configurator()
         if not config.get('DISABLE_DLQ', default='false', converter=Configurator.string_to_bool):
             if isinstance(source, KafkaSource):
                 self.set_dlq_target(self.init_dlq_target(source))
             else:
                 logger.warning(
-                    'Dead letter queue sink can only be automatically initialised when the action\'s target is a '
-                    'KafkaSink. To provide a dead letter queue sink manually, call `set_dql_target(target: DataSink)'
+                    'Dead letter queue sink can only be automatically initialised when the action\'s source is a '
+                    'KafkaSource. To provide a dead letter queue sink manually, call `set_dql_target(target: DataSink)'
                 )
 
     @staticmethod
@@ -683,14 +687,6 @@ class InputOutputAction(OutputAction):
         targeting a topic based on the action's source's topic.
         """
         return KafkaSink(f'{source.topic}.dlq')
-
-    def set_dlq_target(self, target: DataSink):
-        self.dlq_target = target
-
-    def send_dlq_record(self, record: Record, dlq_reason: str):
-        if self.dlq_target is not None:
-            record = RecordUtils.add_headers(record, [('Dead-Letter-Reason', dlq_reason)])
-            self.dlq_target.send(record)
 
     def generate_id(self):
         if self.name is not None:

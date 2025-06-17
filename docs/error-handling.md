@@ -91,6 +91,7 @@ requires the user manages the data that is sent to it themselves.
 my_dlq = KafkaSource('inbound.dlq')
 adapter.set_dlq_target(my_dlq)
 ...
+record = Record(headers, key, value)
 adapter.send_dlq_record(record, dlq_reason)
 ```
 
