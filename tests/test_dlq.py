@@ -100,7 +100,7 @@ class MapperDLQTestCase(TestCase):
         mapper = Mapper(source=source, target=target, map_function=map_func, has_reporter=False, disable_metrics=True)
 
         self.assertIsInstance(mapper.dlq_target, KafkaSink)
-        self.assertEqual(mapper.dlq_target.topic, 'target_test-dlq')
+        self.assertEqual(mapper.dlq_target.topic, 'source_test.dlq')
 
     @mock.patch.dict(os.environ, {"BOOTSTRAP_SERVERS": "localhost:1234"})
     @mock.patch('telicent_lib.sinks.kafkaSink.Producer', MockProducer)
@@ -114,11 +114,11 @@ class MapperDLQTestCase(TestCase):
         mapper.run()
 
         # Ensure DLQ has a message
-        self.assertEqual(len(mapper.dlq_target.target.produced_messages['target_test-dlq']), 1)
+        self.assertEqual(len(mapper.dlq_target.target.produced_messages['source_test.dlq']), 1)
 
         # Ensure mapper's target topic didn't get a message
         self.assertNotIn('target_test', mapper.target.target.produced_messages)
 
         # Ensure headers are present
-        dlq_message = mapper.dlq_target.target.produced_messages['target_test-dlq'][0]
-        self.assertEqual(dlq_message[2][2], ('Dead-Letter-Reason', b'Test Exception'))
+        dlq_message = mapper.dlq_target.target.produced_messages['source_test.dlq'][0]
+        self.assertEqual(dlq_message[2][1], ('Dead-Letter-Reason', b'Test Exception'))

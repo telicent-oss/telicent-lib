@@ -14,7 +14,7 @@ from telicent_lib.errors import PrintErrorHandler, auto_discover_error_handler
 from telicent_lib.records import Record, RecordUtils
 from telicent_lib.reporter import Reporter
 from telicent_lib.sinks import DataSink, KafkaSink
-from telicent_lib.sources import DataSource
+from telicent_lib.sources import DataSource, KafkaSource
 from telicent_lib.status import Status
 
 __license__ = """
@@ -346,10 +346,10 @@ class Action:
         Tells the action that a record has been output.
         """
         with self.tracer.start_as_current_span('acknowledge output'):
-            #if not self.disable_metrics:
-            self.records_output_counter.add(1)
-            self.output_counter += 1
-            self.output_metric_counter += 1
+            if not self.disable_metrics:
+                self.records_output_counter.add(1)
+                self.output_counter += 1
+                self.output_metric_counter += 1
 
     def records_processed(self, count: int) -> None:
         """
@@ -524,43 +524,10 @@ class OutputAction(Action):
             raise TypeError('Did not receive a Data Sink as required')
         self.target = target
 
-        self.dlq_target: DataSink | None = None
-        config = Configurator()
-        if not config.get('DISABLE_DLQ', default='false', converter=Configurator.string_to_bool):
-            if isinstance(target, KafkaSink):
-                self.set_dlq_target(self.init_dlq_target(target))
-            else:
-                logger.warning(
-                    'Dead letter queue sink can only be automatically initialised when the action\'s target is a '
-                    'KafkaSink. To provide a dead letter queue sink manually, call `set_dql_target(target: DataSink)'
-                )
-
         super().__init__(text_colour=text_colour, reporting_batch_size=reporting_batch_size,
                          action=action, name=name, has_reporter=has_reporter, reporter_sink=reporter_sink,
                          has_error_handler=has_error_handler, error_handler=error_handler,
                          disable_metrics=disable_metrics)
-
-    @staticmethod
-    def init_dlq_target(target_sink: KafkaSink):
-        """
-        Convenience function for when using a KafkaSink, to initialise a DQL sink
-        targeting a topic based on the action's target's topic.
-        """
-        return KafkaSink(f'{target_sink.topic}-dlq')
-
-    def set_dlq_target(self, target: DataSink):
-        self.dlq_target = target
-
-    def send_dlq_record(self, record: Record, dlq_reason: str):
-        if self.dlq_target is not None:
-            record = RecordUtils.add_headers(
-                record,
-                [
-                    ('Exec-Path', str(self.generated_id)),
-                    ('Dead-Letter-Reason', dlq_reason)
-                ]
-            )
-            self.dlq_target.send(record)
 
     def send(self, record: Record):
         """
@@ -622,6 +589,35 @@ class InputAction(Action):
             has_error_handler=has_error_handler, error_handler=error_handler, disable_metrics=disable_metrics
         )
 
+        self.dlq_target: DataSink | None = None
+        config = Configurator()
+        if not config.get('DISABLE_DLQ', default='false', converter=Configurator.string_to_bool):
+            if isinstance(source, KafkaSource):
+                self.set_dlq_target(self.init_dlq_target(source))
+            else:
+                logger.warning(
+                    'Dead letter queue sink can only be automatically initialised when the action\'s target is a '
+                    'KafkaSink. To provide a dead letter queue sink manually, call `set_dql_target(target: DataSink)'
+                )
+
+    @staticmethod
+    def init_dlq_target(source: KafkaSource):
+        """
+        Convenience function for when using a KafkaSource, to initialise a DQL sink
+        targeting a topic based on the action's source's topic.
+        """
+        return KafkaSink(f'{source.topic}.dlq')
+
+    def set_dlq_target(self, target: DataSink):
+        self.dlq_target = target
+
+    def send_dlq_record(self, record: Record, dlq_reason: str, position: str | None):
+        if self.dlq_target is not None:
+            record = RecordUtils.add_headers(record, [('Dead-Letter-Reason', dlq_reason)])
+            if position is not None:
+                record = RecordUtils.add_headers(record, [('Dead-Letter-Position', position)])
+            self.dlq_target.send(record)
+
     def generate_id(self):
         if self.name is not None:
             return self.name.replace(' ', "-")
@@ -671,6 +667,33 @@ class InputOutputAction(OutputAction):
             raise ValueError('Data Source cannot be None')
         if not isinstance(source, DataSource):
             raise TypeError('Did not receive a Data Source as required')
+
+        self.dlq_target: DataSink | None = None
+        config = Configurator()
+        if not config.get('DISABLE_DLQ', default='false', converter=Configurator.string_to_bool):
+            if isinstance(source, KafkaSource):
+                self.set_dlq_target(self.init_dlq_target(source))
+            else:
+                logger.warning(
+                    'Dead letter queue sink can only be automatically initialised when the action\'s target is a '
+                    'KafkaSink. To provide a dead letter queue sink manually, call `set_dql_target(target: DataSink)'
+                )
+
+    @staticmethod
+    def init_dlq_target(source: KafkaSource):
+        """
+        Convenience function for when using a KafkaSource, to initialise a DQL sink
+        targeting a topic based on the action's source's topic.
+        """
+        return KafkaSink(f'{source.topic}.dlq')
+
+    def set_dlq_target(self, target: DataSink):
+        self.dlq_target = target
+
+    def send_dlq_record(self, record: Record, dlq_reason: str):
+        if self.dlq_target is not None:
+            record = RecordUtils.add_headers(record, [('Dead-Letter-Reason', dlq_reason)])
+            self.dlq_target.send(record)
 
     def generate_id(self):
         if self.name is not None:
