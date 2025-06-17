@@ -2,6 +2,7 @@ from colored import fore
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
 from telicent_lib.action import DEFAULT_REPORTING_BATCH_SIZE, InputAction
+from telicent_lib.exceptions import DLQException
 from telicent_lib.records import RecordProjector, RecordUtils
 from telicent_lib.sources import DataSource
 from telicent_lib.status import Status
@@ -117,10 +118,16 @@ class Projector(InputAction):
                         else:
                             tracer_span.set_attribute("record.input_request_id", input_request_id)
                         with self.tracer.start_as_current_span("projector function"):
-                            if self.projector_args:
-                                self.projector_function(record, **self.projector_args)
-                            else:
-                                self.projector_function(record)
+                            try:
+                                if self.projector_args:
+                                    self.projector_function(record, **self.projector_args)
+                                else:
+                                    self.projector_function(record)
+                            except DLQException as e:
+                                self.send_dlq_record(record, str(e))
+                                self.record_processed()
+                                continue
+
                     self.record_processed()
                 self.finished()
             except KeyboardInterrupt:

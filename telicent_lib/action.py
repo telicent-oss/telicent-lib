@@ -610,11 +610,9 @@ class InputAction(Action):
     def set_dlq_target(self, target: DataSink):
         self.dlq_target = target
 
-    def send_dlq_record(self, record: Record, dlq_reason: str, position: str | None):
+    def send_dlq_record(self, record: Record, dlq_reason: str):
         if self.dlq_target is not None:
             record = RecordUtils.add_headers(record, [('Dead-Letter-Reason', dlq_reason)])
-            if position is not None:
-                record = RecordUtils.add_headers(record, [('Dead-Letter-Position', position)])
             self.dlq_target.send(record)
 
     def generate_id(self):
