@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import warnings
 import zlib
 from typing import Any, Protocol, runtime_checkable
 
@@ -143,6 +144,12 @@ class RdfSerializer(Serializer):
             a Dataset.  Defaults to NTriples 1.1 since that's a subset of the NQuads format used as the default for
             `rdf_format`
         """
+        warnings.warn(
+            "`telicent_lib.sinks.serializers.RdfSerializer` has been deprecated. "
+            "You should serialize RDF data yourself before calling `send()`.",
+            DeprecationWarning,
+            stacklevel=2
+        )
         super().__init__()
         self.rdf_format = rdf_format
         self.require_context_awareness = require_context_awareness

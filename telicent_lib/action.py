@@ -142,8 +142,8 @@ class Action:
             self.reporter = Reporter(**self.reporter_kwargs())
 
         self.tracer = trace.get_tracer(__name__)
-
-        if not disable_metrics:
+        self.disable_metrics = disable_metrics
+        if not self.disable_metrics:
             action_type = self.reporter_kwargs()['action']
             self.meter = metrics.get_meter(self.telemetry_id)
 
@@ -321,9 +321,10 @@ class Action:
         Action.
         """
         with self.tracer.start_as_current_span('acknowledge processed') as tracer_span:
-            self.records_processed_counter.add(1)
             self.counter += 1
-            self.processed_metric_counter += 1
+            if not self.disable_metrics:
+                self.records_processed_counter.add(1)
+                self.processed_metric_counter += 1
             tracer_span.set_attribute("action.counter", self.counter)
             if self.reporting_batch_size > 0 and self.counter % self.reporting_batch_size == 0:
                 self.report_progress()
@@ -335,7 +336,8 @@ class Action:
         Tells the action that a record has been output.
         """
         with self.tracer.start_as_current_span('acknowledge read'):
-            self.records_read_counter.add(1)
+            if not self.disable_metrics:
+                self.records_read_counter.add(1)
             self.read_counter += 1
 
     def record_output(self) -> None:
@@ -343,9 +345,10 @@ class Action:
         Tells the action that a record has been output.
         """
         with self.tracer.start_as_current_span('acknowledge output'):
-            self.records_output_counter.add(1)
+            if not self.disable_metrics:
+                self.records_output_counter.add(1)
+                self.output_metric_counter += 1
             self.output_counter += 1
-            self.output_metric_counter += 1
 
     def records_processed(self, count: int) -> None:
         """
@@ -447,14 +450,16 @@ class Action:
             self.print_coloured(f"Telicent Live Reporter unregistered from {self.reporter.sink}")
 
     def send_error(self, error, error_type, level):
+        if not self.disable_metrics:
+            self.records_error_counter.add(1)
         self.error_count += 1
-        self.records_error_counter.add(1)
         if self.include_error_handler:
             self.error_handler.send_error(error, error_type, level, self.counter)
 
     def send_exception(self, e):
+        if not self.disable_metrics:
+            self.records_error_counter.add(1)
         self.error_count += 1
-        self.records_error_counter.add(1)
         if self.include_error_handler:
             self.error_handler.send_exception(e, counter=self.counter)
 
