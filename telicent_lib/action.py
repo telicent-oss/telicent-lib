@@ -10,9 +10,9 @@ from opentelemetry import metrics, trace
 from opentelemetry.metrics import CallbackOptions, Observation
 
 from telicent_lib.errors import PrintErrorHandler, auto_discover_error_handler
-from telicent_lib.records import Record
+from telicent_lib.records import Record, RecordUtils
 from telicent_lib.reporter import Reporter
-from telicent_lib.sinks import DataSink
+from telicent_lib.sinks import DataSink, KafkaSink
 from telicent_lib.sources import DataSource
 from telicent_lib.status import Status
 
@@ -516,10 +516,30 @@ class OutputAction(Action):
             raise TypeError('Did not receive a Data Sink as required')
         self.target = target
 
+        self.dlq_target: DataSink | None = None
+        if isinstance(target, KafkaSink):
+            self.set_dlq_target(self.init_dlq_target(target))
+        else:
+            logger.warning(
+                'Dead letter queue sink can only be automatically initialised when the action\'s target is a KafkaSink.'
+                ' To provide a dead letter queue sink manually call `set_dql_target(target: DataSink)')
+
         super().__init__(text_colour=text_colour, reporting_batch_size=reporting_batch_size,
                          action=action, name=name, has_reporter=has_reporter, reporter_sink=reporter_sink,
                          has_error_handler=has_error_handler, error_handler=error_handler,
                          disable_metrics=disable_metrics)
+
+    @staticmethod
+    def init_dlq_target(target_sink: KafkaSink):
+        return KafkaSink(f'{target_sink.topic}-dlq')
+
+    def set_dlq_target(self, target: DataSink):
+        self.dlq_target = target
+
+    def send_dlq_record(self, record: Record, dlq_reason: str):
+        if self.dlq_target is not None:
+            RecordUtils.add_headers(record, [('Dead-Letter-Reason', dlq_reason)])
+            self.dlq_target.send(record)
 
     def send(self, record: Record):
         """
