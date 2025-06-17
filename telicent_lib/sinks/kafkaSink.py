@@ -102,7 +102,7 @@ class KafkaSink(DataSink):
                 DeprecationWarning,
                 stacklevel=2
             )
-        if debug is not None:
+        if debug:
             warnings.warn(
                 "Parameter 'debug' has been deprecated. Please use a logger to view debug messages.",
                 DeprecationWarning,

@@ -137,6 +137,7 @@ class Mapper(InputOutputAction):
                                         output_data = self.map_function(record)
                                 except DLQException as e:
                                     self.send_dlq_record(record, str(e))
+                                    self.record_processed()
                                     continue
 
                             self.record_processed()
@@ -179,6 +180,7 @@ class Mapper(InputOutputAction):
                                                     'Security-Label',
                                                     header_value
                                                 )
+                                        print('sending to target')
                                         self.target.send(output_data)
                                     self.record_output()
                 self.finished()

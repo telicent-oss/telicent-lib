@@ -9,6 +9,7 @@ from colored import colored, fore, style
 from opentelemetry import metrics, trace
 from opentelemetry.metrics import CallbackOptions, Observation
 
+from telicent_lib.config import Configurator
 from telicent_lib.errors import PrintErrorHandler, auto_discover_error_handler
 from telicent_lib.records import Record, RecordUtils
 from telicent_lib.reporter import Reporter
@@ -141,7 +142,9 @@ class Action:
             self.reporter = Reporter(**self.reporter_kwargs())
 
         self.tracer = trace.get_tracer(__name__)
-        if not disable_metrics:
+
+        self.disable_metrics = disable_metrics
+        if not self.disable_metrics:
             action_type = self.reporter_kwargs()['action']
             self.meter = metrics.get_meter(self.telemetry_id)
 
@@ -319,9 +322,10 @@ class Action:
         Action.
         """
         with self.tracer.start_as_current_span('acknowledge processed') as tracer_span:
-            self.records_processed_counter.add(1)
+            if not self.disable_metrics:
+                self.records_processed_counter.add(1)
+                self.processed_metric_counter += 1
             self.counter += 1
-            self.processed_metric_counter += 1
             tracer_span.set_attribute("action.counter", self.counter)
             if self.reporting_batch_size > 0 and self.counter % self.reporting_batch_size == 0:
                 self.report_progress()
@@ -333,7 +337,8 @@ class Action:
         Tells the action that a record has been output.
         """
         with self.tracer.start_as_current_span('acknowledge read'):
-            self.records_read_counter.add(1)
+            if not self.disable_metrics:
+                self.records_read_counter.add(1)
             self.read_counter += 1
 
     def record_output(self) -> None:
@@ -341,6 +346,7 @@ class Action:
         Tells the action that a record has been output.
         """
         with self.tracer.start_as_current_span('acknowledge output'):
+            #if not self.disable_metrics:
             self.records_output_counter.add(1)
             self.output_counter += 1
             self.output_metric_counter += 1
@@ -446,13 +452,15 @@ class Action:
 
     def send_error(self, error, error_type, level):
         self.error_count += 1
-        self.records_error_counter.add(1)
+        if not self.disable_metrics:
+            self.records_error_counter.add(1)
         if self.include_error_handler:
             self.error_handler.send_error(error, error_type, level, self.counter)
 
     def send_exception(self, e):
         self.error_count += 1
-        self.records_error_counter.add(1)
+        if not self.disable_metrics:
+            self.records_error_counter.add(1)
         if self.include_error_handler:
             self.error_handler.send_exception(e, counter=self.counter)
 
@@ -517,12 +525,15 @@ class OutputAction(Action):
         self.target = target
 
         self.dlq_target: DataSink | None = None
-        if isinstance(target, KafkaSink):
-            self.set_dlq_target(self.init_dlq_target(target))
-        else:
-            logger.warning(
-                'Dead letter queue sink can only be automatically initialised when the action\'s target is a KafkaSink.'
-                ' To provide a dead letter queue sink manually call `set_dql_target(target: DataSink)')
+        config = Configurator()
+        if not config.get('DISABLE_DLQ', default='false', converter=Configurator.string_to_bool):
+            if isinstance(target, KafkaSink):
+                self.set_dlq_target(self.init_dlq_target(target))
+            else:
+                logger.warning(
+                    'Dead letter queue sink can only be automatically initialised when the action\'s target is a '
+                    'KafkaSink. To provide a dead letter queue sink manually, call `set_dql_target(target: DataSink)'
+                )
 
         super().__init__(text_colour=text_colour, reporting_batch_size=reporting_batch_size,
                          action=action, name=name, has_reporter=has_reporter, reporter_sink=reporter_sink,
@@ -531,6 +542,10 @@ class OutputAction(Action):
 
     @staticmethod
     def init_dlq_target(target_sink: KafkaSink):
+        """
+        Convenience function for when using a KafkaSink, to initialise a DQL sink
+        targeting a topic based on the action's target's topic.
+        """
         return KafkaSink(f'{target_sink.topic}-dlq')
 
     def set_dlq_target(self, target: DataSink):
@@ -538,7 +553,7 @@ class OutputAction(Action):
 
     def send_dlq_record(self, record: Record, dlq_reason: str):
         if self.dlq_target is not None:
-            RecordUtils.add_headers(
+            record = RecordUtils.add_headers(
                 record,
                 [
                     ('Exec-Path', str(self.generated_id)),
