@@ -538,7 +538,13 @@ class OutputAction(Action):
 
     def send_dlq_record(self, record: Record, dlq_reason: str):
         if self.dlq_target is not None:
-            RecordUtils.add_headers(record, [('Dead-Letter-Reason', dlq_reason)])
+            RecordUtils.add_headers(
+                record,
+                [
+                    ('Exec-Path', str(self.generated_id)),
+                    ('Dead-Letter-Reason', dlq_reason)
+                ]
+            )
             self.dlq_target.send(record)
 
     def send(self, record: Record):
