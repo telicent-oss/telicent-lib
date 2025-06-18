@@ -98,7 +98,7 @@ Automatic initialisation of the dead letter queue sink can be disabled by settin
 `DISABLE_DLQ` to 'true'.
 
 
-### Manually managing a Dead Letter Queue with a mapper
+### Manually managing a Dead Letter Queue
 
 It is possible to manually configure and manage a dead letter queue. This is required when using
 a mapper or projector with a source that is not a `KafkaSource`.
@@ -112,7 +112,7 @@ my_dlq = MySink()
 mapper.set_dlq_target(my_dlq)
 ```
 
-### Sending messages to a dead letter queue from an adapter
+### Sending messages to a Dead Letter Queue from an adapter
 
 Unlike with a mapper or projector, an adapter has no inbound Kafka record. The inbound record will depend
 on the source being adapted. It is still possible to make use of a dead letter queue, it just 

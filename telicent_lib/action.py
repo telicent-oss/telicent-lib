@@ -622,7 +622,7 @@ class InputAction(Action):
     @staticmethod
     def init_dlq_target(source: KafkaSource):
         """
-        Convenience function for when using a KafkaSource, to initialise a DQL sink
+        Convenience function for when using a KafkaSource, to initialise a DLQ sink
         targeting a topic based on the action's source's topic.
         """
         return KafkaSink(f'{source.topic}.dlq')
