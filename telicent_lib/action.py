@@ -164,6 +164,11 @@ class Action:
                 description="The number of errors encountered by the component",
             )
 
+            self.records_dlq_counter = self.meter.create_counter(
+                f"{action_type}.items.dlq_total",
+                description="The number of messages sent to the dead letter queue by the component",
+            )
+
             self.records_read_counter = self.meter.create_counter(
                 f"{action_type}.items.read",
                 description="The count of records read",
@@ -192,6 +197,8 @@ class Action:
         if self.dlq_target is not None:
             record = RecordUtils.add_headers(record, [('Dead-Letter-Reason', dlq_reason)])
             self.dlq_target.send(record)
+            if not self.disable_metrics:
+                self.records_dlq_counter.add(1)
         else:
             error_message = 'Unable to send record to DLQ as not dlq_target has been set.'
             logger.error(error_message)

@@ -11,14 +11,15 @@ For more information about implementing OpenTelemetry instrumentation in applica
 
 ## Metrics
 
-| Metric                          | Type | Description                  |
-|---------------------------------|------|------------------------------|
- | \<action\>.items.processed_rate | Gauge | Records processed per second |
- | \<action\>.items.output_rate    | Gauge | Records output per second    |
- | \<action\>.items.read           | Counter | Total records read           |
- | \<action\>.items.procesed       | Counter | Total records processed      |
- | \<action\>.items.output         | Counter | Total records output         |
- | \<action\>.items.error_total         | Counter | Total errors encountered     |
+| Metric                            | Type    | Description                                 |
+|-----------------------------------|---------|---------------------------------------------|
+ | \<action\>.items.processed_rate   | Gauge   | Records processed per second                |
+ | \<action\>.items.output_rate      | Gauge   | Records output per second                   |
+ | \<action\>.items.read             | Counter | Total records read                          |
+ | \<action\>.items.procesed         | Counter | Total records processed                     |
+ | \<action\>.items.output           | Counter | Total records output                        |
+ | \<action\>.items.dlq_total        | Counter | Total records sent to the dead letter queue |
+ | \<action\>.items.error_total      | Counter | Total errors encountered                    |
 
 ### Counts for Adapters and Projectors
 
@@ -70,8 +71,8 @@ def mapping_functions(records: Record) -> Record:
 
 Additional attributes are included with traces that can be searched in many visualisation tools.
 
-| Attribute         | Description                  |
-|-------------------|------------------------------|
-| record.request_id | The record's ID |
-| record.input_request_id | The ID of the inbound record |
-| record.exec_path | The action's name |
+| Attribute               | Description                   |
+|-------------------------|-------------------------------|
+| record.request_id       | The record's ID               |
+| record.input_request_id | The ID of the inbound record  |
+| record.exec_path        | The action's name             |
