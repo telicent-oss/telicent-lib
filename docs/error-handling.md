@@ -42,6 +42,34 @@ def process_data():
 ...
 ```
 
+
+## Configuration
+
+### Environment Variables
+
+The default error handler can be configured and even replaced through environmental variables.
+
+ERROR_HANDLER_CLASS
+    : *default*: telicent_lib.error.KafkaErrorHandler.
+
+ERROR_HANDLER_PROVENANCE_TOPIC
+    : *default*: provenance.errors
+
+
+### Code Configuration
+
+```python
+# Replace with different error handler
+from telicent_lib.errors import FileBasedErrorHandler
+
+error_handler = FileBasedErrorHandler(component_id='my-adapter', file_path='errors.log')
+adapter = Adapter(target=target, name=name, source_name=source_name, error_handler=error_handler)
+
+# Disable the error handler
+adapter = Adapter(target=target, name=name, source_name=source_name, has_error_handler=False)
+```
+
+
 ## Dead Letter Queues
 
 When mapping or projecting data, an invalid or failed record can be sent to a dead letter queue. If the mapper or 
@@ -57,14 +85,17 @@ from telicent_lib.exceptions import DLQException
 
 def my_mapper(record):
     ...
-    if not valid_function(data):
+    if not validation_function(data):
        raise DLQException("Record did not pass validation function") 
     ... 
 ```
 
 This will create a message in the dead letter queue topic on Kafka with the initial input record as the message's
 body and all original headers intact. Additionally, the exception message will be present in a `Dead-Letter-Reason` 
-header and the offset of the record will be present in the `Dead-Letter-Offset` header.
+header.
+
+Automatic initialisation of the dead letter queue sink can be disabled by setting the configuration variable 
+`DISABLE_DLQ` to 'true'.
 
 
 ### Manually managing a Dead Letter Queue with a mapper
@@ -93,31 +124,4 @@ adapter.set_dlq_target(my_dlq)
 ...
 record = Record(headers, key, value)
 adapter.send_dlq_record(record, dlq_reason)
-```
-
-
-## Configuration
-
-### Environment Variables
-
-The default error handler can be configured and even replaced through environmental variables.
-
-ERROR_HANDLER_CLASS
-    : *default*: telicent_lib.error.KafkaErrorHandler.
-
-ERROR_HANDLER_PROVENANCE_TOPIC
-    : *default*: provenance.errors
-
-
-### Code Configuration
-
-```python
-# Replace with different error handler
-from telicent_lib.errors import FileBasedErrorHandler
-
-error_handler = FileBasedErrorHandler(component_id='my-adapter', file_path='errors.log')
-adapter = Adapter(target=target, name=name, source_name=source_name, error_handler=error_handler)
-
-# Disable the error handler
-adapter = Adapter(target=target, name=name, source_name=source_name, has_error_handler=False)
 ```
