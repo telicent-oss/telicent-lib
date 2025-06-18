@@ -200,9 +200,9 @@ class Action:
             if not self.disable_metrics:
                 self.records_dlq_counter.add(1)
         else:
-            error_message = 'Unable to send record to DLQ as not dlq_target has been set.'
+            error_message = 'Unable to send record to DLQ as dlq_target has not been set.'
             logger.error(error_message)
-            raise RuntimeError('Unable to send record to DLQ as not dlq_target has been set.')
+            raise RuntimeError(error_message)
 
     @property
     def telemetry_id(self):
