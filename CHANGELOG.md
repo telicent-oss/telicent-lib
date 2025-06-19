@@ -1,5 +1,18 @@
 # Changelog
 
+## [3.2.0](https://github.com/telicent-oss/telicent-lib/compare/v3.1.2...v3.2.0) (2025-06-19)
+
+
+### Features
+
+* dead letter queue support ([#66](https://github.com/telicent-oss/telicent-lib/issues/66)) ([51f3ca2](https://github.com/telicent-oss/telicent-lib/commit/51f3ca2b574c5ea74ad4cc888a88a5b43377c61e))
+* deprecated RdfSerializer and RdfDeserializer ([#63](https://github.com/telicent-oss/telicent-lib/issues/63)) ([ea8b741](https://github.com/telicent-oss/telicent-lib/commit/ea8b7417489705789a79b532059dad88b9fc85a6))
+
+
+### Bug Fixes
+
+* disabled telemetry bug ([#67](https://github.com/telicent-oss/telicent-lib/issues/67)) ([4315482](https://github.com/telicent-oss/telicent-lib/commit/431548229c6caf937d9dc63c56210b3c17caf02a))
+
 ## [3.1.2](https://github.com/telicent-oss/telicent-lib/compare/v3.1.1...v3.1.2) (2025-04-22)
 
 
