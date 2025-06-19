@@ -92,6 +92,7 @@ def projector_func(record: Record) -> None:
 class DLQTestCase(TestCase):
 
     @mock.patch.dict(os.environ, {"BOOTSTRAP_SERVERS": "localhost:1234"})
+    @mock.patch.dict(os.environ, {"AUTO_ENABLE_DLQ": "true"})
     @mock.patch('telicent_lib.sinks.kafkaSink.Producer', MockProducer)
     @mock.patch('telicent_lib.utils.AdminClient', MockConsumer)
     @mock.patch('telicent_lib.sources.kafkaSource.Consumer', MockConsumer)
@@ -115,6 +116,7 @@ class DLQTestCase(TestCase):
         self.assertEqual(dlq_message[2][1], ('Dead-Letter-Reason', b'Test Exception'))
 
     @mock.patch.dict(os.environ, {"BOOTSTRAP_SERVERS": "localhost:1234"})
+    @mock.patch.dict(os.environ, {"AUTO_ENABLE_DLQ": "true"})
     @mock.patch('telicent_lib.sinks.kafkaSink.Producer', MockProducer)
     @mock.patch('telicent_lib.utils.AdminClient', MockConsumer)
     @mock.patch('telicent_lib.sources.kafkaSource.Consumer', MockConsumer)
