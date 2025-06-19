@@ -73,8 +73,10 @@ adapter = Adapter(target=target, name=name, source_name=source_name, has_error_h
 ## Dead Letter Queues
 
 When mapping or projecting data, an invalid or failed record can be sent to a dead letter queue. If the mapper or 
-projector uses a `KafkaSource`, the dead letter queue is automatically initialised using a topic with ".dlq" appended to the 
+projector uses a `KafkaSource`, the dead letter queue can be automatically initialised using a topic with ".dlq" appended to the 
 source topic's name. E.g. a projector reading from "knowledge" would have a dead letter queue, "knowledge.dlq".
+
+To enable a dead letter queue for a mapper or a projector, set the configuration variable `AUTO_ENABLE_DLQ` to true.
 
 To send a record to a dead letter queue a `DLQException` can be raised. The exception message should state the reason 
 for the item going to DLQ.
@@ -94,13 +96,10 @@ This will create a message in the dead letter queue topic on Kafka with the init
 body and all original headers intact. Additionally, the exception message will be present in a `Dead-Letter-Reason` 
 header.
 
-Automatic initialisation of the dead letter queue sink can be disabled by setting the configuration variable 
-`DISABLE_DLQ` to 'true'.
-
 
 ### Manually managing a Dead Letter Queue
 
-It is possible to manually configure and manage a dead letter queue. This is required when using
+It is also possible to manually configure and manage a dead letter queue. This is required when using
 a mapper or projector with a source that is not a `KafkaSource`.
 
 You must initialise your own sink to the dead letter queue and provide that to the mapper or projector. 

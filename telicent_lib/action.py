@@ -610,7 +610,7 @@ class InputAction(Action):
         )
 
         config = Configurator()
-        if not config.get('DISABLE_DLQ', default='false', converter=Configurator.string_to_bool):
+        if config.get('AUTO_ENABLE_DLQ', default='false', converter=Configurator.string_to_bool):
             if isinstance(source, KafkaSource):
                 self.set_dlq_target(self.init_dlq_target(source))
             else:
@@ -678,7 +678,7 @@ class InputOutputAction(OutputAction):
             raise TypeError('Did not receive a Data Source as required')
 
         config = Configurator()
-        if not config.get('DISABLE_DLQ', default='false', converter=Configurator.string_to_bool):
+        if config.get('AUTO_ENABLE_DLQ', default='false', converter=Configurator.string_to_bool):
             if isinstance(source, KafkaSource):
                 self.set_dlq_target(self.init_dlq_target(source))
             else:
