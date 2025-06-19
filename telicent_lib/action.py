@@ -9,11 +9,12 @@ from colored import colored, fore, style
 from opentelemetry import metrics, trace
 from opentelemetry.metrics import CallbackOptions, Observation
 
+from telicent_lib.config import Configurator
 from telicent_lib.errors import PrintErrorHandler, auto_discover_error_handler
-from telicent_lib.records import Record
+from telicent_lib.records import Record, RecordUtils
 from telicent_lib.reporter import Reporter
-from telicent_lib.sinks import DataSink
-from telicent_lib.sources import DataSource
+from telicent_lib.sinks import DataSink, KafkaSink
+from telicent_lib.sources import DataSource, KafkaSource
 from telicent_lib.status import Status
 
 __license__ = """
@@ -163,6 +164,11 @@ class Action:
                 description="The number of errors encountered by the component",
             )
 
+            self.records_dlq_counter = self.meter.create_counter(
+                f"{action_type}.items.dlq_total",
+                description="The number of messages sent to the dead letter queue by the component",
+            )
+
             self.records_read_counter = self.meter.create_counter(
                 f"{action_type}.items.read",
                 description="The count of records read",
@@ -181,6 +187,22 @@ class Action:
                 f"{action_type}.items.output",
                 description="The count of records output",
             )
+
+        self.dlq_target: DataSink | None = None
+
+    def set_dlq_target(self, target: DataSink):
+        self.dlq_target = target
+
+    def send_dlq_record(self, record: Record, dlq_reason: str):
+        if self.dlq_target is not None:
+            record = RecordUtils.add_headers(record, [('Dead-Letter-Reason', dlq_reason)])
+            self.dlq_target.send(record)
+            if not self.disable_metrics:
+                self.records_dlq_counter.add(1)
+        else:
+            error_message = 'Unable to send record to DLQ as dlq_target has not been set.'
+            logger.error(error_message)
+            raise RuntimeError(error_message)
 
     @property
     def telemetry_id(self):
@@ -587,6 +609,24 @@ class InputAction(Action):
             has_error_handler=has_error_handler, error_handler=error_handler, disable_metrics=disable_metrics
         )
 
+        config = Configurator()
+        if config.get('AUTO_ENABLE_DLQ', default='false', converter=Configurator.string_to_bool):
+            if isinstance(source, KafkaSource):
+                self.set_dlq_target(self.init_dlq_target(source))
+            else:
+                logger.warning(
+                    'Dead letter queue sink can only be automatically initialised when the action\'s source is a '
+                    'KafkaSource. To provide a dead letter queue sink manually, call `set_dql_target(target: DataSink)'
+                )
+
+    @staticmethod
+    def init_dlq_target(source: KafkaSource):
+        """
+        Convenience function for when using a KafkaSource, to initialise a DLQ sink
+        targeting a topic based on the action's source's topic.
+        """
+        return KafkaSink(f'{source.topic}.dlq')
+
     def generate_id(self):
         if self.name is not None:
             return self.name.replace(' ', "-")
@@ -636,6 +676,24 @@ class InputOutputAction(OutputAction):
             raise ValueError('Data Source cannot be None')
         if not isinstance(source, DataSource):
             raise TypeError('Did not receive a Data Source as required')
+
+        config = Configurator()
+        if config.get('AUTO_ENABLE_DLQ', default='false', converter=Configurator.string_to_bool):
+            if isinstance(source, KafkaSource):
+                self.set_dlq_target(self.init_dlq_target(source))
+            else:
+                logger.warning(
+                    'Dead letter queue sink can only be automatically initialised when the action\'s source is a '
+                    'KafkaSource. To provide a dead letter queue sink manually, call `set_dql_target(target: DataSink)'
+                )
+
+    @staticmethod
+    def init_dlq_target(source: KafkaSource):
+        """
+        Convenience function for when using a KafkaSource, to initialise a DQL sink
+        targeting a topic based on the action's source's topic.
+        """
+        return KafkaSink(f'{source.topic}.dlq')
 
     def generate_id(self):
         if self.name is not None:

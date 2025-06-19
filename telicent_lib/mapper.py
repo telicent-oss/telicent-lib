@@ -6,6 +6,7 @@ from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapProp
 
 from telicent_lib.action import DEFAULT_REPORTING_BATCH_SIZE, InputOutputAction
 from telicent_lib.config.configurator import Configurator
+from telicent_lib.exceptions import DLQException
 from telicent_lib.records import RecordMapper, RecordUtils
 from telicent_lib.sinks import DataSink
 from telicent_lib.sources import DataSource
@@ -129,10 +130,16 @@ class Mapper(InputOutputAction):
                             # send onto the target sink.  Also, there's the potential that a record should not be mapped
                             # at all in which case None would be returned.
                             with self.tracer.start_as_current_span("map function"):
-                                if self.map_args:
-                                    output_data = self.map_function(record, **self.map_args)
-                                else:
-                                    output_data = self.map_function(record)
+                                try:
+                                    if self.map_args:
+                                        output_data = self.map_function(record, **self.map_args)
+                                    else:
+                                        output_data = self.map_function(record)
+                                except DLQException as e:
+                                    self.send_dlq_record(record, str(e))
+                                    self.record_processed()
+                                    continue
+
                             self.record_processed()
                             with self.tracer.start_as_current_span("process output"):
                                 if output_data is not None:
