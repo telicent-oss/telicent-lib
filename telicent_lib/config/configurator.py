@@ -151,4 +151,3 @@ class Configurator:
             sys.exit(self.exit_code)
         else:
             raise ValueError(message)
-

@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 
 class BaseAdapter(OutputAction):
 
-    def __init__(self, target: DataSink, action, name,
+    def __init__(self, target: DataSink | None, action, name,
                  text_colour, reporting_batch_size,
                  has_reporter, reporter_sink: DataSink, has_error_handler, error_handler,
                  disable_metrics, has_data_catalog, data_catalog_sink, dataset=None):
@@ -104,7 +104,8 @@ class Adapter(BaseAdapter):
     themselves, transform the records and call the `send()` method of the adapter to send records to the data sink.
     """
 
-    def __init__(self, target: DataSink, text_colour=fore.LIGHT_CYAN, reporting_batch_size=DEFAULT_REPORTING_BATCH_SIZE,
+    def __init__(self, target: DataSink | None = None, text_colour=fore.LIGHT_CYAN,
+                 reporting_batch_size=DEFAULT_REPORTING_BATCH_SIZE,
                  name: str = None, dataset=None, has_reporter: bool = True,
                  reporter_sink=None, has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False,
                  has_data_catalog: bool = True, data_catalog_sink = None):
@@ -189,7 +190,7 @@ class AutomaticAdapter(BaseAdapter):
     function cannot do as easily.
     """
 
-    def __init__(self, target: DataSink, adapter_function: RecordAdapter, dataset=None, name: str = None,
+    def __init__(self, adapter_function: RecordAdapter, target: DataSink = None, dataset=None, name: str = None,
                  text_colour=fore.LIGHT_CYAN, reporting_batch_size=DEFAULT_REPORTING_BATCH_SIZE,
                  has_reporter: bool = True, reporter_sink=None,
                  has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False,

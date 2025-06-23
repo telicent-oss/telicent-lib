@@ -33,7 +33,7 @@ class Projector(InputAction):
     function.
     """
 
-    def __init__(self, source: DataSource, projector_function: RecordProjector, target_store: str,
+    def __init__(self, projector_function: RecordProjector, target_store: str, source: DataSource | None = None,
                  target_type: str = None, text_colour: str = fore.GREEN,
                  reporting_batch_size: int = DEFAULT_REPORTING_BATCH_SIZE, name: str = None, has_reporter: bool = True,
                  reporter_sink=None,
@@ -62,8 +62,7 @@ class Projector(InputAction):
 
         super().__init__(
             source=source, text_colour=text_colour, reporting_batch_size=reporting_batch_size, name=name,
-            action="Projector",
-            has_reporter=has_reporter, reporter_sink=reporter_sink,
+            action="Projector", has_reporter=has_reporter, reporter_sink=reporter_sink,
             has_error_handler=has_error_handler, error_handler=error_handler
         )
 
