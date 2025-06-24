@@ -123,7 +123,7 @@ class KafkaSink(DataSink):
             if exp_config in kafka_config:
                 del kafka_config[exp_config]
 
-        self.broker = broker
+        self.broker = kafka_config['bootstrap.servers']
         self.topic = topic
         self.debug = debug
 
