@@ -1,6 +1,6 @@
 from telicent_lib.sinks.dataSink import DataSink
 from telicent_lib.sinks.kafkaSink import KafkaSink
-from telicent_lib.sinks.serializers import RdfSerializer, SerializerFunction, Serializers
+from telicent_lib.sinks.serializers import SerializerFunction, Serializers
 
 __license__ = """
 Copyright (c) Telicent Ltd.
@@ -20,5 +20,5 @@ limitations under the License.
 
 
 __all__ = [
-    'SerializerFunction', 'Serializers', 'RdfSerializer', 'DataSink', 'KafkaSink'
+    'SerializerFunction', 'Serializers', 'DataSink', 'KafkaSink'
 ]
