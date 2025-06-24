@@ -1,7 +1,7 @@
 import logging
 import uuid
 
-from colored import fore
+from colored import Fore
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
 from telicent_lib.action import DEFAULT_REPORTING_BATCH_SIZE, InputOutputAction
@@ -45,7 +45,7 @@ class Mapper(InputOutputAction):
     If the data sink wants to be managed entirely by the caller then use a `Projector` instead.
     """
 
-    def __init__(self, source: DataSource, target: DataSink, map_function: RecordMapper, text_colour: str = fore.YELLOW,
+    def __init__(self, source: DataSource, target: DataSink, map_function: RecordMapper, text_colour: str = Fore.yellow,
                  reporting_batch_size: int = DEFAULT_REPORTING_BATCH_SIZE, name: str = None, has_reporter: bool = True,
                  reporter_sink=None, has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False,
                  **map_args):
