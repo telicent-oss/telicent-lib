@@ -1,5 +1,29 @@
 # Changelog
 
+## [4.0.0](https://github.com/telicent-oss/telicent-lib/compare/v3.1.2...v4.0.0) (2025-06-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* **colored:** upgraded colored to latest version ([#68](https://github.com/telicent-oss/telicent-lib/issues/68))
+* target and source now optional parameters for actions ([#69](https://github.com/telicent-oss/telicent-lib/issues/69))
+
+### Features
+
+* dead letter queue support ([#66](https://github.com/telicent-oss/telicent-lib/issues/66)) ([51f3ca2](https://github.com/telicent-oss/telicent-lib/commit/51f3ca2b574c5ea74ad4cc888a88a5b43377c61e))
+* deprecated RdfSerializer and RdfDeserializer ([#63](https://github.com/telicent-oss/telicent-lib/issues/63)) ([ea8b741](https://github.com/telicent-oss/telicent-lib/commit/ea8b7417489705789a79b532059dad88b9fc85a6))
+* target and source now optional parameters for actions ([#69](https://github.com/telicent-oss/telicent-lib/issues/69)) ([134539e](https://github.com/telicent-oss/telicent-lib/commit/134539ef7ac934fd72c47c03d7337d609cac562d))
+
+
+### Bug Fixes
+
+* disabled telemetry bug ([#67](https://github.com/telicent-oss/telicent-lib/issues/67)) ([4315482](https://github.com/telicent-oss/telicent-lib/commit/431548229c6caf937d9dc63c56210b3c17caf02a))
+
+
+### Miscellaneous
+
+* **colored:** upgraded colored to latest version ([#68](https://github.com/telicent-oss/telicent-lib/issues/68)) ([6fc8b09](https://github.com/telicent-oss/telicent-lib/commit/6fc8b0971d47871f29a1087e830bb9a58192119f))
+
 ## [3.1.2](https://github.com/telicent-oss/telicent-lib/compare/v3.1.1...v3.1.2) (2025-04-22)
 
 
