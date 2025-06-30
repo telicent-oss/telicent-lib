@@ -513,7 +513,7 @@ class Action:
 
 
 class OutputAction(Action):
-    def __init__(self, target: DataSink, text_colour: str = fore.LIGHT_CYAN,
+    def __init__(self, target: DataSink | None, text_colour: str = fore.LIGHT_CYAN,
                  reporting_batch_size: int = DEFAULT_REPORTING_BATCH_SIZE,
                  action: str = None, name: str = None, has_reporter: bool = True, reporter_sink=None,
                  has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False):
@@ -539,7 +539,9 @@ class OutputAction(Action):
         :type name: str
         """
         if target is None:
-            raise ValueError('Data Sink cannot be None')
+            config = Configurator()
+            target = KafkaSink(topic=config.get('TARGET_TOPIC'))
+
         if not isinstance(target, DataSink):
             raise TypeError('Did not receive a Data Sink as required')
         self.target = target
@@ -572,7 +574,7 @@ class OutputAction(Action):
 
 
 class InputAction(Action):
-    def __init__(self, source: DataSource, text_colour: str = fore.GREEN,
+    def __init__(self, source: DataSource | None = None, text_colour: str = fore.GREEN,
                  reporting_batch_size: int = DEFAULT_REPORTING_BATCH_SIZE, action: str = None, name: str = None,
                  has_reporter: bool = True, reporter_sink=None, has_error_handler: bool = True, error_handler=None,
                  disable_metrics: bool = False):
@@ -597,8 +599,9 @@ class InputAction(Action):
             Provides a more specific name for the action, this should detail what the specific implementation is doing.
         :type name: str
         """
+        config = Configurator()
         if source is None:
-            raise ValueError('Data Source cannot be None')
+            source = KafkaSource(config.get('SOURCE_TOPIC'))
         if not isinstance(source, DataSource):
             raise TypeError('Did not receive a Data Source as required')
         self.source = source
@@ -640,7 +643,7 @@ class InputAction(Action):
 
 
 class InputOutputAction(OutputAction):
-    def __init__(self, source: DataSource, target: DataSink, text_colour: str = fore.YELLOW,
+    def __init__(self, source: DataSource| None, target: DataSink | None, text_colour: str = fore.YELLOW,
                  reporting_batch_size: int = DEFAULT_REPORTING_BATCH_SIZE,
                  action: str = None, name: str = None, has_reporter: bool = True, reporter_sink=None,
                  has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False):
@@ -665,6 +668,10 @@ class InputOutputAction(OutputAction):
             Provides a more specific name for the action, this should detail what the specific implementation is doing.
         :type name: str
         """
+        config = Configurator()
+        if source is None:
+            source = KafkaSource(topic=config.get('SOURCE_TOPIC', required=True))
+
         self.source = source
         self.records_output = 0
         super().__init__(target=target, text_colour=text_colour, reporting_batch_size=reporting_batch_size,

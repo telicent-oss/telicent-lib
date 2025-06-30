@@ -113,9 +113,11 @@ class TestAdapter(RecordVerifier):
             self.__validate_record__(record=actual, headers=headers, key=expected_key, value=expected_value)
 
     def test_bad_adapter_01(self):
-        with self.assertRaisesRegex(ValueError, expected_regex=".* cannot be None"):
-            AutomaticAdapter(target=None, adapter_function=integer_generator, has_reporter=False,
-                             has_error_handler=False, has_data_catalog=False)
+        # Test removed as a sink will be initialised automatically if None
+        pass
+        # with self.assertRaisesRegex(ValueError, expected_regex=".* cannot be None"):
+        #     AutomaticAdapter(target=None, adapter_function=integer_generator, has_reporter=False,
+        #                      has_error_handler=False, has_data_catalog=False)
 
     def test_bad_adapter_02(self):
         with self.assertRaisesRegex(TypeError, expected_regex=".*Data Sink as required"):
