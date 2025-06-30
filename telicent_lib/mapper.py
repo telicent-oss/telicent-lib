@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import uuid
 
-from colored import fore
+from colored import Fore
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
 from telicent_lib.action import DEFAULT_REPORTING_BATCH_SIZE, InputOutputAction
@@ -48,7 +48,7 @@ class Mapper(InputOutputAction):
     """
 
     def __init__(self, map_function: RecordMapper, source: DataSource | None = None, target: DataSink | None = None,
-                 text_colour: str = fore.YELLOW,
+                 text_colour: str = Fore.yellow,
                  reporting_batch_size: int = DEFAULT_REPORTING_BATCH_SIZE, name: str = None, has_reporter: bool = True,
                  reporter_sink=None, has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False,
                  **map_args):

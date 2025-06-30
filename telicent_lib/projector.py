@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from colored import fore
+from colored import Fore
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
 from telicent_lib.action import DEFAULT_REPORTING_BATCH_SIZE, InputAction
@@ -36,7 +36,7 @@ class Projector(InputAction):
     """
 
     def __init__(self, projector_function: RecordProjector, target_store: str, source: DataSource | None = None,
-                 target_type: str = None, text_colour: str = fore.GREEN,
+                 target_type: str = None, text_colour: str =  Fore.green,
                  reporting_batch_size: int = DEFAULT_REPORTING_BATCH_SIZE, name: str = None, has_reporter: bool = True,
                  reporter_sink=None,
                  has_error_handler: bool = True, error_handler=None, **projector_args):
