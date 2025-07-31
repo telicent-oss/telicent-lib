@@ -90,4 +90,4 @@ each record a unique ID, which component wrote the record, and in the case of a 
 | `Request-Id`       | Unique ID for the request composed of the topic and a UUID                                                                       |
 | `Exec-Path`        | ID of the component processing the record                                                                                        |
 | `Input-Request-Id` | Input record's request ID, where present. Header may be repeated if there are multiple input requests, e.g. when merging records |
-| `Distribution-Id`  | Used track a record's provenance when using a data catalog                                                                       |
+| `Distribution-Id`  | Added by an adapter to track a record's provenance when using a data catalog                                                     |

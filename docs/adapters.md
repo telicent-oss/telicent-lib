@@ -49,6 +49,13 @@ Another alternative to consider is whether it would be better to implement a pro
 instead, as that class more naturally provides for state management of the data source.  If you choose to go down the
 `DataSource` route then you would use a [`Mapper`](mappers.md) action instead of either adapter action.
 
+
+## Data Catalog
+
+An adapter can be initialised with an optional parameter, `distribution_id`. This is added to the record's headers 
+automatically. See [provenance documentation](./provenance.md) for further information about automatic headers. 
+
+
 ## Example Usage
 
 ### Manual `Adapter`
@@ -65,7 +72,7 @@ some_data_source = open_data_source()
 
 # Create a sink and an adapter
 sink = KafkaSink(topic="output-topic", broker="your-kafka-broker:1234")
-adapter = Adapter(target=sink, name="Example Adapter", source_name="Legacy DB")
+adapter = Adapter(target=sink, name="Example Adapter", distribution_id="my-data-source")
 
 try:
     # Call run() to start the action, for an adapter this just initializes progress counters
@@ -120,8 +127,9 @@ def generate_records() -> Iterable[Record]:
 
 # Create a sink and the adapter
 sink = KafkaSink(topic="output-topic", broker="your-kafka-broker:1234")
-adapter = AutomaticAdapter(target=sink, adapter_function=generate_records, 
-                           name="Example Adapter")
+adapter = AutomaticAdapter(
+    target=sink, adapter_function=generate_records, name="Example Adapter", distribution_id="my-data-source"
+)
 
 # Call run() to run the action
 adapter.run()
