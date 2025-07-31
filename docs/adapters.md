@@ -72,7 +72,7 @@ some_data_source = open_data_source()
 
 # Create a sink and an adapter
 sink = KafkaSink(topic="output-topic", broker="your-kafka-broker:1234")
-adapter = Adapter(target=sink, name="Example Adapter", distribution_id="my-data-source")
+adapter = Adapter(target=sink, name="Example Adapter", distribution_id="my-distribution-id")
 
 try:
     # Call run() to start the action, for an adapter this just initializes progress counters
