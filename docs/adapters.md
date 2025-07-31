@@ -128,7 +128,7 @@ def generate_records() -> Iterable[Record]:
 # Create a sink and the adapter
 sink = KafkaSink(topic="output-topic", broker="your-kafka-broker:1234")
 adapter = AutomaticAdapter(
-    target=sink, adapter_function=generate_records, name="Example Adapter", distribution_id="my-data-source"
+    target=sink, adapter_function=generate_records, name="Example Adapter", distribution_id="my-distribution-id"
 )
 
 # Call run() to run the action
