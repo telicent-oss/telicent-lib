@@ -85,9 +85,9 @@ mapper.run()
 telicent-lib automatically applies headers to each record written by an adapter or a mapper. These records provide an audit that gives
 each record a unique ID, which component wrote the record, and in the case of a mapper, the unique ID of the source record.
 
-| Header             | Usage                                                                                                                            |
-|--------------------|----------------------------------------------------------------------------------------------------------------------------------|
-| `Request-Id`       | Unique ID for the request composed of the topic and a UUID                                                                       |
-| `Exec-Path`        | ID of the component processing the record                                                                                        |
-| `Input-Request-Id` | Input record's request ID, where present. Header may be repeated if there are multiple input requests, e.g. when merging records |
-| `Distribution-Id`  | Added by an adapter to track a record's provenance when using a data catalog                                                     |
+| Header             | Usage                                                                                                                                                                                                                                                                               |
+|--------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Request-Id`       | Unique ID for the request composed of the topic and a UUID                                                                                                                                                                                                                          |
+| `Exec-Path`        | ID of the component processing the record                                                                                                                                                                                                                                           |
+| `Input-Request-Id` | Input record's request ID, where present. Header may be repeated if there are multiple input requests, e.g. when merging records                                                                                                                                                    |
+| `Distribution-Id`  | Uniquely identifies the distribution of data which the adapter is ingesting into the Telicent CORE platform.<br><br> The Distribution-Id is tied to a Dataset in the Telicent CATALOG and facilitates the provenance and lineage tracking of data which has come into the platform. |
