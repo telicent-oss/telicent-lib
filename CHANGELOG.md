@@ -1,5 +1,16 @@
 # Changelog
 
+## [5.0.0](https://github.com/telicent-oss/telicent-lib/compare/v4.0.0...v5.0.0) (2025-08-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* replace data catalog with distribution id ([#71](https://github.com/telicent-oss/telicent-lib/issues/71))
+
+### Features
+
+* replace data catalog with distribution id ([#71](https://github.com/telicent-oss/telicent-lib/issues/71)) ([1936654](https://github.com/telicent-oss/telicent-lib/commit/19366547693bbf2528c84a8b6782d9570e218bf9))
+
 ## [4.0.0](https://github.com/telicent-oss/telicent-lib/compare/v3.1.2...v4.0.0) (2025-06-30)
 
 
