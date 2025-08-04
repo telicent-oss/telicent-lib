@@ -2,17 +2,13 @@ from __future__ import annotations
 
 import logging
 import uuid
-from collections.abc import Iterable, Mapping
-from typing import Any
+from collections.abc import Iterable
 
 from colored import Fore
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
 from telicent_lib.action import DEFAULT_REPORTING_BATCH_SIZE, OutputAction
-from telicent_lib.config import Configurator
-from telicent_lib.datasets.datasets import SimpleDataSet
 from telicent_lib.records import Record, RecordAdapter, RecordUtils
-from telicent_lib.sinks import KafkaSink
 from telicent_lib.sinks.dataSink import DataSink
 from telicent_lib.status import Status
 from telicent_lib.utils import validate_callable_protocol
@@ -39,20 +35,11 @@ logger = logging.getLogger(__name__)
 
 class BaseAdapter(OutputAction):
 
-    def __init__(self, target: DataSink | None, action, name,
-                 text_colour, reporting_batch_size,
-                 has_reporter, reporter_sink: DataSink, has_error_handler, error_handler,
-                 disable_metrics, has_data_catalog, data_catalog_sink, dataset=None):
+    def __init__(self, name, target: DataSink | None, distribution_id: str | None, action,
+                 text_colour, reporting_batch_size, has_reporter,
+                 reporter_sink: DataSink, has_error_handler, error_handler, disable_metrics):
 
-        config = Configurator()
-        self.data_catalog_topic = config.get("DATA_CATALOG_TOPIC", "catalog")
-        self.dataset = dataset
-        if self.dataset is None:
-            self.dataset = SimpleDataSet(dataset_id=__name__, title=__name__, source_mime_type='unknown')
-        self.has_data_catalog = has_data_catalog
-        self.data_catalog_sink = data_catalog_sink
-        if self.has_data_catalog and self.data_catalog_sink is None:
-            self.data_catalog_sink = KafkaSink(topic=self.data_catalog_topic)
+        self.distribution_id = distribution_id
 
         super().__init__(
             target, text_colour=text_colour, reporting_batch_size=reporting_batch_size,
@@ -61,39 +48,10 @@ class BaseAdapter(OutputAction):
         )
 
     def finished(self) -> None:
-        if self.has_data_catalog:
-            self.data_catalog_sink.close()
         super().finished()
 
     def aborted(self) -> None:
-        if self.has_data_catalog:
-            self.data_catalog_sink.close()
         super().aborted()
-
-    def update_data_catalog(self, headers: list[tuple[str, str | bytes | None]] = None) -> bool:
-        if not self.has_data_catalog:
-            logger.warning("Cannot create data catalogue update as 'has_data_catalogue' is False")
-            return False
-        record = self.dataset.update_record(headers)
-        return self.send_catalog_record_to_broker(record)
-
-    def register_data_catalog(self, registration_fields: Mapping,
-                              headers: list[tuple[str, str | bytes | None]] = None) -> bool:
-        if not self.has_data_catalog:
-            logger.warning("Cannot create data catalogue update as 'has_data_catalogue' is False")
-            return False
-        record = self.dataset.registration_record(registration_fields, headers)
-        return self.send_catalog_record_to_broker(record)
-
-    def send_catalog_record_to_broker(self, record: Record):
-        default_headers: list[tuple[str, str | bytes | dict[Any, Any] | None]] = [
-            ('Exec-Path', self.generated_id),
-            ('Request-Id', f'{self.data_catalog_topic}:{str(uuid.uuid4())}'),
-            ('Content-Type', self.dataset.content_type)
-        ]
-        record = RecordUtils.add_headers(record, default_headers)
-        self.data_catalog_sink.send(record)
-        return True
 
 
 class Adapter(BaseAdapter):
@@ -104,11 +62,10 @@ class Adapter(BaseAdapter):
     themselves, transform the records and call the `send()` method of the adapter to send records to the data sink.
     """
 
-    def __init__(self, target: DataSink | None = None, text_colour=Fore.light_cyan,
+    def __init__(self, target: DataSink | None = None, distribution_id: str | None = None, text_colour=Fore.light_cyan,
                  reporting_batch_size=DEFAULT_REPORTING_BATCH_SIZE,
-                 name: str = None, dataset=None, has_reporter: bool = True,
-                 reporter_sink=None, has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False,
-                 has_data_catalog: bool = True, data_catalog_sink = None):
+                 name: str = None, has_reporter: bool = True,
+                 reporter_sink=None, has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False):
         """
         Creates a new adapter that imports data into a data sink.
 
@@ -127,20 +84,20 @@ class Adapter(BaseAdapter):
             The sink to write data catalogue updates to
         """
 
-        super().__init__(target, text_colour=text_colour, reporting_batch_size=reporting_batch_size,
-                         action="Manual Adapter", name=name, dataset=dataset,
+        super().__init__(target=target, distribution_id=distribution_id, text_colour=text_colour,
+                         reporting_batch_size=reporting_batch_size,
+                         action="Manual Adapter", name=name,
                          has_reporter=has_reporter, reporter_sink=reporter_sink,
                          has_error_handler=has_error_handler, error_handler=error_handler,
-                         disable_metrics=disable_metrics, has_data_catalog=has_data_catalog,
-                         data_catalog_sink=data_catalog_sink)
+                         disable_metrics=disable_metrics)
 
     def reporter_kwargs(self):
         return {
             'action_name': self.name,
             'target_name': self.target.get_sink_name(),
             'target_type': 'topic',
-            'source_name': self.dataset.title,
-            'source_type': self.dataset.source_mime_type,
+            'source_name': self.distribution_id,
+            'source_type': 'distribution',
             'action': "adapter",
             'action_id': self.generate_id(),
             'sink': self.reporter_sink,
@@ -157,8 +114,7 @@ class Adapter(BaseAdapter):
         """
         self.display_startup_banner()
 
-        self.print_coloured("Waiting for data from " + self.dataset.title +
-                            " - will write out to " + str(self.target))
+        self.print_coloured("Waiting for data from N/A - will write out to " + str(self.target))
 
         if self.reporter is not None:
             self.reporter.run()
@@ -190,11 +146,10 @@ class AutomaticAdapter(BaseAdapter):
     function cannot do as easily.
     """
 
-    def __init__(self, adapter_function: RecordAdapter, target: DataSink = None, dataset=None, name: str = None,
-                 text_colour=Fore.light_cyan, reporting_batch_size=DEFAULT_REPORTING_BATCH_SIZE,
-                 has_reporter: bool = True, reporter_sink=None,
-                 has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False,
-                 has_data_catalog: bool = True, data_catalog_sink = None, **adapter_args):
+    def __init__(self, adapter_function: RecordAdapter, target: DataSink | None = None,
+                 distribution_id: str | None = None, name: str = None, text_colour=Fore.light_cyan,
+                 reporting_batch_size=DEFAULT_REPORTING_BATCH_SIZE, has_reporter: bool = True, reporter_sink=None,
+                 has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False, **adapter_args):
         """
         Creates a new automatic adapter that imports data into a data sink.
 
@@ -221,22 +176,19 @@ class AutomaticAdapter(BaseAdapter):
         self.adapter_function = adapter_function
         self.adapter_args = adapter_args
 
-        if adapter_function is None:
-            raise ValueError('Adapter Function cannot be None')
         validate_callable_protocol(adapter_function, RecordAdapter)
-        super().__init__(target, action="Automatic Adapter", name=name, dataset=dataset,
+        super().__init__(target=target, distribution_id=distribution_id, action="Automatic Adapter", name=name,
                          text_colour=text_colour, reporting_batch_size=reporting_batch_size,
                          has_reporter=has_reporter, reporter_sink=reporter_sink, disable_metrics=disable_metrics,
-                         has_error_handler=has_error_handler, error_handler=error_handler,
-                         has_data_catalog=has_data_catalog, data_catalog_sink=data_catalog_sink)
+                         has_error_handler=has_error_handler, error_handler=error_handler)
 
     def reporter_kwargs(self):
         return {
             'action_name': self.name,
             'target_name': self.target.get_sink_name(),
             'target_type': 'topic',
-            'source_name': self.dataset.title,
-            'source_type': self.dataset.source_mime_type,
+            'source_name': self.distribution_id,
+            'source_type': 'distribution',
             'action': "adapter",
             'action_id': self.generate_id(),
             'sink': self.reporter_sink,
@@ -256,7 +208,7 @@ class AutomaticAdapter(BaseAdapter):
         Runs the adapter
         """
         self.display_startup_banner()
-        self.print_coloured(f"Waiting for data from {self.dataset.title} - will write out to {self.target}",
+        self.print_coloured(f"Waiting for data from N/A - will write out to {self.target}",
                             flush=True)
 
         if self.reporter is not None:
@@ -279,11 +231,10 @@ class AutomaticAdapter(BaseAdapter):
                             tracer_span.set_attribute("record.request_id", request_id)
 
                             default_headers = [
-                                ('Exec-Path', self.generated_id),
-                                ('Request-Id', request_id),
-                                ('traceparent', carrier.get('traceparent', '')),
-                                ('Data-Source-Name', self.dataset.title),
-                                ('Data-Source-Type', self.dataset.source_mime_type),
+                                ("Exec-Path", self.generated_id),
+                                ("Request-Id", request_id),
+                                ("traceparent", carrier.get("traceparent", "")),
+                                ("Distribution-Id", self.distribution_id or ""),
                             ]
                             record = RecordUtils.add_headers(record, default_headers)
 
