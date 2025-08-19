@@ -84,7 +84,7 @@ class Adapter(BaseAdapter):
             The sink to write data catalogue updates to
         """
 
-        super().__init__(distribution_id=distribution_id, target=target, text_colour=text_colour,
+        super().__init__(target=target, distribution_id=distribution_id, text_colour=text_colour,
                          reporting_batch_size=reporting_batch_size,
                          action="Manual Adapter", name=name,
                          has_reporter=has_reporter, reporter_sink=reporter_sink,
@@ -97,7 +97,7 @@ class Adapter(BaseAdapter):
             'target_name': self.target.get_sink_name(),
             'target_type': 'topic',
             'source_name': self.distribution_id,
-            'source_type': 'dataset',
+            'source_type': 'distribution',
             'action': "adapter",
             'action_id': self.generate_id(),
             'sink': self.reporter_sink,
@@ -188,7 +188,7 @@ class AutomaticAdapter(BaseAdapter):
             'target_name': self.target.get_sink_name(),
             'target_type': 'topic',
             'source_name': self.distribution_id,
-            'source_type': 'dataset',
+            'source_type': 'distribution',
             'action': "adapter",
             'action_id': self.generate_id(),
             'sink': self.reporter_sink,
