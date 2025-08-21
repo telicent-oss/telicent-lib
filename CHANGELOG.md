@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.1](https://github.com/telicent-oss/telicent-lib/compare/v5.0.0...v5.0.1) (2025-08-21)
+
+
+### Bug Fixes
+
+* broker correctly displayed in str output of kafkaSink ([#73](https://github.com/telicent-oss/telicent-lib/issues/73)) ([720adca](https://github.com/telicent-oss/telicent-lib/commit/720adcad8656cf9471335e503a266ee0dc7aa56b))
+
 ## [5.0.0](https://github.com/telicent-oss/telicent-lib/compare/v4.0.0...v5.0.0) (2025-08-04)
 
 
