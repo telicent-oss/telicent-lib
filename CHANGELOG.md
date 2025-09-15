@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.2](https://github.com/telicent-oss/telicent-lib/compare/v5.0.1...v5.0.2) (2025-09-15)
+
+
+### Miscellaneous
+
+* set open telemetry to minimum version ([#75](https://github.com/telicent-oss/telicent-lib/issues/75)) ([5e50202](https://github.com/telicent-oss/telicent-lib/commit/5e50202abdb59c1eae2562df3a2a915eb64b30b8))
+
 ## [5.0.1](https://github.com/telicent-oss/telicent-lib/compare/v5.0.0...v5.0.1) (2025-08-21)
 
 
