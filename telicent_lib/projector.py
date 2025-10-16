@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from colored import Fore
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
