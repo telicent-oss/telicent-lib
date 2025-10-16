@@ -36,7 +36,7 @@ class Projector(InputAction):
     """
 
     def __init__(self, projector_function: RecordProjector, target_store: str, source: DataSource | None = None,
-                 target_type: str = None, text_colour: str =  Fore.green,
+                 target_type: str = None, text_colour: str | None =  Fore.green,
                  reporting_batch_size: int = DEFAULT_REPORTING_BATCH_SIZE, name: str = None, has_reporter: bool = True,
                  reporter_sink=None,
                  has_error_handler: bool = True, error_handler=None, **projector_args):
