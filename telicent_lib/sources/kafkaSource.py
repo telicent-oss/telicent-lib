@@ -1,6 +1,5 @@
 import inspect
 import logging
-import warnings
 from collections.abc import Iterable
 
 from confluent_kafka import OFFSET_BEGINNING, OFFSET_END, Consumer, Message, TopicPartition
@@ -54,10 +53,10 @@ class KafkaSource(DataSource):
     A Data Source backed by Apache Kafka
     """
 
-    def __init__(self, topic, broker: str | list[str] | None = None, kafka_config: dict | None = None,
+    def __init__(self, topic, kafka_config: dict | None = None,
                  key_deserializer: DeserializerFunction | Deserializer = Deserializers.binary_to_string,
                  value_deserializer: DeserializerFunction | Deserializer = Deserializers.binary_to_string,
-                 commit_interval: int = 10000, debug: bool = None):
+                 commit_interval: int = 10000):
         """
         The portion of that topic that will be read is controlled by the various parameters passed to this constructor
         through the kafka_config dict. For all available options, see:
@@ -81,34 +80,21 @@ class KafkaSource(DataSource):
 
         :param topic: The Kafka topic from which data will be read
         :type topic: str
-        :param broker: Deprecated, please specify broker through kafka_config
-        :type broker: str
+
         :param kafka_config: Kafka configuration
         :type kafka_config: dict
+
         :param key_deserializer: The deserializer function/class to use to deserialize record keys
         :type key_deserializer: DeserializerFunction | Deserializer
+
         :param value_deserializer: The deserializer function/class to use to deserialize record values
         :type value_deserializer: DeserializerFunction | Deserializer
+
         :param commit_interval:
             How often to commit the read position to Kafka.  Defaults to 10,000 i.e. every 10,000 records read the read
             position will be committed.  Note that the read position is also committed whenever the source is closed
             **but** we cannot guarantee that we will be closed gracefully, so we commit the read position as we go.
-        :param debug:
-            Deprecated, please use a logger
-        :type debug: bool
         """
-        if debug is not None:
-            warnings.warn(
-                "Parameter 'debug' has been deprecated. Please use a logger to view debug messages.",
-                DeprecationWarning,
-                stacklevel=2
-            )
-        if broker is not None:
-            warnings.warn(
-                "Parameter 'broker' has been deprecated. Please provide 'kafka_config'.",
-                DeprecationWarning,
-                stacklevel=2
-            )
         super().__init__(topic)
         self.topic = topic
         self.commit_interval = commit_interval
