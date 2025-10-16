@@ -1,5 +1,21 @@
 # Changelog
 
+## [6.0.0](https://github.com/telicent-oss/telicent-lib/compare/v5.0.2...v6.0.0) (2025-10-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* removed deprecated broker and debug ([#82](https://github.com/telicent-oss/telicent-lib/issues/82))
+* removed RDF serializer and deserializer ([#77](https://github.com/telicent-oss/telicent-lib/issues/77))
+* removed Python 3.9 support ([#79](https://github.com/telicent-oss/telicent-lib/issues/79))
+
+### Miscellaneous
+
+* bump dependencies ([#78](https://github.com/telicent-oss/telicent-lib/issues/78)) ([8d71247](https://github.com/telicent-oss/telicent-lib/commit/8d712479c1b8436e181a46c44006158aaf734346))
+* removed deprecated broker and debug ([#82](https://github.com/telicent-oss/telicent-lib/issues/82)) ([38ee203](https://github.com/telicent-oss/telicent-lib/commit/38ee203b4f1fef27dc22cf7e64ae940bb8827905))
+* removed Python 3.9 support ([#79](https://github.com/telicent-oss/telicent-lib/issues/79)) ([d700379](https://github.com/telicent-oss/telicent-lib/commit/d700379e8896eeb6729b6724b3f611ff164dd47d))
+* removed RDF serializer and deserializer ([#77](https://github.com/telicent-oss/telicent-lib/issues/77)) ([7791c69](https://github.com/telicent-oss/telicent-lib/commit/7791c69b0ef52caeb831f32f6697ac4a8185ac83))
+
 ## [5.0.2](https://github.com/telicent-oss/telicent-lib/compare/v5.0.1...v5.0.2) (2025-09-15)
 
 

@@ -1,6 +1,5 @@
 import inspect
 import logging
-import warnings
 
 # noinspection PyProtectedMem
 from confluent_kafka import Producer
@@ -68,8 +67,8 @@ def __validate_kafka_serializer__(instance, name):
 class KafkaSink(DataSink):
     """A Data Sink backed by Apache Kafka"""
 
-    def __init__(self, topic: str, broker: str | list[str] | None = None, kafka_config: dict | None = None,
-                 debug: bool = False, key_serializer: SerializerFunction | Serializer = Serializers.to_binary,
+    def __init__(self, topic: str, kafka_config: dict | None = None,
+                 key_serializer: SerializerFunction | Serializer = Serializers.to_binary,
                  value_serializer: SerializerFunction | Serializer = Serializers.to_binary):
         """
         Creates a new Kafka Data Sink that writes records to the specified topic
@@ -85,27 +84,16 @@ class KafkaSink(DataSink):
 
         :param topic: Kafka topic to send data to
         :type topic: str
-        :param broker: Deprecated, please specify broker through kafka_config
-        :type broker: str
+
         :param kafka_config: Kafka configuration
         :type kafka_config: dict
+
         :param key_serializer: A serialization function/class used to serialize the record keys to bytes
         :type key_serializer: SerializerFunction | Serializer
+
         :param value_serializer: A serialization function/class used to serialize the record values to bytes
         :type value_serializer: SerializerFunction | Serializer
         """
-        if broker is not None:
-            warnings.warn(
-                "Parameter 'broker' has been deprecated. Please provide 'kafka_config'.",
-                DeprecationWarning,
-                stacklevel=2
-            )
-        if debug:
-            warnings.warn(
-                "Parameter 'debug' has been deprecated. Please use a logger to view debug messages.",
-                DeprecationWarning,
-                stacklevel=2
-            )
         super().__init__(topic)
 
         __validate_kafka_serializer__(key_serializer, "key_serializer")
@@ -123,7 +111,6 @@ class KafkaSink(DataSink):
 
         self.broker = kafka_config['bootstrap.servers']
         self.topic = topic
-        self.debug = debug
 
         logging.debug(f"Configured KafkaSink to connect to {self}")
 
