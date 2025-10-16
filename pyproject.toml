@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=80.9.0", "wheel==0.45.1", "pip-tools==7.5.1"]
+requires = ["setuptools>=61.2.0", "wheel==0.41.3", "pip-tools==7.3.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -11,7 +11,7 @@ requires-python = ">=3.9"
 license = {file = "LICENSE"}
 readme = "README.md"
 dependencies = [
-    "colored==2.3.1",
+    "colored==2.3.0",
     "pytz==2025.2",
     "confluent-kafka==2.8.2",
     "opentelemetry-api>=1.20.0",
