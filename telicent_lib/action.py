@@ -513,7 +513,7 @@ class Action:
 
 
 class OutputAction(Action):
-    def __init__(self, target: DataSink, text_colour: str | None = Fore.light_cyan,
+    def __init__(self, target: DataSink | None, text_colour: str = Fore.light_cyan,
                  reporting_batch_size: int = DEFAULT_REPORTING_BATCH_SIZE,
                  action: str = None, name: str = None, has_reporter: bool = True, reporter_sink=None,
                  has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False):
