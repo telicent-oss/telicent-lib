@@ -71,7 +71,7 @@ class Action:
     """Represents an action that is executed on the Telicent Core Platform"""
 
     def __init__(
-            self, text_colour: str | None = Fore.light_gray, reporting_batch_size: int = DEFAULT_REPORTING_BATCH_SIZE,
+            self, text_colour: str = Fore.light_gray, reporting_batch_size: int = DEFAULT_REPORTING_BATCH_SIZE,
             action: str = None, name: str = None, has_error_handler: bool = True, error_handler=None,
             has_reporter: bool = True, reporter_sink=None, disable_metrics: bool = False
          ):
@@ -280,7 +280,7 @@ class Action:
         """
 
         if self.colors_enabled:
-            print(f"{self.text_colour} {line} {Style.reset}", end=end, flush=flush)
+            print(self.text_colour + line + Style.reset, end=end, flush=flush)
         else:
             print(line, end=end, flush=flush)
 
@@ -513,7 +513,7 @@ class Action:
 
 
 class OutputAction(Action):
-    def __init__(self, target: DataSink | None, text_colour: str | None = Fore.light_cyan,
+    def __init__(self, target: DataSink, text_colour: str | None = Fore.light_cyan,
                  reporting_batch_size: int = DEFAULT_REPORTING_BATCH_SIZE,
                  action: str = None, name: str = None, has_reporter: bool = True, reporter_sink=None,
                  has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False):
@@ -574,7 +574,7 @@ class OutputAction(Action):
 
 
 class InputAction(Action):
-    def __init__(self, source: DataSource | None = None, text_colour: str | None = Fore.green,
+    def __init__(self, source: DataSource | None = None, text_colour: str = Fore.green,
                  reporting_batch_size: int = DEFAULT_REPORTING_BATCH_SIZE, action: str = None, name: str = None,
                  has_reporter: bool = True, reporter_sink=None, has_error_handler: bool = True, error_handler=None,
                  disable_metrics: bool = False):
@@ -643,7 +643,7 @@ class InputAction(Action):
 
 
 class InputOutputAction(OutputAction):
-    def __init__(self, source: DataSource| None, target: DataSink | None, text_colour: str | None = Fore.yellow,
+    def __init__(self, source: DataSource| None, target: DataSink | None, text_colour: str = Fore.yellow,
                  reporting_batch_size: int = DEFAULT_REPORTING_BATCH_SIZE,
                  action: str = None, name: str = None, has_reporter: bool = True, reporter_sink=None,
                  has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False):
