@@ -48,7 +48,7 @@ class Mapper(InputOutputAction):
     """
 
     def __init__(self, map_function: RecordMapper, source: DataSource | None = None, target: DataSink | None = None,
-                 text_colour: str = Fore.yellow,
+                 text_colour: str | None = Fore.yellow,
                  reporting_batch_size: int = DEFAULT_REPORTING_BATCH_SIZE, name: str = None, has_reporter: bool = True,
                  reporter_sink=None, has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False,
                  **map_args):
