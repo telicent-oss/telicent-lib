@@ -7,7 +7,7 @@ name = "telicent-lib"
 version = "5.0.2"
 authors = [{name = "Telicent Ltd", email = "opensource@telicent.io"}]
 description = "A helper package for building Adapters, Mappers and Projectors for Telicent Core"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = {file = "LICENSE"}
 readme = "README.md"
 dependencies = [
@@ -19,7 +19,6 @@ dependencies = [
     "opentelemetry-sdk>=1.20.0"
 ]
 classifiers = [
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -49,7 +48,7 @@ dev = [
 readme = {file = ["README.md"]}
 
 [tool.ruff]
-target-version = "py39"
+target-version = "py310"
 select = [
     "E",  # pycodestyle errors
     "W",  # pycodestyle warnings
