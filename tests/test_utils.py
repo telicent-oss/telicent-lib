@@ -11,7 +11,7 @@ class TestGenerateGroupID(unittest.TestCase):
     @patch('telicent_lib.utils.os.environ', {})
     def test_clean_hostname_non_k8s(self):
 
-        for hostname, expected in zip(host_data["hosts"], host_data["expected_hosts"]):
+        for hostname, expected in zip(host_data["hosts"], host_data["expected_hosts"], strict=False):
             result = clean_hostname(hostname)
             self.assertEqual(result, expected, f"Failed for hostname: {hostname} in non-K8s environment")
 
@@ -24,7 +24,7 @@ class TestGenerateGroupID(unittest.TestCase):
 
     @patch.dict('telicent_lib.utils.os.environ', {"KUBERNETES_SERVICE_HOST": "some_value"})
     def test_clean_hostname_k8s(self):
-        for hostname, expected in zip(host_data["k8s_hosts"], host_data["k8s_expected_hosts"]):
+        for hostname, expected in zip(host_data["k8s_hosts"], host_data["k8s_expected_hosts"], strict=False):
             result = clean_hostname(hostname)
             self.assertEqual(result, expected, f"Failed for hostname: {hostname} in K8s environment")
 
@@ -44,7 +44,7 @@ class TestGenerateGroupID(unittest.TestCase):
             "host_three_5b9a7c76c1"
         ]
 
-        for mock_hostname, expected_group_id in zip(mock_hostnames, expected_group_ids):
+        for mock_hostname, expected_group_id in zip(mock_hostnames, expected_group_ids, strict=False):
             mock_gethostname.return_value = mock_hostname
 
             group_id = generate_group_id()
@@ -66,7 +66,7 @@ class TestGenerateGroupID(unittest.TestCase):
             "host_three_5b9a7c76c1"
         ]
 
-        for mock_hostname, expected_group_id in zip(mock_hostnames, expected_group_ids):
+        for mock_hostname, expected_group_id in zip(mock_hostnames, expected_group_ids, strict=False):
             mock_gethostname.return_value = mock_hostname
 
             group_id = generate_group_id()
