@@ -5,6 +5,7 @@ from collections.abc import Iterable
 from confluent_kafka import OFFSET_BEGINNING, OFFSET_END, Consumer, Message, TopicPartition
 from confluent_kafka.serialization import Deserializer
 
+from telicent_lib.config import Configurator
 from telicent_lib.config.kafka import kafka_config_factory
 from telicent_lib.exceptions import SourceNotFoundException
 from telicent_lib.records import Record
@@ -56,7 +57,7 @@ class KafkaSource(DataSource):
     def __init__(self, topic, kafka_config: dict | None = None,
                  key_deserializer: DeserializerFunction | Deserializer = Deserializers.binary_to_string,
                  value_deserializer: DeserializerFunction | Deserializer = Deserializers.binary_to_string,
-                 commit_interval: int = 10000):
+                 commit_interval: int = None):
         """
         The portion of that topic that will be read is controlled by the various parameters passed to this constructor
         through the kafka_config dict. For all available options, see:
@@ -91,13 +92,18 @@ class KafkaSource(DataSource):
         :type value_deserializer: DeserializerFunction | Deserializer
 
         :param commit_interval:
-            How often to commit the read position to Kafka.  Defaults to 10,000 i.e. every 10,000 records read the read
+            How often to commit the read position to Kafka.  Defaults to 100 i.e. every 100 records read the read
             position will be committed.  Note that the read position is also committed whenever the source is closed
             **but** we cannot guarantee that we will be closed gracefully, so we commit the read position as we go.
         """
         super().__init__(topic)
         self.topic = topic
+
+        if commit_interval is None:
+            config = Configurator()
+            commit_interval = config.get('CONSUMER_COMMIT_INTERVAL', 100, converter=int)
         self.commit_interval = commit_interval
+
         self.records_seen: int = 0
         self.last_known_remaining: int | None = None
 
