@@ -82,7 +82,7 @@ enable.auto.commit
 
 See [controlling what data is read](#controlling-what-data-is-read) for further information about `auto.offset.reset` and `group.id`. 
 
-### KafkaSource commit management
+### KafkaSource offset commit management
 
 telicent-lib's `KafkaSource` will manage offset commits automatically. It is recommended that your own Kafka config
 avoids changing the `enable.auto.commit`, which telicent-lib sets to false.
