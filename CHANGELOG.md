@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.1.0](https://github.com/telicent-oss/telicent-lib/compare/v6.0.0...v6.1.0) (2025-12-08)
+
+
+### Features
+
+* configurable commit intervals ([#83](https://github.com/telicent-oss/telicent-lib/issues/83)) ([aa66c43](https://github.com/telicent-oss/telicent-lib/commit/aa66c4358bb4ea16c6c112f2c73593536cfa65b1))
+
 ## [6.0.0](https://github.com/telicent-oss/telicent-lib/compare/v5.0.2...v6.0.0) (2025-10-16)
 
 
