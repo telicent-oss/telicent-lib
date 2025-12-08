@@ -82,6 +82,24 @@ enable.auto.commit
 
 See [controlling what data is read](#controlling-what-data-is-read) for further information about `auto.offset.reset` and `group.id`. 
 
+### KafkaSource commit management
+
+telicent-lib's `KafkaSource` will manage offset commits automatically. It is recommended that your own Kafka config
+avoids changing the `enable.auto.commit`, which telicent-lib sets to false.
+
+Depending on the nature of your data, and your deployed mappers and projectors, you may wish to change how frequently
+telicent-lib commits the offset. This can be done in code, by passing `commit_interval` parameter during initialisation.
+
+```python
+from telicent_lib.sources import KafkaSource
+source = KafkaSource(topic='my-topics', commit_interval=10)
+```
+
+Alternatively, if the parameter is not provided during initialisation, telicent-lib will look for an env variable
+`CONSUMER_BATCH_SIZE`. This should be an integer value.
+
+Finally, telicent-lib will use a default commit interval of 100.
+
 ### Controlling how Data is Deserialized
 
 Kafka stores records as `bytes` internally and when reading from Kafka we can choose how, and if, we deserialize
@@ -147,13 +165,8 @@ a `from telicent_lib.sources import Deserializers` and referring to one of the s
 - `Deserializers.from_json` - Deserializes from UTF-8 bytes that are encoding a JSON string into a Python object.  
   The type of the returned object will depend on the JSON string.
 
-Additionally, the following `Deserializer` instances are available:
-
-- `RdfDeserializer` - Deserializes from UTF-8 bytes that are encoding RDF using NQuads serialization into a RDFLib
-  `Dataset` object.
-
 Note that when using a `Deserializer` instance you must pass in an instance of the class, not the class itself e.g.
-`KafkaSource(topic="example", value_deserializer=RdfDeerializer())`. If you pass in the class
+`KafkaSource(topic="example", value_deserializer=MyDeserializer())`. If you pass in the class
 itself then you will receive an error message.
 
 ### Controlling what Data is Read
