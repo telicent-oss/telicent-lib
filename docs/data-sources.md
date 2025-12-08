@@ -96,7 +96,7 @@ source = KafkaSource(topic='my-topics', commit_interval=10)
 ```
 
 Alternatively, if the parameter is not provided during initialisation, telicent-lib will look for an env variable
-`CONSUMER_BATCH_SIZE`. This should be an integer value.
+`CONSUMER_COMMIT_INTERVAL`. This should be an integer value.
 
 Finally, telicent-lib will use a default commit interval of 100.
 

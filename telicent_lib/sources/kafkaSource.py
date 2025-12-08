@@ -101,7 +101,7 @@ class KafkaSource(DataSource):
 
         if commit_interval is None:
             config = Configurator()
-            commit_interval = config.get('CONSUMER_BATCH_SIZE', 100, converter=int)
+            commit_interval = config.get('CONSUMER_COMMIT_INTERVAL', 100, converter=int)
         self.commit_interval = commit_interval
 
         self.records_seen: int = 0
