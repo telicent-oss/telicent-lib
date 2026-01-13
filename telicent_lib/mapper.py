@@ -32,6 +32,8 @@ limitations under the License.
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_SECURITY_LABEL_HEADER = "Security-Label"
+
 
 class Mapper(InputOutputAction):
     """
@@ -45,11 +47,21 @@ class Mapper(InputOutputAction):
     If the data sink wants to be managed entirely by the caller then use a `Projector` instead.
     """
 
-    def __init__(self, map_function: RecordMapper, source: DataSource | None = None, target: DataSink | None = None,
-                 text_colour: str | None = Fore.yellow,
-                 reporting_batch_size: int = DEFAULT_REPORTING_BATCH_SIZE, name: str = None, has_reporter: bool = True,
-                 reporter_sink=None, has_error_handler: bool = True, error_handler=None, disable_metrics: bool = False,
-                 **map_args):
+    def __init__(
+        self,
+        map_function: RecordMapper,
+        source: DataSource | None = None,
+        target: DataSink | None = None,
+        text_colour: str | None = Fore.yellow,
+        reporting_batch_size: int = DEFAULT_REPORTING_BATCH_SIZE,
+        name: str = None,
+        has_reporter: bool = True,
+        reporter_sink=None,
+        has_error_handler: bool = True,
+        error_handler=None,
+        disable_metrics: bool = False,
+        **map_args,
+    ):
         """
         Creates a mapper that maps between a data source and a data sink.
 
@@ -73,27 +85,36 @@ class Mapper(InputOutputAction):
             arguments for this to work
         """
 
-        super().__init__(source=source, target=target, text_colour=text_colour,
-                         reporting_batch_size=reporting_batch_size, name=name, has_reporter=has_reporter,
-                         reporter_sink=reporter_sink, has_error_handler=has_error_handler, error_handler=error_handler,
-                         action="Mapper", disable_metrics=disable_metrics)
+        super().__init__(
+            source=source,
+            target=target,
+            text_colour=text_colour,
+            reporting_batch_size=reporting_batch_size,
+            name=name,
+            has_reporter=has_reporter,
+            reporter_sink=reporter_sink,
+            has_error_handler=has_error_handler,
+            error_handler=error_handler,
+            action="Mapper",
+            disable_metrics=disable_metrics,
+        )
 
         if map_function is None:
-            raise ValueError('Map Function cannot be None')
+            raise ValueError("Map Function cannot be None")
         validate_callable_protocol(map_function, RecordMapper)
         self.map_function = map_function
         self.map_args = map_args
 
     def reporter_kwargs(self):
         return {
-            'action_name': self.name,
-            'target_name': self.target.get_sink_name(),
-            'target_type': 'topic',
-            'source_name': self.source.get_source_name(),
-            'source_type': 'topic',
-            'action': "mapper",
-            'action_id': self.generate_id(),
-            'sink': self.reporter_sink,
+            "action_name": self.name,
+            "target_name": self.target.get_sink_name(),
+            "target_type": "topic",
+            "source_name": self.source.get_source_name(),
+            "source_type": "topic",
+            "action": "mapper",
+            "action_id": self.generate_id(),
+            "sink": self.reporter_sink,
         }
 
     def run(self):
@@ -102,38 +123,57 @@ class Mapper(InputOutputAction):
 
         This fully manages all the input and output and the caller need only call this.
         """
+        conf = Configurator()
+        security_label_header = conf.get(
+            "SECURITY_LABEL_HEADER", default=DEFAULT_SECURITY_LABEL_HEADER
+        )
         self.display_startup_banner()
-        self.print_coloured("Waiting for data from " + str(self.source) +
-                            " - will write out to " + str(self.target), flush=True)
+        self.print_coloured(
+            "Waiting for data from "
+            + str(self.source)
+            + " - will write out to "
+            + str(self.target),
+            flush=True,
+        )
         print("")
         if self.reporter is not None:
             self.reporter.run()
-            self.print_coloured(f"Telicent Live Reporter registered to send heartbeats to {self.reporter.sink}")
+            self.print_coloured(
+                f"Telicent Live Reporter registered to send heartbeats to {self.reporter.sink}"
+            )
         with self.source:
             try:
                 self.started()
-                logger.debug('Print source status')
+                logger.debug("Print source status")
                 self.__print_source_status__(self.source)
                 with self.target:
                     for _, record in enumerate(self.source.data()):
                         try:
-                            traceparent = list(RecordUtils.get_headers(record, 'traceparent'))[-1]
+                            traceparent = list(
+                                RecordUtils.get_headers(record, "traceparent")
+                            )[-1]
                         except IndexError:
                             traceparent = None
                         carrier = {"traceparent": traceparent}
                         ctx = TraceContextTextMapPropagator().extract(carrier)
-                        with self.tracer.start_as_current_span("process record", context=ctx) as tracer_span:
+                        with self.tracer.start_as_current_span(
+                            "process record", context=ctx
+                        ) as tracer_span:
                             carrier = {}
                             TraceContextTextMapPropagator().inject(carrier)
                             self.record_read()
-                            tracer_span.set_attribute("record.mapper", str(self.map_function))
+                            tracer_span.set_attribute(
+                                "record.mapper", str(self.map_function)
+                            )
                             # The map function may return either a single record or a list of records which we need to
                             # send onto the target sink.  Also, there's the potential that a record should not be mapped
                             # at all in which case None would be returned.
                             with self.tracer.start_as_current_span("map function"):
                                 try:
                                     if self.map_args:
-                                        output_data = self.map_function(record, **self.map_args)
+                                        output_data = self.map_function(
+                                            record, **self.map_args
+                                        )
                                     else:
                                         output_data = self.map_function(record)
                                 except DLQException as e:
@@ -144,42 +184,72 @@ class Mapper(InputOutputAction):
                             self.record_processed()
                             with self.tracer.start_as_current_span("process output"):
                                 if output_data is not None:
-                                    with self.tracer.start_as_current_span("prepare headers"):
+                                    with self.tracer.start_as_current_span(
+                                        "prepare headers"
+                                    ):
                                         output_headers = []
                                         try:
-                                            input_request_id = list(RecordUtils.get_headers(record, 'Request-Id'))[-1]
+                                            input_request_id = list(
+                                                RecordUtils.get_headers(
+                                                    record, "Request-Id"
+                                                )
+                                            )[-1]
                                         except IndexError:
                                             pass
                                         else:
-                                            output_headers.append(('Input-Request-Id', input_request_id))
-                                            tracer_span.set_attribute("record.input_request_id", input_request_id)
+                                            output_headers.append(
+                                                ("Input-Request-Id", input_request_id)
+                                            )
+                                            tracer_span.set_attribute(
+                                                "record.input_request_id",
+                                                input_request_id,
+                                            )
 
-                                        request_id = f'{self.target.get_sink_name()}:{str(uuid.uuid4())}'
+                                        request_id = f"{self.target.get_sink_name()}:{str(uuid.uuid4())}"
 
-                                        tracer_span.set_attribute("record.exec_path", self.generated_id)
-                                        tracer_span.set_attribute("record.request_id", request_id)
+                                        tracer_span.set_attribute(
+                                            "record.exec_path", self.generated_id
+                                        )
+                                        tracer_span.set_attribute(
+                                            "record.request_id", request_id
+                                        )
 
                                         output_headers += [
-                                            ('Request-Id', request_id),
-                                            ('Exec-Path', self.generated_id),
-                                            ('traceparent', carrier.get('traceparent', ''))
+                                            ("Request-Id", request_id),
+                                            ("Exec-Path", self.generated_id),
+                                            (
+                                                "traceparent",
+                                                carrier.get("traceparent", ""),
+                                            ),
                                         ]
                                     if isinstance(output_data, list):
                                         for output_record in output_data:
-                                            output_record = RecordUtils.add_headers(output_record, output_headers)
+                                            output_record = RecordUtils.add_headers(
+                                                output_record, output_headers
+                                            )
                                             self.target.send(output_record)
                                     else:
-                                        output_data = RecordUtils.add_headers(output_data, output_headers)
-                                        conf = Configurator()
-                                        if conf.get("DISABLE_PERSISTENT_HEADERS", "0") != "1" and \
-                                                not RecordUtils.has_header(output_data, 'Security-Label') and \
-                                                RecordUtils.has_header(record, 'Security-Label'):
-                                            label_headers = RecordUtils.get_headers(record, 'Security-Label')
+                                        output_data = RecordUtils.add_headers(
+                                            output_data, output_headers
+                                        )
+                                        if (
+                                            conf.get("DISABLE_PERSISTENT_HEADERS", "0")
+                                            != "1"
+                                            and not RecordUtils.has_header(
+                                                output_data, security_label_header
+                                            )
+                                            and RecordUtils.has_header(
+                                                record, security_label_header
+                                            )
+                                        ):
+                                            label_headers = RecordUtils.get_headers(
+                                                record, security_label_header
+                                            )
                                             for header_value in label_headers:
                                                 output_data = RecordUtils.add_header(
                                                     output_data,
-                                                    'Security-Label',
-                                                    header_value
+                                                    security_label_header,
+                                                    header_value,
                                                 )
                                         self.target.send(output_data)
                                     self.record_output()
@@ -192,6 +262,8 @@ class Mapper(InputOutputAction):
                 self.send_exception(e)
                 self.__print_source_status__(self.source)
                 self.update_status(Status.ERRORING)
-                self.print_coloured("ERROR: Unexpected error during processing, is your map function faulty?")
+                self.print_coloured(
+                    "ERROR: Unexpected error during processing, is your map function faulty?"
+                )
                 self.aborted()
                 raise

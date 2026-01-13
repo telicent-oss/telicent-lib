@@ -9,8 +9,13 @@ data types are correct.
 A validated instance of a model can subsequently be converted into a security label, which can then be appended as a 
 header to a record. If a `Security-Label` header is applied to a record in an [action](actions.md), all subsequent 
 mappers in a pipeline will automatically persist that header value, unless another action explicitly returns a record with a
-`Security-Label` header.  This behaviour can be disabled by setting the [configuration](configuration.md) value of 
+`Security-Label` header.  This behaviour can be disabled by setting the [configuration](configuration.md) value of
 `DISABLE_PERSISTENT_HEADERS` to `"1"`.
+
+By default, the library looks for the header named `Security-Label`. This can be customised by setting the
+`SECURITY_LABEL_HEADER` environment variable to a different header name. For example, setting
+`SECURITY_LABEL_HEADER=X-Custom-Label` will cause the library to look for and persist the `X-Custom-Label` header
+instead.
 
 It is important to note that telicent-lib does not enforce any of these operations; 
 the implementation is entirely at the discretion of the user. The label-builder module provides users with the 
