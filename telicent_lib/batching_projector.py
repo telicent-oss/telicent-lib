@@ -98,6 +98,9 @@ class BatchingProjector(InputAction):
     persisting them to the target system.
     """
 
+    # Override parent type - BatchingProjector requires KafkaSource for offset commit control
+    source: KafkaSource
+
     def __init__(
         self,
         storage_function: BatchStorageFunction,
