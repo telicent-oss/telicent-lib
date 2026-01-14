@@ -4,7 +4,7 @@
 
 Actions provide automation and progress monitoring of data processing tasks. A component within Telicent Core will typically be implemented using one or more of the subclasses of `Action`.
 
-[Actions](https://github.com/telicent-oss/telicent-lib/blob/main/docs/actions.md) | [Adapters](https://github.com/telicent-oss/telicent-lib/blob/main/docs/adapters.md) | [Mappers](https://github.com/telicent-oss/telicent-lib/blob/main/docs/mappers.md) | [Projectors](https://github.com/telicent-oss/telicent-lib/blob/main/docs/projectors.md)
+[Actions](https://github.com/telicent-oss/telicent-lib/blob/main/docs/actions.md) | [Adapters](https://github.com/telicent-oss/telicent-lib/blob/main/docs/adapters.md) | [Mappers](https://github.com/telicent-oss/telicent-lib/blob/main/docs/mappers.md) | [Projectors](https://github.com/telicent-oss/telicent-lib/blob/main/docs/projectors.md) | [Batching Projector](https://github.com/telicent-oss/telicent-lib/blob/main/docs/batching-projector.md)
 
 ## Record Handling
 

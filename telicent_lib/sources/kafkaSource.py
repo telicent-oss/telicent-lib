@@ -160,6 +160,22 @@ class KafkaSource(DataSource):
         self.already_seeked: list[TopicPartition] = []
         self.last_offsets: dict[TopicPartition, Message] = {}
 
+        # Controls whether offsets are committed automatically as records are read.
+        # Default is True for backward compatibility with existing Mappers/Projectors.
+        #
+        # WHY THIS EXISTS:
+        # The default behavior commits offsets every N records READ (commit_interval).
+        # This works fine for simple Mappers/Projectors that process one record at a time.
+        # However, for BatchingProjector, this creates a data loss risk:
+        #   1. BatchingProjector reads 100 records into memory
+        #   2. KafkaSource auto-commits those offsets (marking them "done")
+        #   3. Process crashes before BatchingProjector stores the batch
+        #   4. On restart, those 100 records are lost - Kafka thinks they were processed
+        #
+        # BatchingProjector disables auto-commit and explicitly calls commit() only
+        # AFTER successfully storing each batch, ensuring no data loss on crash.
+        self._auto_commit_enabled = True
+
     def on_partitions_revoked(self, consumer, partitions):
         for partition in partitions:
             logger.debug(f"Revoked topic partition {partition.topic}-{partition.partition} from consumer {consumer}")
@@ -231,9 +247,11 @@ class KafkaSource(DataSource):
 
             self.last_offsets[TopicPartition(record.topic(), record.partition())] = record
 
-            # As we've disabled auto commit on the consumer we periodically commit the read positions ourselves
+            # Periodically commit read positions if auto-commit is enabled.
+            # When auto-commit is disabled (e.g., by BatchingProjector), the caller is
+            # responsible for calling commit() explicitly after processing records.
             self.records_seen += 1
-            if self.records_seen % self.commit_interval == 0:
+            if self._auto_commit_enabled and self.records_seen % self.commit_interval == 0:
                 self.__commit_read_positions__()
 
             return Record(
@@ -304,6 +322,44 @@ class KafkaSource(DataSource):
                 f"Committing position {message.offset() + 1} for partition {partition.topic}-{partition.partition}"
             )
             self.consumer.commit(message=message)
+
+    def set_auto_commit(self, enabled: bool) -> None:
+        """
+        Enable or disable automatic offset commits during record reads.
+
+        When enabled (default), offsets are committed every `commit_interval` records.
+        When disabled, offsets are only committed when `commit()` is explicitly called.
+
+        WHY THIS EXISTS:
+        BatchingProjector needs to control when offsets are committed to prevent data loss.
+        It disables auto-commit and calls commit() only after successfully storing each batch.
+        This ensures that if the process crashes mid-batch, the records will be re-read on restart
+        rather than lost.
+
+        Existing Mappers and Projectors don't call this method, so they continue to use
+        the default auto-commit behavior - no breaking changes.
+
+        :param enabled: True to enable auto-commit (default), False to disable
+        """
+        self._auto_commit_enabled = enabled
+        logger.debug(f"Auto-commit {'enabled' if enabled else 'disabled'} for {self}")
+
+    def commit(self) -> None:
+        """
+        Explicitly commit the current read positions to Kafka.
+
+        This commits the offsets of all records that have been read so far, marking them
+        as "processed" so they won't be re-read on restart.
+
+        WHY THIS EXISTS:
+        When auto-commit is disabled (via set_auto_commit(False)), this method allows
+        the caller to control exactly when offsets are committed. BatchingProjector uses
+        this to commit only after successfully storing a batch, preventing data loss.
+
+        Safe to call even when auto-commit is enabled - it just commits immediately
+        rather than waiting for the next commit_interval.
+        """
+        self.__commit_read_positions__()
 
     def __str__(self):
         return "Kafka " + self.broker + "::" + self.topic
